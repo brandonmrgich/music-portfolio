@@ -1,5 +1,5 @@
 import React from "react";
-import { BrowserRouter as Router, Route, Switch, Link } from "react-router-dom";
+import { BrowserRouter as Router, Route, Routes, Link } from "react-router-dom";
 import About from "./components/About";
 import InWork from "./components/InWork";
 import Services from "./components/Services";
@@ -12,25 +12,31 @@ const App = () => {
   return (
     <Router>
       <div className="app">
-        <nav>
-          <ul>
+        <nav className="bg-gray-800 p-4">
+          <ul className="flex space-x-4">
             <li>
-              <Link to="/">About</Link>
+              <Link to="/" className="text-white hover:text-gray-300">
+                About
+              </Link>
             </li>
             <li>
-              <Link to="/in-work">In Work</Link>
+              <Link to="/in-work" className="text-white hover:text-gray-300">
+                In Work
+              </Link>
             </li>
             <li>
-              <Link to="/services">Services</Link>
+              <Link to="/services" className="text-white hover:text-gray-300">
+                Services
+              </Link>
             </li>
           </ul>
         </nav>
 
-        <Switch>
-          <Route exact path="/" component={About} />
-          <Route path="/in-work" component={InWork} />
-          <Route path="/services" component={Services} />
-        </Switch>
+        <Routes>
+          <Route path="/" element={<About />} />
+          <Route path="/in-work" element={<InWork />} />
+          <Route path="/services" element={<Services />} />
+        </Routes>
       </div>
     </Router>
   );
