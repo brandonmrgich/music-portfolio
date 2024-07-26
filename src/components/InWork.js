@@ -41,11 +41,20 @@ const AudioPlayer = ({ src, title }) => {
   };
 
   return (
-    <div className="audio-player">
-      <h3>{title}</h3>
+    <div className="audio-player content-around">
+      <h3 className="text-lg font-semibold mb-2">{title}</h3>
       <audio id={`audio-${title}`} src={src}></audio>
-      <button onClick={togglePlay}>{isPlaying ? "Pause" : "Play"}</button>
-      <button onClick={handleLike} disabled={hasLiked}>
+      <button
+        onClick={togglePlay}
+        className="bg-blue-500 text-white px-3 py-1 rounded mr-2"
+      >
+        {isPlaying ? "Pause" : "Play"}
+      </button>
+      <button
+        onClick={handleLike}
+        className="bg-gray-300 px-3 py-1 rounded"
+        disabled={hasLiked}
+      >
         Like ({likes})
       </button>
     </div>
@@ -69,8 +78,8 @@ const InWork = () => {
   }, []);
 
   return (
-    <div className="in-work">
-      <h1>Work in Progress</h1>
+    <div className="in-work p-6">
+      <h1 className="text-3xl font-bold mb-6">Work in Progress</h1>
       {tracks.map((track) => (
         <AudioPlayer key={track.id} src={track.src} title={track.title} />
       ))}
