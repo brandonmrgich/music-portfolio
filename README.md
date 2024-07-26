@@ -102,5 +102,3 @@ To deploy:
 6. Add unit and integration tests to ensure code quality and prevent regressions.
 
 ---
-
-This README provides a comprehensive overview of the music portfolio project. As the project evolves, remember to update this document to reflect any significant changes in the architecture or new features.
