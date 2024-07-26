@@ -1,25 +1,39 @@
-import logo from './logo.svg';
-import './App.css';
+import React from "react";
+import { BrowserRouter as Router, Route, Switch, Link } from "react-router-dom";
+import About from "./components/About";
+import InWork from "./components/InWork";
+import Services from "./components/Services";
 
-function App() {
+/**
+ * Main App component that sets up the router and navigation.
+ * @returns {React.Component} The main App component
+ */
+const App = () => {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <Router>
+      <div className="app">
+        <nav>
+          <ul>
+            <li>
+              <Link to="/">About</Link>
+            </li>
+            <li>
+              <Link to="/in-work">In Work</Link>
+            </li>
+            <li>
+              <Link to="/services">Services</Link>
+            </li>
+          </ul>
+        </nav>
+
+        <Switch>
+          <Route exact path="/" component={About} />
+          <Route path="/in-work" component={InWork} />
+          <Route path="/services" component={Services} />
+        </Switch>
+      </div>
+    </Router>
   );
-}
+};
 
 export default App;

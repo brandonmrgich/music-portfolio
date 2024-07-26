@@ -1,70 +1,106 @@
-# Getting Started with Create React App
+# Music Portfolio Website
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+## Table of Contents
 
-## Available Scripts
+1. [Project Overview](#project-overview)
+2. [Technology Stack](#technology-stack)
+3. [Project Structure](#project-structure)
+4. [Component Architecture](#component-architecture)
+5. [State Management](#state-management)
+6. [Routing](#routing)
+7. [Styling](#styling)
+8. [Audio Playback](#audio-playback)
+9. [Form Handling](#form-handling)
+10. [Deployment](#deployment)
+11. [Future Enhancements](#future-enhancements)
 
-In the project directory, you can run:
+## Project Overview
 
-### `npm start`
+This project is a music portfolio website designed to showcase a musician's work, offer services, and provide a means of contact. The site features an about page, a work-in-progress section, and a services page with audio comparisons and a contact form.
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+## Technology Stack
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+- **React**: A JavaScript library for building user interfaces
+- **React Router**: For handling routing within the application
+- **Tailwind CSS**: A utility-first CSS framework for rapid UI development
+- **lucide-react**: For including icons in the UI
+- **HTML5 Audio API**: For handling audio playback
+- **localStorage**: For managing user interactions like track likes
 
-### `npm test`
+## Project Structure
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+```
+music-portfolio/
+├── public/
+│   └── index.html
+├── src/
+│   ├── components/
+│   │   ├── About.js
+│   │   ├── InWork.js
+│   │   ├── Services.js
+│   │   ├── AudioPlayer.js
+│   │   └── ContactForm.js
+│   ├── App.js
+│   ├── index.js
+│   └── index.css
+├── package.json
+├── tailwind.config.js
+└── README.md
+```
 
-### `npm run build`
+## Component Architecture
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+The application is built using a component-based architecture:
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+1. **App.js**: The main component that sets up routing and the overall structure of the application.
+2. **About.js**: Displays information about the musician, including a bio and skills.
+3. **InWork.js**: Shows work-in-progress tracks with play and like functionality.
+4. **Services.js**: Offers mixing and mastering services with before/after audio comparisons and includes the contact form.
+5. **AudioPlayer.js**: A reusable component for playing audio tracks.
+6. **ContactForm.js**: Handles the contact form submission.
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+## State Management
 
-### `npm run eject`
+The application primarily uses React's built-in state management (useState and useEffect hooks) for handling component-level state. For more complex state management needs in the future, consider implementing Redux or MobX.
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+## Routing
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+React Router is used for handling navigation within the application. The main routes are:
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+- `/`: About page
+- `/in-work`: Work in Progress page
+- `/services`: Services page
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+## Styling
 
-## Learn More
+Tailwind CSS is used for styling the application. The `tailwind.config.js` file can be customized to extend or modify the default Tailwind styles.
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+## Audio Playback
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+Audio playback is handled using the HTML5 Audio API. The AudioPlayer component encapsulates this functionality, providing play/pause controls and the ability to switch between "before" and "after" versions of a track.
 
-### Code Splitting
+## Form Handling
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+The contact form in the Services component uses React's controlled components pattern for form handling. Form submission is currently logged to the console, but can be extended to send data to a backend API.
 
-### Analyzing the Bundle Size
+## Deployment
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+The project is set up for deployment on GitHub Pages. The deployment process is automated using the `gh-pages` package and npm scripts.
 
-### Making a Progressive Web App
+To deploy:
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+1. Ensure all changes are committed and pushed to the main branch.
+2. Run `npm run deploy`.
 
-### Advanced Configuration
+## Future Enhancements
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
+1. Implement a backend API for handling form submissions and managing audio files.
+2. Add user authentication for additional features like saving liked tracks.
+3. Implement a content management system for easy updates to the portfolio.
+4. Add animations and transitions for a more engaging user experience.
+5. Implement progressive loading for audio files to improve performance.
+6. Add unit and integration tests to ensure code quality and prevent regressions.
 
-### Deployment
+---
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+This README provides a comprehensive overview of the music portfolio project. As the project evolves, remember to update this document to reflect any significant changes in the architecture or new features.
