@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useEffect } from "react";
 
 /**
  * Contact form component.
@@ -20,13 +20,14 @@ const ContactForm = () => {
   };
 
   return (
-    <form onSubmit={handleSubmit}>
+    <form onSubmit={handleSubmit} className="space-y-4">
       <input
         type="text"
         value={name}
         onChange={(e) => setName(e.target.value)}
         placeholder="Your Name"
         required
+        className="w-full p-2 border rounded"
       />
       <input
         type="email"
@@ -34,14 +35,21 @@ const ContactForm = () => {
         onChange={(e) => setEmail(e.target.value)}
         placeholder="Your Email"
         required
+        className="w-full p-2 border rounded"
       />
       <textarea
         value={message}
         onChange={(e) => setMessage(e.target.value)}
         placeholder="Your Message"
         required
+        className="w-full p-2 border rounded h-32"
       ></textarea>
-      <button type="submit">Send</button>
+      <button
+        type="submit"
+        className="bg-blue-500 text-white px-4 py-2 rounded"
+      >
+        Send
+      </button>
     </form>
   );
 };
@@ -57,7 +65,7 @@ const ContactForm = () => {
 const AudioComparisonPlayer = ({ beforeSrc, afterSrc, title }) => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [isAfter, setIsAfter] = useState(false);
-  const audioRef = useRef(null);
+  const audioRef = React.useRef(null);
 
   const togglePlay = () => {
     if (isPlaying) {
@@ -79,15 +87,22 @@ const AudioComparisonPlayer = ({ beforeSrc, afterSrc, title }) => {
   };
 
   return (
-    <div className="audio-comparison-player">
-      <h3>{title}</h3>
+    <div className="audio-comparison-player bg-gray-100 p-4 rounded mb-4">
+      <h3 className="text-lg font-semibold mb-2">{title}</h3>
       <audio
         ref={audioRef}
         src={isAfter ? afterSrc : beforeSrc}
         onEnded={() => setIsPlaying(false)}
       ></audio>
-      <button onClick={togglePlay}>{isPlaying ? "Pause" : "Play"}</button>
-      <button onClick={toggleVersion}>{isAfter ? "Before" : "After"}</button>
+      <button
+        onClick={togglePlay}
+        className="bg-blue-500 text-white px-3 py-1 rounded mr-2"
+      >
+        {isPlaying ? "Pause" : "Play"}
+      </button>
+      <button onClick={toggleVersion} className="bg-gray-300 px-3 py-1 rounded">
+        {isAfter ? "Before" : "After"}
+      </button>
     </div>
   );
 };
@@ -119,11 +134,13 @@ const Services = () => {
   }, []);
 
   return (
-    <div className="services">
-      <h1>Services</h1>
-      <section className="mixing-mastering">
-        <h2>Mixing and Mastering</h2>
-        <p>Description of your mixing and mastering services...</p>
+    <div className="services p-6">
+      <h1 className="text-3xl font-bold mb-6">Services</h1>
+      <section className="mixing-mastering mb-8">
+        <h2 className="text-2xl font-semibold mb-4">Mixing and Mastering</h2>
+        <p className="mb-4">
+          Description of your mixing and mastering services...
+        </p>
         {tracks.map((track) => (
           <AudioComparisonPlayer
             key={track.id}
@@ -134,7 +151,7 @@ const Services = () => {
         ))}
       </section>
       <section className="contact">
-        <h2>Contact</h2>
+        <h2 className="text-2xl font-semibold mb-4">Contact</h2>
         <ContactForm />
       </section>
     </div>
