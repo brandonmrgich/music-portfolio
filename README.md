@@ -61,7 +61,7 @@ The application is built using a component-based architecture:
 
 ## State Management
 
-The application primarily uses React's built-in state management (useState and useEffect hooks) for handling component-level state. For more complex state management needs in the future, consider implementing Redux or MobX.
+The application primarily uses React's built-in state management (useState and useEffect hooks) for handling component-level state. In the future, Redux or MobX.
 
 ## Routing
 
@@ -73,7 +73,7 @@ React Router is used for handling navigation within the application. The main ro
 
 ## Styling
 
-Tailwind CSS is used for styling the application. The `tailwind.config.js` file can be customized to extend or modify the default Tailwind styles.
+Tailwind CSS is used for styling the application via `tailwind.config.js` file.
 
 ## Audio Playback
 
@@ -81,7 +81,7 @@ Audio playback is handled using the HTML5 Audio API. The AudioPlayer component e
 
 ## Form Handling
 
-The contact form in the Services component uses React's controlled components pattern for form handling. Form submission is currently logged to the console, but can be extended to send data to a backend API.
+The contact form in the Services component uses React's controlled components pattern for form handling. Form submission is currently logged to the console, but will be extended to send data to a backend API.
 
 ## Deployment
 
