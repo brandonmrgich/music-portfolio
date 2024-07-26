@@ -1,0 +1,1 @@
+{"version":3,"file":"static/css/main.f89ea7af.css","mappings":"AAAA,kBAAkB,CAClB,wBAAwB,CACxB,uBAAuB","sources":["index.css"],"sourcesContent":["@tailwindcss /base;\n@tailwindcss /components;\n@tailwindcss /utilities;\n"],"names":[],"sourceRoot":""}

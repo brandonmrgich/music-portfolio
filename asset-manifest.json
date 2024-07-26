@@ -1,0 +1,15 @@
+{
+  "files": {
+    "main.css": "/music-portfolio/static/css/main.f89ea7af.css",
+    "main.js": "/music-portfolio/static/js/main.5450b8a9.js",
+    "static/js/453.0094daa3.chunk.js": "/music-portfolio/static/js/453.0094daa3.chunk.js",
+    "index.html": "/music-portfolio/index.html",
+    "main.f89ea7af.css.map": "/music-portfolio/static/css/main.f89ea7af.css.map",
+    "main.5450b8a9.js.map": "/music-portfolio/static/js/main.5450b8a9.js.map",
+    "453.0094daa3.chunk.js.map": "/music-portfolio/static/js/453.0094daa3.chunk.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.f89ea7af.css",
+    "static/js/main.5450b8a9.js"
+  ]
+}
