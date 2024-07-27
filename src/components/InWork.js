@@ -33,9 +33,11 @@ const AudioPlayer = ({ src, title }) => {
   const togglePlay = () => {
     const audioElement = document.getElementById(`audio-${title}`);
     if (isPlaying) {
-      audioElement.pause();
+      // audioElement.pause();
+      console.debug("Stopped");
     } else {
-      audioElement.play();
+      // audioElement.play();
+      console.debug("Playing");
     }
     setIsPlaying(!isPlaying);
   };
@@ -71,8 +73,8 @@ const InWork = () => {
   useEffect(() => {
     // Fetch tracks from an API or load from a local source
     setTracks([
-      { id: 1, title: "Track 1", src: "/path/to/track1.mp3" },
-      { id: 2, title: "Track 2", src: "/path/to/track2.mp3" },
+      { id: 1, title: "another-one-wip", src: "/path/to/track1.mp3" },
+      { id: 2, title: "just-another-unnamed-wip", src: "/path/to/track2.mp3" },
       // Add more tracks as needed
     ]);
   }, []);

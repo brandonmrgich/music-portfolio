@@ -1,8 +1,11 @@
 import React from "react";
 import { BrowserRouter as Router, Route, Routes, Link } from "react-router-dom";
+import Footer from "./components/Footer";
 import About from "./components/About";
 import InWork from "./components/InWork";
 import Services from "./components/Services";
+
+import Logo from "./pictures/asailboat.png";
 
 /**
  * Main App component that sets up the router and navigation.
@@ -14,6 +17,12 @@ const App = () => {
       <div className="app">
         <nav className="bg-gray-800 p-4">
           <ul className="flex space-x-4">
+            <li>
+              <a href="https://linktr.ee/brandonamrgich">
+                <img src={Logo} height="24" width="24" alt="Brandon Mrgich" />
+              </a>
+            </li>
+
             <li>
               <Link to="/" className="text-white hover:text-gray-300">
                 About
@@ -33,10 +42,13 @@ const App = () => {
         </nav>
 
         <Routes>
+          <Route path="/music-portfolio" element={<About />} />
           <Route path="/" element={<About />} />
+          <Route path="/about" element={<About />} />
           <Route path="/in-work" element={<InWork />} />
           <Route path="/services" element={<Services />} />
         </Routes>
+        <Footer />
       </div>
     </Router>
   );
