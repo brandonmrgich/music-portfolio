@@ -2,7 +2,7 @@
   "name": "music-portfolio",
   "version": "0.1.0",
   "private": false,
-  "homepage": "brandonmrgich.com",
+  "homepage": "brandonmrgich.github.io/music-portfolio/",
   "dependencies": {
     "@babel/plugin-proposal-private-property-in-object": "^7.21.11",
     "@fortawesome/fontawesome-free": "^6.6.0",
