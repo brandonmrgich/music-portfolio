@@ -13,7 +13,7 @@ import Logo from "./pictures/asailboat.png";
  */
 const App = () => {
   return (
-    <Router basename="/music-portfolio">
+    <Router>
       <div className="app">
         <nav className="bg-gray-800 p-4">
           <ul className="flex space-x-4">
