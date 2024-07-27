@@ -42,7 +42,6 @@ const App = () => {
         </nav>
 
         <Routes>
-          <Route path="/music-portfolio" element={<About />} />
           <Route path="/" element={<About />} />
           <Route path="/about" element={<About />} />
           <Route path="/in-work" element={<InWork />} />
