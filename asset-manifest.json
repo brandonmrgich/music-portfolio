@@ -1,7 +1,7 @@
 {
   "files": {
     "main.css": "/music-portfolio/static/css/main.3f9a9639.css",
-    "main.js": "/music-portfolio/static/js/main.415176e9.js",
+    "main.js": "/music-portfolio/static/js/main.dfeb811d.js",
     "static/js/453.0094daa3.chunk.js": "/music-portfolio/static/js/453.0094daa3.chunk.js",
     "static/media/profile-coat.png": "/music-portfolio/static/media/profile-coat.4582259a80dbb2e8a226.png",
     "static/media/asailboat.png": "/music-portfolio/static/media/asailboat.879372da421005ace17b.png",
@@ -11,11 +11,11 @@
     "static/media/profile-default.jpg": "/music-portfolio/static/media/profile-default.ff3533004c286ab6805b.jpg",
     "index.html": "/music-portfolio/index.html",
     "main.3f9a9639.css.map": "/music-portfolio/static/css/main.3f9a9639.css.map",
-    "main.415176e9.js.map": "/music-portfolio/static/js/main.415176e9.js.map",
+    "main.dfeb811d.js.map": "/music-portfolio/static/js/main.dfeb811d.js.map",
     "453.0094daa3.chunk.js.map": "/music-portfolio/static/js/453.0094daa3.chunk.js.map"
   },
   "entrypoints": [
     "static/css/main.3f9a9639.css",
-    "static/js/main.415176e9.js"
+    "static/js/main.dfeb811d.js"
   ]
 }
