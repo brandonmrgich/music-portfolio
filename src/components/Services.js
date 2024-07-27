@@ -69,9 +69,11 @@ const AudioComparisonPlayer = ({ beforeSrc, afterSrc, title }) => {
 
   const togglePlay = () => {
     if (isPlaying) {
-      audioRef.current.pause();
+      // audioRef.current.pause();
+      console.debug("Paused");
     } else {
-      audioRef.current.play();
+      // audioRef.current.play();
+      console.debug("Started");
     }
     setIsPlaying(!isPlaying);
   };
@@ -82,7 +84,8 @@ const AudioComparisonPlayer = ({ beforeSrc, afterSrc, title }) => {
     audioRef.current.src = isAfter ? beforeSrc : afterSrc;
     audioRef.current.currentTime = currentTime;
     if (isPlaying) {
-      audioRef.current.play();
+      // audioRef.current.play();
+      console.debug("Toggled");
     }
   };
 
@@ -119,13 +122,13 @@ const Services = () => {
     setTracks([
       {
         id: 1,
-        title: "Track 1",
+        title: "A cool song",
         beforeSrc: "/path/to/before1.mp3",
         afterSrc: "/path/to/after1.mp3",
       },
       {
         id: 2,
-        title: "Track 2",
+        title: "An even better song",
         beforeSrc: "/path/to/before2.mp3",
         afterSrc: "/path/to/after2.mp3",
       },
@@ -136,11 +139,34 @@ const Services = () => {
   return (
     <div className="services p-6">
       <h1 className="text-3xl font-bold mb-6">Services</h1>
+
       <section className="mixing-mastering mb-8">
         <h2 className="text-2xl font-semibold mb-4">Mixing and Mastering</h2>
-        <p className="mb-4">
-          Description of your mixing and mastering services...
+        <p className="description mb-1">
+          I have a passion for taking a song, and bringing it to a whole other
+          level. My goal is to make the track easy to listen to, maintaining
+          balanced dynamics while also adding color and full tone. I've always
+          liked songs like surround the listener, and take advantage of the
+          stereo field, so I do my best to achieve this.
         </p>
+        <p className="description mb-4">
+          When you submit a song to me, I will work with you one on one to meet
+          your expectations, and deliver a polished final track for your
+          catalog.
+        </p>
+        <p className="description mb-2 italic">
+          Requests are currently FREE, as I am currently adding to a 'sample
+          reel' of Mixed and Mastered tracks.
+        </p>
+        <p className="description mb-4 italic">
+          ( I may request to feature them here on my site! )
+        </p>
+      </section>
+
+      <section className="sample-reel mb-8">
+        <h2 className="text-xl font-semibold mb-4">
+          Heres a few tracks I'm particularly proud of:
+        </h2>
         {tracks.map((track) => (
           <AudioComparisonPlayer
             key={track.id}
@@ -150,6 +176,7 @@ const Services = () => {
           />
         ))}
       </section>
+
       <section className="contact">
         <h2 className="text-2xl font-semibold mb-4">Contact</h2>
         <ContactForm />
