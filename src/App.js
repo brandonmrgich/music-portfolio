@@ -5,9 +5,6 @@ import About from "./components/About";
 import InWork from "./components/InWork";
 import Services from "./components/Services";
 
-// import Login from "./components/Login";
-// import Signup from "./components/Signup";
-
 import Logo from "./pictures/asailboat.png";
 
 /**
@@ -28,7 +25,7 @@ const App = () => {
 
     return (
         <Router>
-            <div className="app">
+            <div className="min-h-screen flex flex-col">
                 <nav className="bg-gray-800 p-4">
                     <ul className="flex space-x-4">
                         <li>
@@ -66,48 +63,26 @@ const App = () => {
                                 Services
                             </Link>
                         </li>
-                        {/*<li>
-                            <Link
-                                to="/login"
-                                className="text-white hover:text-gray-300"
-                            >
-                                Login
-                            </Link>
-                        </li>
-                        <li>
-                            <Link
-                                to="/signup"
-                                className="text-white hover:text-gray-300"
-                            >
-                                Signup
-                            </Link>
-                        </li>*/}
                     </ul>
                 </nav>
 
-                <Routes>
-                    <Route path="/" element={<About />} />
-                    <Route
-                        path="/about"
-                        element={<About isAdmin={isAdmin} />}
-                    />
-                    <Route
-                        path="/in-work"
-                        element={<InWork isAdmin={isAdmin} />}
-                    />
-                    <Route
-                        path="/services"
-                        element={<Services isAdmin={isAdmin} />}
-                    />
-                    {/*<Route
-                        path="/login"
-                        element={<Login isAdmin={setIsAdmin} />}
-                    />
-                    <Route
-                        path="/signup"
-                        element={<Login isAdmin={setIsAdmin} />}
-                    />*/}
-                </Routes>
+                <main className="flex-grow">
+                    <Routes>
+                        <Route path="/" element={<About />} />
+                        <Route
+                            path="/about"
+                            element={<About isAdmin={isAdmin} />}
+                        />
+                        <Route
+                            path="/in-work"
+                            element={<InWork isAdmin={isAdmin} />}
+                        />
+                        <Route
+                            path="/services"
+                            element={<Services isAdmin={isAdmin} />}
+                        />
+                    </Routes>
+                </main>
                 <Footer />
             </div>
         </Router>
