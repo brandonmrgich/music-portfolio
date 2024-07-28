@@ -1,6 +1,29 @@
 import React, { useState, useEffect } from "react";
 import AudioGrid from "./AudioPlayer/AudioGrid";
 
+let defaultTracks = [
+    {
+        id: 1,
+        title: "Placeholder Song 1",
+        src: "/path/to/src",
+    },
+    {
+        id: 2,
+        title: "Placeholder Song 2",
+        src: "/path/to/src",
+    },
+    {
+        id: 3,
+        title: "Placeholder Song 4",
+        src: "/path/to/src",
+    },
+    {
+        id: 4,
+        title: "Placeholder Song 4",
+        src: "/path/to/src",
+    },
+];
+
 /**
  * In Work page component.
  * @returns {React.Component} The In Work page component
@@ -10,34 +33,21 @@ const InWork = ({ isAdmin }) => {
 
     useEffect(() => {
         // Fetch tracks from an API or load from a local source
-        setTracks([
-            { id: 1, title: "another-one-wip", src: "/path/to/track1.mp3" },
-            {
-                id: 2,
-                title: "just-another-unnamed-wip",
-                src: "/path/to/track2.mp3",
-            },
-            // Add more tracks as needed
-        ]);
+        setTracks(defaultTracks);
     }, []);
+
     return (
-        <div className="in-work p-6 space-y-8">
-            <h1 className="text-3xl font-bold mb-6">Work in Progress</h1>
+        <div className="in-work p-6 max-w-4xl mx-auto space-y-12">
+            <h1 className="text-4xl font-bold text-center mb-8">
+                Work in Progress
+            </h1>
+            <p className="text-lg text-gray-700 mb-4 text-center">
+                Here are some of the tracks I'm currently working on. Stay tuned
+                for more updates!
+            </p>
             <AudioGrid tracks={tracks} isComparison={false} />
         </div>
     );
-    // return (
-    //     <div className="in-work p-6">
-    //         <h1 className="text-3xl font-bold mb-6">Work in Progress</h1>
-    //         {tracks.map((track) => (
-    //             <AudioPlayer
-    //                 key={track.id}
-    //                 src={track.src}
-    //                 title={track.title}
-    //             />
-    //         ))}
-    //     </div>
-    // );
 };
 
 export default InWork;
