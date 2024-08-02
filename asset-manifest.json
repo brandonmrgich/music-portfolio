@@ -1,7 +1,7 @@
 {
   "files": {
-    "main.css": "/static/css/main.dfe3c25a.css",
-    "main.js": "/static/js/main.fe2d824f.js",
+    "main.css": "/static/css/main.6a87af76.css",
+    "main.js": "/static/js/main.2406ac1f.js",
     "static/js/453.0094daa3.chunk.js": "/static/js/453.0094daa3.chunk.js",
     "static/media/profile-coat.png": "/static/media/profile-coat.4582259a80dbb2e8a226.png",
     "static/media/asailboat.png": "/static/media/asailboat.879372da421005ace17b.png",
@@ -11,12 +11,12 @@
     "static/media/audius-icon.jpeg": "/static/media/audius-icon.3af227222a59677eea7c.jpeg",
     "static/media/profile-default.jpg": "/static/media/profile-default.ff3533004c286ab6805b.jpg",
     "index.html": "/index.html",
-    "main.dfe3c25a.css.map": "/static/css/main.dfe3c25a.css.map",
-    "main.fe2d824f.js.map": "/static/js/main.fe2d824f.js.map",
+    "main.6a87af76.css.map": "/static/css/main.6a87af76.css.map",
+    "main.2406ac1f.js.map": "/static/js/main.2406ac1f.js.map",
     "453.0094daa3.chunk.js.map": "/static/js/453.0094daa3.chunk.js.map"
   },
   "entrypoints": [
-    "static/css/main.dfe3c25a.css",
-    "static/js/main.fe2d824f.js"
+    "static/css/main.6a87af76.css",
+    "static/js/main.2406ac1f.js"
   ]
 }
