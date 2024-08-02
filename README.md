@@ -4,15 +4,8 @@
 
 1. [Project Overview](#project-overview)
 2. [Technology Stack](#technology-stack)
-3. [Project Structure](#project-structure)
-4. [Component Architecture](#component-architecture)
-5. [State Management](#state-management)
-6. [Routing](#routing)
-7. [Styling](#styling)
-8. [Audio Playback](#audio-playback)
-9. [Form Handling](#form-handling)
-10. [Deployment](#deployment)
-11. [Future Enhancements](#future-enhancements)
+3.
+4. [Future Enhancements](#future-enhancements)
 
 ## Project Overview
 
@@ -20,85 +13,148 @@ This project is a music portfolio website designed to showcase a musician's work
 
 ## Technology Stack
 
-- **React**: A JavaScript library for building user interfaces
-- **React Router**: For handling routing within the application
-- **Tailwind CSS**: A utility-first CSS framework for rapid UI development
-- **lucide-react**: For including icons in the UI
-- **HTML5 Audio API**: For handling audio playback
-- **localStorage**: For managing user interactions like track likes
+-   **React**: A JavaScript library for building user interfaces
+-   **React Router**: For handling routing within the application
+-   **Tailwind CSS**: A utility-first CSS framework for rapid UI development
+-   **lucide-react**: For including icons in the UI
+-   **HTML5 Audio API**: For handling audio playback
+-   **localStorage**: For managing user interactions like track likes
 
-## Project Structure
+## Backend
 
-```
-music-portfolio/
-├── public/
-│   └── index.html
-├── src/
-│   ├── components/
-│   │   ├── About.js
-│   │   ├── InWork.js
-│   │   ├── Services.js
-│   │   ├── AudioPlayer.js
-│   │   └── ContactForm.js
-│   ├── App.js
-│   ├── index.js
-│   └── index.css
+### Heirarchy
+
+.
+├── config
+│   └── config.js
+├── controllers
+│   ├── audioController.js
+│   ├── authController.js
+│   ├── profileController.js
+│   └── servicesController.js
+├── helpers
+│   └── fileHelpers.js
+├── middleware
+│   └── auth.js
+├── package-lock.json
 ├── package.json
-├── tailwind.config.js
-└── README.md
+├── routes
+│   ├── audioRoutes.js
+│   ├── authRoutes.js
+│   ├── profileRoutes.js
+│   └── servicesRoutes.js
+└── server.js
+
+### Folders and Responsibilities
+
+#### config/
+
+-   **config.js**: Manages and exports environment variables and other configurations.
+
+#### controllers/
+
+-   **authController.js**: Handles authentication-related logic, such as login.
+-   **audioController.js**: Manages audio file uploads and deletions.
+-   **profileController.js**: Handles profile updates, including uploading profile pictures.
+-   **servicesController.js**: Manages updates to the services page.
+
+#### helpers/
+
+-   **fileHelpers.js**: Provides functions to ensure folders exist and manage audio lists persitatncy.
+
+#### middlewares/
+
+-   **authMiddleware.js**: Verifies JWT tokens for protected routes.
+
+#### routes/
+
+-   **authRoutes.js**: Defines routes related to authentication.
+-   **audioRoutes.js**: Defines routes for uploading and deleting audio files.
+-   **profileRoutes.js**: Defines routes for updating profiles.
+-   **servicesRoutes.js**: Defines routes for updating the services page.
+
+### Management
+
+1.  Environment
+
+    -   Create `.env.development.local` and `.env.production.local` files with the necessary environment variables:
+        ```
+        ADMIN_PASSWORD_HASH=your_hashed_password
+        JWT_SECRET=your_jwt_secret
+        BASE_PATH=your_base_path
+        PORT=your_port
+        ```
+
+2.  **Running the Server**:
+
+    -   Use `npm run start` to run the server in production mode.
+    -   Use `npm run start:dev` to run the server in development mode.
+
+3.  **Adding New Routes**:
+
+    -   Create a new controller in the `controllers/` folder.
+    -   Create a new route in the `routes/` folder and connect it to the controller.
+    -   Import and use the new route in `server.js`.
+
+4.  **Updating Configurations**:
+
+    -   Modify the `config.js` file in the `config/` folder to update or add new environment variables and configurations.
+
+5.  **Authentication Middleware**:
+
+    -   Update the `authMiddleware.js` file in the `middlewares/` folder if there are changes to how authentication should be handled.
+
+6.  **Helper Functions**:
+    -   Add or modify helper functions in the `fileHelpers.js` file in the `helpers/` folder as needed.
+
+### Example Usage
+
+**Login Route**:
+
+```http
+POST /login
+Content-Type: application/json
+{
+  "username": "admin",
+  "password": "your_password"
+}
+
+POST /upload-audio
+Authorization: Bearer <token>
+Content-Type: multipart/form-data
+{
+  "audio": <file>,
+  "title": "Song Title",
+  "artist": "Artist Name",
+  "type": "services"
+}
+
+PUT /update-profile
+Authorization: Bearer <token>
+Content-Type: multipart/form-data
+{
+  "profilePicture": <file>,
+  "bio": "Your bio here"
+}
+
+PUT /update-services
+Authorization: Bearer <token>
+Content-Type: application/json
+{
+  "servicesText": "Services description here"
+}
+
 ```
-
-## Component Architecture
-
-The application is built using a component-based architecture:
-
-1. **App.js**: The main component that sets up routing and the overall structure of the application.
-2. **About.js**: Displays information about the musician, including a bio and skills.
-3. **InWork.js**: Shows work-in-progress tracks with play and like functionality.
-4. **Services.js**: Offers mixing and mastering services with before/after audio comparisons and includes the contact form.
-5. **AudioPlayer.js**: A reusable component for playing audio tracks.
-6. **ContactForm.js**: Handles the contact form submission.
-
-## State Management
-
-The application primarily uses React's built-in state management (useState and useEffect hooks) for handling component-level state. In the future, Redux or MobX.
-
-## Routing
-
-React Router is used for handling navigation within the application. The main routes are:
-
-- `/`: About page
-- `/in-work`: Work in Progress page
-- `/services`: Services page
-
-## Styling
-
-Tailwind CSS is used for styling the application via `tailwind.config.js` file.
-
-## Audio Playback
-
-Audio playback is handled using the HTML5 Audio API. The AudioPlayer component encapsulates this functionality, providing play/pause controls and the ability to switch between "before" and "after" versions of a track.
-
-## Form Handling
-
-The contact form in the Services component uses React's controlled components pattern for form handling. Form submission is currently logged to the console, but will be extended to send data to a backend API.
-
-## Deployment
-
-The project is set up for deployment on GitHub Pages. The deployment process is automated using the `gh-pages` package and npm scripts.
-
-To deploy:
-
-1. Ensure all changes are committed and pushed to the main branch.
-2. Run `npm run deploy`.
 
 ## Future Enhancements
 
-1. Implement a backend API for handling form submissions and managing audio files.
-2. Add user authentication for additional features like saving liked tracks.
-3. Implement a content management system for easy updates to the portfolio.
-4. Add animations and transitions for a more engaging user experience.
-5. Implement progressive loading for audio files to improve performance.
-6. Add unit and integration tests to ensure code quality and prevent regressions.
+1. Extend backend API for handling form submissions.
+2. Add animations and transitions for a more engaging user experience.
+3. Implement progressive loading for audio files to improve performance.
+4. Add unit and integration tests to ensure code quality and prevent regressions.
 
 ---
+
+```
+
+```
