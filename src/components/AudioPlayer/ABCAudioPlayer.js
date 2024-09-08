@@ -13,25 +13,13 @@ class BaseAudioPlayer extends Component {
     }
 
     componentDidMount() {
-        this.audioRef.current.addEventListener(
-            "timeupdate",
-            this.handleTimeUpdate,
-        );
-        this.audioRef.current.addEventListener(
-            "loadedmetadata",
-            this.handleLoadedMetadata,
-        );
+        this.audioRef.current.addEventListener("timeupdate", this.handleTimeUpdate);
+        this.audioRef.current.addEventListener("loadedmetadata", this.handleLoadedMetadata);
     }
 
     componentWillUnmount() {
-        this.audioRef.current.removeEventListener(
-            "timeupdate",
-            this.handleTimeUpdate,
-        );
-        this.audioRef.current.removeEventListener(
-            "loadedmetadata",
-            this.handleLoadedMetadata,
-        );
+        this.audioRef.current.removeEventListener("timeupdate", this.handleTimeUpdate);
+        this.audioRef.current.removeEventListener("loadedmetadata", this.handleLoadedMetadata);
     }
 
     handleTimeUpdate = () => {
@@ -72,17 +60,24 @@ class BaseAudioPlayer extends Component {
         const { title, audioSrc } = this.props;
 
         return (
-            <div className="audio-player bg-gray-100 p-4 rounded mb-4">
-                <h3 className="text-lg font-semibold mb-2">{title}</h3>
+            <div className="audio-player p-4 rounded-lg mb-4 flex-shrink border border-comfy-dark bg-comfy-accent2 bg-opacity-5 shadow-lg">
+                <h3 className="text-lg font-semibold mb-2 text-white">
+                    <a
+                        href="https://google.com/"
+                        className="text-comfy-accent1 hover:text-comfy-accent2 transition-colors"
+                    >
+                        {title}
+                    </a>
+                </h3>
                 <audio
                     ref={this.audioRef}
                     src={audioSrc}
-                    className="w-full mb-2"
+                    className="w-full mb-3 rounded-lg border border-gray-700 bg-gray-900"
                 />
-                <div className="flex items-center">
+                <div className="flex items-center text-gray-400">
                     <button
                         onClick={this.togglePlayPause}
-                        className="bg-blue-500 text-white px-3 py-1 rounded mr-2"
+                        className="bg-comfy-accent2 bg-opacity-50 text-comfy-dark px-4 py-2 rounded-lg hover:bg-gray-600 transition-colors"
                     >
                         {isPlaying ? <Pause /> : <Play />}
                     </button>
@@ -92,14 +87,13 @@ class BaseAudioPlayer extends Component {
                         max={duration}
                         value={currentTime}
                         onChange={this.handleSeek}
-                        className="flex-grow mr-2"
+                        className="flex-grow mx-3 accent-comfy-accent2 opacity-60"
                     />
                     <span className="text-sm">
-                        {this.formatTime(currentTime)} /{" "}
-                        {this.formatTime(duration)}
+                        {this.formatTime(currentTime)} / {this.formatTime(duration)}
                     </span>
                 </div>
-                <div className="mt-2">{this.renderAdditionalControls()}</div>
+                <div className="mt-3">{this.renderAdditionalControls()}</div>
             </div>
         );
     }
