@@ -3,10 +3,13 @@
 @tailwind utilities;
 
 body {
-  margin: 0;
-  padding: 0;
-  min-height: 100vh; /* Ensures the body takes at least the full viewport height */
-  /*background: linear-gradient(180deg, #ffecd2, #fcb69f);*/
-  background: linear-gradient(180deg, #d1bfa7, #f6f2e7);
-  font-family: Arial, sans-serif; /* Optional: Set a global font */
+    margin: 0;
+    padding: 0;
+    min-height: 100vh; /* Ensures the body takes at least the full viewport height */
+    font-family: Arial, sans-serif; /* Optional: Set a global font */
+}
+
+a {
+    @apply text-primary-dark2 hover:text-linktree-accent focus:text-linktree-accent active:text-linktree-accent;
+    cursor: pointer;
 }
