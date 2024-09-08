@@ -1,3 +1,4 @@
+import { wait } from "@testing-library/user-event/dist/utils";
 import React from "react";
 
 import {
@@ -74,6 +75,7 @@ const Links = {
                     width="32"
                     alt="Audius"
                     style={{ paddingTop: "3px" }}
+                    max-h-6
                 />
             ),
             colorClass: "text-purple-600",
@@ -90,13 +92,12 @@ const Links = {
 
 const SocialMediaLink = ({ href, icon: Icon, colorClass, label }) => {
     return (
-        <li className="flex flex-col items-center p-2 rounded-full border border-gray-300 hover:bg-blue-100 transition">
-            <a
-                className="flex flex-col items-center space-y-1 text-blue-800 hover:text-blue-300"
-                href={href}
-            >
-                <Icon className={`text-3xl ${colorClass}`} />
-                <span>{label}</span>
+        <li className="group flex flex-col items-center p-2 rounded-full bg-opacity-0 hover:bg-opacity-10 opacity-85 font-thin transition">
+            <a className="flex flex-col items-center space-y-1 transition-colors" href={href}>
+                <Icon className={`text-3xl max-h-6 ${colorClass} group-hover:text-comfy-dark`} />
+                <span className="text-comfy-accent2 group-hover:text-comfy-tertiary transition-colors">
+                    {label}
+                </span>
             </a>
         </li>
     );

@@ -26,8 +26,8 @@ const App = () => {
 
     return (
         <Router>
-            <div className="min-h-screen flex flex-col text-comfy-dark bg-gradient-to-b from-comfy-light to-comfy-medium">
-                <nav className="p-4 border border-comfy-medium text-xl">
+            <div className="min-h-screen flex flex-col text-white">
+                <nav className="p-4 bg-zinc-100 opacity-80 border border-linktree-black">
                     <ul className="flex justify-center space-x-4">
                         <li>
                             <a href="https://linktr.ee/brandonamrgich">
@@ -36,53 +36,38 @@ const App = () => {
                         </li>
 
                         <li>
-                            <Link
-                                to="/"
-                                className="text-comfy-dark hover:text-comfy-accent1 focus:text-comfy-accent2 transition-color"
-                            >
+                            <Link to="/" className="text-white hover:text-gray-300">
                                 About
                             </Link>
                         </li>
                         <li>
-                            <Link
-                                to="/in-work"
-                                className="text-comfy-dark hover:text-comfy-accent1 focus:text-comfy-accent2 transition-color"
-                            >
+                            <Link to="/in-work" className="text-white hover:text-gray-300">
                                 Work In Progress
                             </Link>
                         </li>
                         <li>
-                            <Link
-                                to="/services"
-                                className="text-comfy-dark hover:text-comfy-accent1 focus:text-comfy-accent2 transition-color"
-                            >
+                            <Link to="/services" className="text-white hover:text-gray-300">
                                 Services
                             </Link>
                         </li>
                         <li>
-                            <Link
-                                to="/scoring"
-                                className="text-comfy-dark hover:text-comfy-accent1 focus:text-comfy-accent2 transition-color"
-                            >
+                            <Link to="/scoring" className="text-white hover:text-gray-300">
                                 Scoring
                             </Link>
                         </li>
                     </ul>
                 </nav>
 
-                <main className="flex flex-col flex-grow min-h-screen">
-                    <div>
-                        <Routes>
-                            <Route path="/" element={<About />} />
-                            <Route path="/about" element={<About isAdmin={isAdmin} />} />
-                            <Route path="/in-work" element={<InWork isAdmin={isAdmin} />} />
-                            <Route path="/services" element={<Services isAdmin={isAdmin} />} />
-                            <Route path="/scoring" element={<Scoring isAdmin={isAdmin} />} />
-                        </Routes>
-                    </div>
-
-                    <Footer />
+                <main className="flex flex-grow bg-comfy-accent opacity-15 min-h-screen">
+                    <Routes>
+                        <Route path="/" element={<About />} />
+                        <Route path="/about" element={<About isAdmin={isAdmin} />} />
+                        <Route path="/in-work" element={<InWork isAdmin={isAdmin} />} />
+                        <Route path="/services" element={<Services isAdmin={isAdmin} />} />
+                        <Route path="/scoring" element={<Scoring isAdmin={isAdmin} />} />
+                    </Routes>
                 </main>
+                <Footer />
             </div>
         </Router>
     );
