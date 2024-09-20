@@ -1,9 +1,9 @@
 const path = require("path");
 const fs = require("fs").promises;
-const { AUDIO_FOLDER, SERVICES_AUDIO_FOLDER } = require("../config/config");
 const {
     updateAudioList,
     removeFromAudioList,
+    getFolderForType,
 } = require("../helpers/fileHelpers");
 
 const uploadAudio = async (req, res) => {
@@ -15,8 +15,8 @@ const uploadAudio = async (req, res) => {
             return res.status(400).json({ message: "No file uploaded" });
         }
 
-        const targetFolder =
-            type === "services" ? SERVICES_AUDIO_FOLDER : AUDIO_FOLDER;
+        const targetFolder = getFolderForType(type);
+
         const fileName = `${Date.now()}-${file.originalname}`;
         const filePath = path.join(targetFolder, fileName);
 
@@ -39,8 +39,8 @@ const removeAudio = async (req, res) => {
         const { fileName } = req.params;
         const { type } = req.query;
 
-        const targetFolder =
-            type === "services" ? SERVICES_AUDIO_FOLDER : AUDIO_FOLDER;
+        const targetFolder = getFolderForType(type);
+
         const filePath = path.join(targetFolder, fileName);
 
         await fs.unlink(filePath);
@@ -55,4 +55,16 @@ const removeAudio = async (req, res) => {
     }
 };
 
-module.exports = { uploadAudio, removeAudio };
+const handleAudioStreaming = (req, res) => {
+    const { type, filename } = req.params;
+    const validTypes = ["inwork", "samplereel", "scoring"];
+
+    if (!validTypes.includes(type)) {
+        return res.status(400).send("Invalid type");
+    }
+
+    const filePath = path.join(config.audioDirectory, type, filename);
+    streamAudio(res, filePath);
+};
+
+module.exports = { uploadAudio, removeAudio, handleAudioStreaming };

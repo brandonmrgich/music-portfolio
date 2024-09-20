@@ -1,28 +1,6 @@
 import React, { useState, useEffect } from "react";
 import AudioGrid from "./AudioPlayer/AudioGrid";
-
-let defaultTracks = [
-    {
-        id: 1,
-        title: "Placeholder Song 1",
-        src: "/path/to/src",
-    },
-    {
-        id: 2,
-        title: "Placeholder Song 2",
-        src: "/path/to/src",
-    },
-    {
-        id: 3,
-        title: "Placeholder Song 4",
-        src: "/path/to/src",
-    },
-    {
-        id: 4,
-        title: "Placeholder Song 4",
-        src: "/path/to/src",
-    },
-];
+import AudioLoader from "./AudioPlayer/AudioLoader";
 
 /**
  * In Work page component.
@@ -30,10 +8,11 @@ let defaultTracks = [
  */
 const InWork = ({ isAdmin }) => {
     const [tracks, setTracks] = useState([]);
+    let loader = new AudioLoader();
 
     useEffect(() => {
-        // Fetch tracks from an API or load from a local source
-        setTracks(defaultTracks);
+        let newTracks = loader.getTracks();
+        setTracks([...tracks, newTracks]);
     }, []);
 
     return (

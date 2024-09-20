@@ -1,12 +1,7 @@
 const express = require("express");
 const { ensureFolderExists } = require("./helpers/fileHelpers");
-const {
-    AUDIO_FOLDER,
-    SERVICES_AUDIO_FOLDER,
-    PROFILE_PICTURE_FOLDER,
-    DATA_FOLDER,
-    PORT,
-} = require("./config/config");
+const { PROFILE_PICTURE_FOLDER, DATA_FOLDER, PORT } = require("./config/config");
+const AudioTypes = require("./schema/audioTypes");
 const authRoutes = require("./routes/authRoutes");
 const audioRoutes = require("./routes/audioRoutes");
 const profileRoutes = require("./routes/profileRoutes");
@@ -15,11 +10,14 @@ const servicesRoutes = require("./routes/servicesRoutes");
 const app = express();
 app.use(express.json());
 
+console.log(AudioTypes.AudioTypes.AUDIO_WIP);
+
 // Ensure all required folders exist
 (async () => {
     await Promise.all([
-        ensureFolderExists(AUDIO_FOLDER),
-        ensureFolderExists(SERVICES_AUDIO_FOLDER),
+        ensureFolderExists(AudioTypes.AudioTypes.AUDIO_WIP),
+        ensureFolderExists(AudioTypes.AudioTypes.AUDIO_REEL),
+        ensureFolderExists(AudioTypes.AudioTypes.AUDIO_SCORING),
         ensureFolderExists(PROFILE_PICTURE_FOLDER),
         ensureFolderExists(DATA_FOLDER),
     ]);

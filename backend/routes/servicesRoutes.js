@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const { updateServices } = require("../controllers/servicesController");
-const authenticateToken = require("../middlewares/authMiddleware");
+const authenticateToken = require("../middleware/auth");
 
 router.put("/update-services", authenticateToken, updateServices);
 

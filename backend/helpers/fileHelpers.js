@@ -1,4 +1,16 @@
 const fs = require("fs").promises;
+const { AudioTypes } = require("../schema/audioTypes");
+
+// TODO: All catches need to log somewhere
+
+const getFolderForType = (type) => {
+    try {
+        folder = AudioTypes[String.toString(type).toLowerCase()];
+    } catch (e) {
+        // No matching audio type, handle
+    }
+    return folder;
+};
 
 const ensureFolderExists = async (folderPath) => {
     try {
@@ -38,4 +50,5 @@ module.exports = {
     ensureFolderExists,
     updateAudioList,
     removeFromAudioList,
+    getFolderForType,
 };
