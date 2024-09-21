@@ -8,10 +8,9 @@ import AudioLoader from "./AudioPlayer/AudioLoader";
  */
 const InWork = ({ isAdmin }) => {
     const [tracks, setTracks] = useState([]);
-    let loader = new AudioLoader();
 
     useEffect(() => {
-        let newTracks = loader.getTracks();
+        let newTracks = AudioLoader.getTracks();
         setTracks([...tracks, newTracks]);
     }, []);
 

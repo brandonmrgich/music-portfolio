@@ -1,38 +1,12 @@
 import React, { useState, useEffect } from "react";
 import AudioUpload from "../admin/AudioUpload";
 import AudioGrid from "./AudioPlayer/AudioGrid";
+import AudioLoader from "./AudioPlayer/AudioLoader";
 import ContactForm from "./ContactForm";
 import { FaCheckCircle, FaExclamationCircle } from "react-icons/fa";
 
-let defaultTracks = [
-    {
-        id: 1,
-        title: "Placeholder Song 1",
-        beforeSrc: "/path/to/before1.mp3",
-        afterSrc: "/path/to/after1.mp3",
-    },
-    {
-        id: 2,
-        title: "Placeholder Song 2",
-        beforeSrc: "/path/to/before2.mp3",
-        afterSrc: "/path/to/after2.mp3",
-    },
-    {
-        id: 3,
-        title: "Placeholder Song 4",
-        beforeSrc: "/path/to/before1.mp3",
-        afterSrc: "/path/to/after1.mp3",
-    },
-    {
-        id: 4,
-        title: "Placeholder Song 4",
-        beforeSrc: "/path/to/before2.mp3",
-        afterSrc: "/path/to/after2.mp3",
-    },
-];
-
 const Services = ({ isAdmin }) => {
-    const [tracks, setTracks] = useState([]);
+    const [tracks, setTracks] = useState(AudioLoader.getTracks("comparison"));
     const [error, setError] = useState(null);
 
     useEffect(() => {
@@ -49,7 +23,6 @@ const Services = ({ isAdmin }) => {
             .catch((err) => {
                 console.error(err);
                 setError("Unable to fetch audio tracks. Please try again later.");
-                setTracks(defaultTracks);
             });
     }, []);
 

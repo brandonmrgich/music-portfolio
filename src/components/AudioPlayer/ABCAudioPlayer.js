@@ -8,6 +8,8 @@ class BaseAudioPlayer extends Component {
             isPlaying: false,
             currentTime: 0,
             duration: 0,
+            error: "",
+            isLoading: false,
         };
         this.audioRef = React.createRef();
     }
@@ -32,11 +34,36 @@ class BaseAudioPlayer extends Component {
 
     togglePlayPause = () => {
         if (this.state.isPlaying) {
-            this.audioRef.current.pause();
+            this.pause();
         } else {
-            this.audioRef.current.play();
+            this.play();
         }
-        this.setState((prevState) => ({ isPlaying: !prevState.isPlaying }));
+    };
+
+    play = () => {
+        this.setState({ isLoading: true, error: "" });
+
+        const playPromise = this.audioRef.current.play();
+
+        if (playPromise !== undefined) {
+            playPromise
+                .then(() => {
+                    this.setState({ isPlaying: true, isLoading: false });
+                })
+                .catch((error) => {
+                    console.error("Playback failed:", error);
+                    this.setState({
+                        isPlaying: false,
+                        isLoading: false,
+                        error: "Failed to play track, please try again later.",
+                    });
+                });
+        }
+    };
+
+    pause = () => {
+        this.audioRef.current.pause();
+        this.setState({ isPlaying: false });
     };
 
     handleSeek = (e) => {
@@ -56,7 +83,7 @@ class BaseAudioPlayer extends Component {
     }
 
     render() {
-        const { isPlaying, currentTime, duration } = this.state;
+        const { isPlaying, currentTime, duration, error, isLoading } = this.state;
         const { title, audioSrc } = this.props;
 
         return (
@@ -77,9 +104,10 @@ class BaseAudioPlayer extends Component {
                 <div className="flex items-center text-gray-400">
                     <button
                         onClick={this.togglePlayPause}
-                        className="bg-comfy-accent2 bg-opacity-50 text-comfy-dark px-4 py-2 rounded-lg hover:bg-gray-600 transition-colors"
+                        disabled={isLoading}
+                        className="bg-comfy-accent2 bg-opacity-50 text-comfy-dark px-4 py-2 rounded-lg hover:bg-gray-600 transition-colors disabled:opacity-50"
                     >
-                        {isPlaying ? <Pause /> : <Play />}
+                        {isLoading ? "Loading..." : isPlaying ? <Pause /> : <Play />}
                     </button>
                     <input
                         type="range"
@@ -93,6 +121,7 @@ class BaseAudioPlayer extends Component {
                         {this.formatTime(currentTime)} / {this.formatTime(duration)}
                     </span>
                 </div>
+                {error && <span className="text-red-500 mt-2">{error}</span>}
                 <div className="mt-3">{this.renderAdditionalControls()}</div>
             </div>
         );
