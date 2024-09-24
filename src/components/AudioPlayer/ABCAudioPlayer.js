@@ -42,12 +42,13 @@ class BaseAudioPlayer extends Component {
 
     play = () => {
         this.setState({ isLoading: true, error: "" });
-
         const playPromise = this.audioRef.current.play();
+        console.log(this.audioRef.current);
 
         if (playPromise !== undefined) {
             playPromise
                 .then(() => {
+                    console.log("ref: ", this.audioRef.current);
                     this.setState({ isPlaying: true, isLoading: false });
                 })
                 .catch((error) => {
@@ -84,7 +85,7 @@ class BaseAudioPlayer extends Component {
 
     render() {
         const { isPlaying, currentTime, duration, error, isLoading } = this.state;
-        const { title, audioSrc } = this.props;
+        const { title, src } = this.props;
 
         return (
             <div className="audio-player p-4 rounded-lg mb-4 flex-shrink border border-comfy-dark bg-comfy-accent2 bg-opacity-5 shadow-lg">
@@ -98,7 +99,7 @@ class BaseAudioPlayer extends Component {
                 </h3>
                 <audio
                     ref={this.audioRef}
-                    src={audioSrc}
+                    src={src}
                     className="w-full mb-3 rounded-lg border border-gray-700 bg-gray-900"
                 />
                 <div className="flex items-center text-gray-400">

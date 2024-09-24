@@ -10,8 +10,9 @@ const InWork = ({ isAdmin }) => {
     const [tracks, setTracks] = useState([]);
 
     useEffect(() => {
-        let newTracks = AudioLoader.getTracks();
-        setTracks([...tracks, newTracks]);
+        let tracks = AudioLoader.getTracks();
+        setTracks(tracks);
+        console.log({ tracks });
     }, []);
 
     return (

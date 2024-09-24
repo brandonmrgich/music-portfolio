@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 const publicPath = process.env.PUBLIC_URL;
-const wip = publicPath + "/wip";
+const wip = publicPath + "audio/wip";
 
 class AudioLoader {
     loadAudio(path) {
@@ -10,22 +10,22 @@ class AudioLoader {
         {
             id: 1,
             title: "Placeholder Song 1",
-            src: "path/to/before1.mp3",
+            src: wip + "/default.mp3",
         },
         {
             id: 2,
             title: "Placeholder Song 2",
-            src: "/path/to/after2.mp3",
+            src: wip + "/default.mp3",
         },
         {
             id: 3,
             title: "Placeholder Song 4",
-            src: "/path/to/after1.mp3",
+            src: wip + "/default.mp3",
         },
         {
             id: 4,
             title: "Placeholder Song 4",
-            src: "/path/to/after2.mp3",
+            src: wip + "/default.mp3",
         },
     ];
 
@@ -58,6 +58,8 @@ class AudioLoader {
 
     static getTracks(trackType = "wip") {
         // if tracks fail return default
+        console.log({ publicPath });
+
         return trackType.toLowerCase === "comparison"
             ? this.defaultComparisonTracks
             : this.defaultTracks;
