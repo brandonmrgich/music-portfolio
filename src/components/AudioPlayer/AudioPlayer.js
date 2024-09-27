@@ -35,7 +35,7 @@ class AudioPlayer extends ABCAudioPlayer {
             <button
                 onClick={this.handleLike}
                 disabled={hasLiked}
-                className="px-2 py-1 rounded bg-comfy-accent2 bg-opacity-50"
+                className="400 px-2 py-1 rounded bg-comfy-accent2 bg-opacity-50"
             >
                 Like ({likes})
             </button>

@@ -1,17 +1,21 @@
 import React, { useState, useEffect } from "react";
 import AudioUpload from "../admin/AudioUpload";
+import { useTracks } from "../Hooks";
 import AudioGrid from "./AudioPlayer/AudioGrid";
-import AudioLoader from "./AudioPlayer/AudioLoader";
 import ContactForm from "./ContactForm";
 import { FaCheckCircle, FaExclamationCircle } from "react-icons/fa";
 
 const Services = ({ isAdmin }) => {
-    const [tracks, setTracks] = useState(AudioLoader.getTracks("comparison"));
-    const [error, setError] = useState(null);
+    const { tracks, isLoading, error, isComparison } = useTracks("reel");
+    console.log({ tracks });
 
-    useEffect(() => {
-        console.log("");
-    }, []);
+    if (isLoading) {
+        return <div>Loading tracks...</div>;
+    }
+
+    if (error) {
+        return <div>Error: {error}</div>;
+    }
 
     return (
         <div className="services p-6 max-w-4xl mx-auto space-y-12">
@@ -42,13 +46,7 @@ const Services = ({ isAdmin }) => {
                 <h2 className="text-2xl font-semibold text-primary-dark">
                     Here's a few tracks I'm particularly proud of:
                 </h2>
-                {error && (
-                    <p className="error-message text-red-500 flex items-center space-x-2">
-                        <FaExclamationCircle />
-                        <span>{error}</span>
-                    </p>
-                )}
-                <AudioGrid tracks={tracks} isComparison={true} />
+                <AudioGrid tracks={tracks} isComparison={isComparison} />
             </section>
 
             <section className="contact space-y-4">

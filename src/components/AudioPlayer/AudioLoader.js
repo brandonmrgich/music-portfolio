@@ -1,52 +1,57 @@
-import React, { useState, useEffect } from "react";
-import defaultTracks from "audio/defaultTracklist.json";
+import defaultTracks from "./defaultTracklist.json";
 
+// TODO: Remove after API postman checks
 const publicPath = process.env.PUBLIC_URL;
-const wip = publicPath + "audio/wip";
 
 class AudioLoader {
     constructor() {
-        this.state = {
-            error: "",
-        };
-        fetch("./audio/defaultTracklist.json")
-            .then((res) => res.json())
-            .then((data) => {
-                this.defaultTrackData = data;
-            });
+        this.defaultTrackData = defaultTracks;
+    }
+    static trackTypes = {
+        "wip": defaultTracks.WIP,
+        "scoring": defaultTracks.SCORING,
+        "reel": defaultTracks.REEL,
+    };
+
+    static async getLocalTracks(trackType = "wip") {
+        console.debug("AudioLoader::getLocalTracks():", { trackType });
+
+        const tracks = this.trackTypes[trackType.toLowerCase()] || this.trackTypes["wip"];
+        //const tracks = trackType.toLowerCase() === "comparison" ? defaultTracks.SCORING : defaultTracks.WIP;
+
+        console.debug("AudioLoader::getLocalTracks():", { tracks });
+        console.debug("Local tracks JSON had this: ", tracks);
+
+        return tracks.map((track) => ({
+            ...track,
+            id: track.id || `${trackType}-${track.filename}`,
+            src: `/audio/${trackType}/${track.src}`,
+            beforeSrc: track.beforeSrc ? `/audio/${trackType}/${track.beforeSrc}` : null,
+            afterSrc: track.afterSrc ? `/audio/${trackType}/${track.afterSrc}` : null,
+        }));
     }
 
-    loadAudio(path) {
-        // TODO: Check path, load src, default title to src basename, default to type: defaultTrack
+    static async getAPITracks(trackType = "wip") {
+        try {
+            const response = await fetch(`/api/audio/${trackType}`);
+            if (!response.ok) {
+                throw new Error("Failed to fetch audio files from API");
+            }
+            return await response.json();
+        } catch (error) {
+            console.error("Error fetching API tracks:", error);
+            return [];
+        }
     }
 
-    static defaultTracks = defaultTracks.WIP;
-    static defaultComparisonTracks = defaultTracks.SCORING;
+    static async getAllTracks(trackType = "wip") {
+        const [localTracks, apiTracks] = await Promise.all([
+            this.getLocalTracks(trackType),
+            this.getAPITracks(trackType),
+        ]);
 
-    static getTracks(trackType = "wip") {
-        // if tracks fail return default
-        console.log({ publicPath });
-
-        return trackType.toLowerCase === "comparison"
-            ? this.defaultComparisonTracks
-            : this.defaultTracks;
-    }
-
-    lazyLoad() {
-        fetch("/api/audio")
-            .then((response) => {
-                if (!response.ok) {
-                    console.error(response.status, ":", response.statusText);
-                    setError("Unable to load audio tracks. Please try again later.");
-                    throw new Error("Failed to fetch audio files");
-                }
-                return response.json();
-            })
-            .then((data) => setTracks(data), setError(""))
-            .catch((err) => {
-                console.error(err);
-                setError("Unable to fetch audio tracks. Please try again later.");
-            });
+        return [...localTracks, ...apiTracks];
     }
 }
+
 export default AudioLoader;

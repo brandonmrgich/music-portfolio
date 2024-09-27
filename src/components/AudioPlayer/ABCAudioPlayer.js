@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import { Play, Pause, LoaderCircle } from "lucide-react";
 
-class BaseAudioPlayer extends Component {
+class ABCAudioPlayer extends Component {
     constructor(props) {
         super(props);
         this.state = {
@@ -10,6 +10,7 @@ class BaseAudioPlayer extends Component {
             duration: 0,
             error: "",
             isLoading: false,
+            // currentTrackIndex: 0,
         };
         this.audioRef = React.createRef();
     }
@@ -43,12 +44,10 @@ class BaseAudioPlayer extends Component {
     play = () => {
         this.setState({ isLoading: true, error: "" });
         const playPromise = this.audioRef.current.play();
-        console.log(this.audioRef.current);
 
         if (playPromise !== undefined) {
             playPromise
                 .then(() => {
-                    console.log("ref: ", this.audioRef.current);
                     this.setState({ isPlaying: true, isLoading: false });
                 })
                 .catch((error) => {
@@ -85,13 +84,15 @@ class BaseAudioPlayer extends Component {
 
     render() {
         const { isPlaying, currentTime, duration, error, isLoading } = this.state;
-        const { title, src } = this.props;
+        const { title, src, url } = this.props;
+
+        //const currentTrack = tracks[this.state.currentTrackIndex];
 
         return (
             <div className="audio-player p-4 rounded-lg mb-4 flex-shrink border border-comfy-dark bg-comfy-accent2 bg-opacity-5 shadow-lg">
                 <h3 className="text-lg font-semibold mb-2 text-white">
                     <a
-                        href="https://google.com/"
+                        href={url || "#"}
                         className="text-comfy-accent1 hover:text-comfy-accent2 transition-colors"
                     >
                         {title}
@@ -108,8 +109,7 @@ class BaseAudioPlayer extends Component {
                         disabled={isLoading}
                         className="bg-comfy-accent2 bg-opacity-50 text-comfy-dark px-4 py-2 rounded-lg hover:bg-gray-600 transition-colors disabled:opacity-50"
                     >
-                        {isLoading ? <LoaderCircle /> : isPlaying ? <Pause /> : <Play />}{" "}
-                        {/*TODO: Animate*/}
+                        {isLoading ? <LoaderCircle /> : isPlaying ? <Pause /> : <Play />}
                     </button>
                     <input
                         type="range"
@@ -130,4 +130,4 @@ class BaseAudioPlayer extends Component {
     }
 }
 
-export default BaseAudioPlayer;
+export default ABCAudioPlayer;

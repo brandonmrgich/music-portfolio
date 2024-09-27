@@ -1,18 +1,22 @@
 import React, { useState, useEffect } from "react";
 import AudioGrid from "./AudioPlayer/AudioGrid";
-import AudioLoader from "./AudioPlayer/AudioLoader";
+import { useTracks } from "../Hooks";
 
 /**
  * Scoring page component.
  * @returns {React.Component} The Scoring page component
  */
 const Scoring = ({ isAdmin }) => {
-    const [tracks, setTracks] = useState(AudioLoader.getTracks());
+    const { tracks, isLoading, error, isComparison } = useTracks("scoring");
+    console.log({ tracks });
 
-    // useEffect(() => {
-    //     // Fetch tracks from an API or load from a local source
-    //     setTracks(defaultTracks);
-    // }, []);
+    if (isLoading) {
+        return <div>Loading tracks...</div>;
+    }
+
+    if (error) {
+        return <div>Error: {error}</div>;
+    }
 
     return (
         <div className="in-work p-6 max-w-4xl mx-auto space-y-12">
@@ -26,7 +30,7 @@ const Scoring = ({ isAdmin }) => {
                     Festivals, etc
                 </p>
             </section>
-            <AudioGrid tracks={tracks} isComparison={false} />
+            <AudioGrid tracks={tracks} isComparison={isComparison} />
         </div>
     );
 };

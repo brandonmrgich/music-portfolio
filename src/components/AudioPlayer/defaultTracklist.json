@@ -1,0 +1,41 @@
+{
+    "WIP": [
+        {
+            "id": 1,
+            "title": "Song 1",
+            "src": "default.mp3",
+            "url": "https://google.com"
+        },
+        {
+            "id": 2,
+            "title": "Song 2",
+            "src": "default2.mp3",
+            "url": "https://google.com"
+        }
+    ],
+
+    "SCORING": [
+        {
+            "id": 3,
+            "title": "Song 1",
+            "src": "default.mp3",
+            "url": "https://google.com"
+        },
+        {
+            "id": 4,
+            "title": "Song 2",
+            "src": "default2.mp3",
+            "url": "https://google.com"
+        }
+    ],
+
+    "REEL": [
+        {
+            "id": 5,
+            "title": "Song 1",
+            "beforeSrc": "default.mp3",
+            "afterSrc": "default2.mp3",
+            "url": "https://google.com"
+        }
+    ]
+}

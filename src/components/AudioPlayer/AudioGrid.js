@@ -15,6 +15,7 @@ const AudioGrid = ({ tracks, isComparison }) => {
             {tracks.map((track) =>
                 isComparison ? (
                     <AudioComparisonPlayer
+                        url={track.url}
                         key={track.id}
                         beforeSrc={track.beforeSrc}
                         afterSrc={track.afterSrc}
@@ -22,6 +23,7 @@ const AudioGrid = ({ tracks, isComparison }) => {
                     />
                 ) : (
                     <AudioPlayer
+                        url={track.url}
                         key={track.id}
                         src={track.src}
                         title={track.title}
