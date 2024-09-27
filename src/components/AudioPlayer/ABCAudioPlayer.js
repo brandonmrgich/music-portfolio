@@ -5,6 +5,7 @@ class ABCAudioPlayer extends Component {
     constructor(props) {
         super(props);
         this.state = {
+            src: "",
             isPlaying: false,
             currentTime: 0,
             duration: 0,
@@ -24,6 +25,12 @@ class ABCAudioPlayer extends Component {
         this.audioRef.current.removeEventListener("timeupdate", this.handleTimeUpdate);
         this.audioRef.current.removeEventListener("loadedmetadata", this.handleLoadedMetadata);
     }
+
+    // TODO: Update the following to both update the seek bar, as well as start the new audio at the
+    // correct time
+    //componentDidUpdate() {
+    //    this.audioRef.current.removeEventListener("timeupdate", this.handleTimeUpdate);
+    //}
 
     handleTimeUpdate = () => {
         this.setState({ currentTime: this.audioRef.current.currentTime });
@@ -84,7 +91,11 @@ class ABCAudioPlayer extends Component {
 
     render() {
         const { isPlaying, currentTime, duration, error, isLoading } = this.state;
-        const { title, src, url } = this.props;
+        const { title, url, src } = this.props;
+
+        let currentSource = this.state.src || src;
+
+        console.log({ currentSource });
 
         //const currentTrack = tracks[this.state.currentTrackIndex];
 
@@ -100,7 +111,7 @@ class ABCAudioPlayer extends Component {
                 </h3>
                 <audio
                     ref={this.audioRef}
-                    src={src}
+                    src={currentSource}
                     className="w-full mb-3 rounded-lg border border-gray-700 bg-gray-900"
                 />
                 <div className="flex flex-shrink items-center text-gray-400">

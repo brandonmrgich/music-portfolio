@@ -25,7 +25,7 @@ class AudioLoader {
         return tracks.map((track) => ({
             ...track,
             id: track.id || `${trackType}-${track.filename}`,
-            src: `/audio/${trackType}/${track.src}`,
+            src: track.src ? `/audio/${trackType}/${track.src}` : null,
             beforeSrc: track.beforeSrc ? `/audio/${trackType}/${track.beforeSrc}` : null,
             afterSrc: track.afterSrc ? `/audio/${trackType}/${track.afterSrc}` : null,
         }));
