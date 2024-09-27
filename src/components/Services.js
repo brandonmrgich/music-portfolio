@@ -10,20 +10,7 @@ const Services = ({ isAdmin }) => {
     const [error, setError] = useState(null);
 
     useEffect(() => {
-        fetch("/api/audio")
-            .then((response) => {
-                if (!response.ok) {
-                    console.error(response.status, ":", response.statusText);
-                    setError("Unable to load audio tracks. Please try again later.");
-                    throw new Error("Failed to fetch audio files");
-                }
-                return response.json();
-            })
-            .then((data) => setTracks(data), setError(""))
-            .catch((err) => {
-                console.error(err);
-                setError("Unable to fetch audio tracks. Please try again later.");
-            });
+        console.log("");
     }, []);
 
     return (

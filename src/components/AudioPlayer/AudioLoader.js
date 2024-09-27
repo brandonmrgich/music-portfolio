@@ -1,60 +1,27 @@
 import React, { useState, useEffect } from "react";
+import defaultTracks from "audio/defaultTracklist.json";
+
 const publicPath = process.env.PUBLIC_URL;
 const wip = publicPath + "audio/wip";
 
 class AudioLoader {
+    constructor() {
+        this.state = {
+            error: "",
+        };
+        fetch("./audio/defaultTracklist.json")
+            .then((res) => res.json())
+            .then((data) => {
+                this.defaultTrackData = data;
+            });
+    }
+
     loadAudio(path) {
         // TODO: Check path, load src, default title to src basename, default to type: defaultTrack
     }
-    static defaultTracks = [
-        {
-            id: 1,
-            title: "Placeholder Song 1",
-            src: wip + "/default.mp3",
-        },
-        {
-            id: 2,
-            title: "Placeholder Song 2",
-            src: wip + "/default.mp3",
-        },
-        {
-            id: 3,
-            title: "Placeholder Song 4",
-            src: wip + "/default.mp3",
-        },
-        {
-            id: 4,
-            title: "Placeholder Song 4",
-            src: wip + "/default.mp3",
-        },
-    ];
 
-    static defaultComparisonTracks = [
-        {
-            id: 1,
-            title: "Placeholder Song 1",
-            beforeSrc: "/path/to/before1.mp3",
-            afterSrc: "/path/to/after1.mp3",
-        },
-        {
-            id: 2,
-            title: "Placeholder Song 2",
-            beforeSrc: "/path/to/before2.mp3",
-            afterSrc: "/path/to/after2.mp3",
-        },
-        {
-            id: 3,
-            title: "Placeholder Song 4",
-            beforeSrc: "/path/to/before1.mp3",
-            afterSrc: "/path/to/after1.mp3",
-        },
-        {
-            id: 4,
-            title: "Placeholder Song 4",
-            beforeSrc: "/path/to/before2.mp3",
-            afterSrc: "/path/to/after2.mp3",
-        },
-    ];
+    static defaultTracks = defaultTracks.WIP;
+    static defaultComparisonTracks = defaultTracks.SCORING;
 
     static getTracks(trackType = "wip") {
         // if tracks fail return default
@@ -65,10 +32,21 @@ class AudioLoader {
             : this.defaultTracks;
     }
 
-    //    constructor(props) {
-    //        super(props);
-    //        this.state = {};
-    //    }
+    lazyLoad() {
+        fetch("/api/audio")
+            .then((response) => {
+                if (!response.ok) {
+                    console.error(response.status, ":", response.statusText);
+                    setError("Unable to load audio tracks. Please try again later.");
+                    throw new Error("Failed to fetch audio files");
+                }
+                return response.json();
+            })
+            .then((data) => setTracks(data), setError(""))
+            .catch((err) => {
+                console.error(err);
+                setError("Unable to fetch audio tracks. Please try again later.");
+            });
+    }
 }
-
 export default AudioLoader;

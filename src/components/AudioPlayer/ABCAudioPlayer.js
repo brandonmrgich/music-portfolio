@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { Play, Pause } from "lucide-react";
+import { Play, Pause, LoaderCircle } from "lucide-react";
 
 class BaseAudioPlayer extends Component {
     constructor(props) {
@@ -102,13 +102,14 @@ class BaseAudioPlayer extends Component {
                     src={src}
                     className="w-full mb-3 rounded-lg border border-gray-700 bg-gray-900"
                 />
-                <div className="flex items-center text-gray-400">
+                <div className="flex flex-shrink items-center text-gray-400">
                     <button
                         onClick={this.togglePlayPause}
                         disabled={isLoading}
                         className="bg-comfy-accent2 bg-opacity-50 text-comfy-dark px-4 py-2 rounded-lg hover:bg-gray-600 transition-colors disabled:opacity-50"
                     >
-                        {isLoading ? "Loading..." : isPlaying ? <Pause /> : <Play />}
+                        {isLoading ? <LoaderCircle /> : isPlaying ? <Pause /> : <Play />}{" "}
+                        {/*TODO: Animate*/}
                     </button>
                     <input
                         type="range"
@@ -118,7 +119,7 @@ class BaseAudioPlayer extends Component {
                         onChange={this.handleSeek}
                         className="flex-grow mx-3 accent-comfy-accent2 opacity-60"
                     />
-                    <span className="text-sm">
+                    <span className="text-sm ">
                         {this.formatTime(currentTime)} / {this.formatTime(duration)}
                     </span>
                 </div>
