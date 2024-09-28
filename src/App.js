@@ -67,6 +67,9 @@ const App = () => {
                                     Scoring
                                 </Link>
                             </li>
+                            <div className="flex justify-center mb-4">
+                                <ContactButton />
+                            </div>
                         </ul>
                     </nav>
 

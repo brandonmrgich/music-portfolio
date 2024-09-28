@@ -51,10 +51,6 @@ const Services = ({ isAdmin }) => {
                 <AudioGrid tracks={tracks} isComparison={isComparison} />
             </section>
 
-            <section className="contact space-y-4">
-                <ContactButton />
-            </section>
-
             {isAdmin && (
                 <section className="admin space-y-4">
                     <h2 className="text-2xl font-semibold text-gray-800">Admin</h2>
