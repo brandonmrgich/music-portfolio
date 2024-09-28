@@ -14,13 +14,11 @@ class AudioLoader {
     };
 
     static async getLocalTracks(trackType = "wip") {
-        console.debug("AudioLoader::getLocalTracks():", { trackType });
+        console.log("AudioLoader::getLocalTracks():", { trackType });
 
         const tracks = this.trackTypes[trackType.toLowerCase()] || this.trackTypes["wip"];
-        //const tracks = trackType.toLowerCase() === "comparison" ? defaultTracks.SCORING : defaultTracks.WIP;
 
-        console.debug("AudioLoader::getLocalTracks():", { tracks });
-        console.debug("Local tracks JSON had this: ", tracks);
+        console.log("AudioLoader::getLocalTracks():", { tracks });
 
         return tracks.map((track) => ({
             ...track,

@@ -1,82 +1,67 @@
 import React, { Component } from "react";
 import { Play, Pause, LoaderCircle } from "lucide-react";
+import { useAudio } from "../../contexts/AudioContext"; // Import the context
+import withAudioContext from "./withAudioContext";
 
 class ABCAudioPlayer extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            src: "",
-            isPlaying: false,
             currentTime: 0,
             duration: 0,
             error: "",
             isLoading: false,
-            // currentTrackIndex: 0,
         };
-        this.audioRef = React.createRef();
+        this.intervalId = null;
     }
 
     componentDidMount() {
-        this.audioRef.current.addEventListener("timeupdate", this.handleTimeUpdate);
-        this.audioRef.current.addEventListener("loadedmetadata", this.handleLoadedMetadata);
+        const { audioRef } = this.props; // AudioRef is coming from context
+        if (audioRef && audioRef.current) {
+            audioRef.current.addEventListener("loadedmetadata", this.handleLoadedMetadata);
+            this.startTimeUpdate();
+        }
     }
 
     componentWillUnmount() {
-        this.audioRef.current.removeEventListener("timeupdate", this.handleTimeUpdate);
-        this.audioRef.current.removeEventListener("loadedmetadata", this.handleLoadedMetadata);
+        const { audioRef } = this.props;
+        if (audioRef && audioRef.current) {
+            audioRef.current.removeEventListener("loadedmetadata", this.handleLoadedMetadata);
+            this.stopTimeUpdate();
+        }
     }
 
-    // TODO: Update the following to both update the seek bar, as well as start the new audio at the
-    // correct time
-    //componentDidUpdate() {
-    //    this.audioRef.current.removeEventListener("timeupdate", this.handleTimeUpdate);
-    //}
+    startTimeUpdate = () => {
+        const { audioRef, currentPlayingId, id } = this.props;
+        this.intervalId = setInterval(() => {
+            if (audioRef && audioRef.current && currentPlayingId === id) {
+                this.setState({ currentTime: audioRef.current.currentTime });
+            }
+        }, 1000);
+    };
 
-    handleTimeUpdate = () => {
-        this.setState({ currentTime: this.audioRef.current.currentTime });
+    stopTimeUpdate = () => {
+        if (this.intervalId) {
+            clearInterval(this.intervalId);
+        }
     };
 
     handleLoadedMetadata = () => {
-        this.setState({ duration: this.audioRef.current.duration });
+        const { audioRef, currentPlayingId, id } = this.props;
+        if (audioRef && audioRef.current && currentPlayingId === id) {
+            this.setState({ duration: audioRef.current.duration });
+        }
     };
 
     togglePlayPause = () => {
-        if (this.state.isPlaying) {
-            this.pause();
+        const { globalIsPlaying, currentPlayingId, id, play, pause, src } = this.props;
+        if (globalIsPlaying && currentPlayingId === id) {
+            pause();
         } else {
-            this.play();
+            this.setState({ isLoading: true, error: "" });
+            play(id, src);
+            this.setState({ isLoading: false });
         }
-    };
-
-    play = () => {
-        this.setState({ isLoading: true, error: "" });
-        const playPromise = this.audioRef.current.play();
-
-        if (playPromise !== undefined) {
-            playPromise
-                .then(() => {
-                    this.setState({ isPlaying: true, isLoading: false });
-                })
-                .catch((error) => {
-                    console.error("Playback failed:", error);
-                    this.setState({
-                        isPlaying: false,
-                        isLoading: false,
-                        error: "Failed to play track, please try again later.",
-                    });
-                });
-        }
-    };
-
-    pause = () => {
-        this.audioRef.current.pause();
-        this.setState({ isPlaying: false });
-    };
-
-    handleSeek = (e) => {
-        const seekTime = e.target.value;
-        this.audioRef.current.currentTime = seekTime;
-        this.setState({ currentTime: seekTime });
     };
 
     formatTime = (time) => {
@@ -90,14 +75,10 @@ class ABCAudioPlayer extends Component {
     }
 
     render() {
-        const { isPlaying, currentTime, duration, error, isLoading } = this.state;
-        const { title, url, src } = this.props;
+        const { currentTime, duration, error, isLoading } = this.state;
+        const { title, url, id, globalIsPlaying, currentPlayingId } = this.props;
 
-        let currentSource = this.state.src || src;
-
-        console.log({ currentSource });
-
-        //const currentTrack = tracks[this.state.currentTrackIndex];
+        const isThisPlaying = globalIsPlaying && currentPlayingId === id;
 
         return (
             <div className="audio-player p-4 rounded-lg mb-4 flex-shrink border border-comfy-dark bg-comfy-accent2 bg-opacity-5 shadow-lg">
@@ -109,18 +90,13 @@ class ABCAudioPlayer extends Component {
                         {title}
                     </a>
                 </h3>
-                <audio
-                    ref={this.audioRef}
-                    src={currentSource}
-                    className="w-full mb-3 rounded-lg border border-gray-700 bg-gray-900"
-                />
                 <div className="flex flex-shrink items-center text-gray-400">
                     <button
                         onClick={this.togglePlayPause}
                         disabled={isLoading}
                         className="bg-comfy-accent2 bg-opacity-50 text-comfy-dark px-4 py-2 rounded-lg hover:bg-gray-600 transition-colors disabled:opacity-50"
                     >
-                        {isLoading ? <LoaderCircle /> : isPlaying ? <Pause /> : <Play />}
+                        {isLoading ? <LoaderCircle /> : isThisPlaying ? <Pause /> : <Play />}
                     </button>
                     <input
                         type="range"
