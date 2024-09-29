@@ -3,60 +3,74 @@ import React, { createContext, useContext, useState, useRef, useEffect } from "r
 const AudioContext = createContext();
 
 export const AudioProvider = ({ children }) => {
-    const [globalIsPlaying, setGlobalIsPlaying] = useState(false);
-    const [currentPlayingId, setCurrentPlayingId] = useState(null);
-    const audioRef = useRef(null); // Initially null
+    const [playingStates, setPlayingStates] = useState({});
+    const audioRefs = useRef({});
 
-    useEffect(() => {
-        if (!audioRef.current) {
-            audioRef.current = new Audio(); // Initialize audio element when the provider mounts
+    const play = (id, src) => {
+        console.log("in play");
+
+        console.log("AudioProvider::play(): Attempting to play the following audio", {
+            children,
+            id,
+            src,
+            audioRefs,
+        });
+
+        // Stop all other audio
+        Object.keys(audioRefs.current).forEach((key) => {
+            if (key !== id && audioRefs.current[key]) {
+                console.log("There was active audio, paused");
+                stop(key);
+            }
+        });
+
+        // Play the selected audio
+        if (!audioRefs.current[id]) {
+            audioRefs.current[id] = new Audio(src);
+            console.log("AudioProvider::play(): Creating entry", audioRefs.current[id]);
         }
 
-        const handleEnded = () => {
-            setGlobalIsPlaying(false);
-            setCurrentPlayingId(null);
-        };
+        console.log("AudioProvider::play(): Playing");
+        audioRefs.current[id].play();
+        setPlayingStates((prev) => ({ ...prev, [id]: true }));
+    };
 
-        audioRef.current.addEventListener("ended", handleEnded);
+    const pause = (id) => {
+        console.log("AudioProvider::pause(): Pausing");
+        if (audioRefs.current[id]) {
+            audioRefs.current[id].pause();
+            setPlayingStates((prev) => ({ ...prev, [id]: false }));
+        }
+    };
 
+    const seek = (id, time) => {
+        if (audioRefs.current[id]) {
+            audioRefs.current[id].currentTime = time;
+        }
+    };
+
+    const stop = (id) => {
+        if (audioRefs.current[id]) {
+            audioRefs.current[id].pause();
+            audioRefs.current[id].currentTime = 0;
+            setPlayingStates((prev) => ({ ...prev, [id]: false }));
+        }
+    };
+
+    useEffect(() => {
+        // Cleanup function to stop all audio when unmounting
         return () => {
-            if (audioRef.current) {
-                audioRef.current.removeEventListener("ended", handleEnded);
-            }
+            Object.values(audioRefs.current).forEach((audio) => {
+                if (audio) {
+                    audio.pause();
+                    audio.currentTime = 0;
+                }
+            });
         };
     }, []);
 
-    const play = (id, src) => {
-        if (currentPlayingId !== id) {
-            if (audioRef.current) {
-                audioRef.current.src = src;
-                audioRef.current.currentTime = 0;
-                audioRef.current.play();
-            }
-            setCurrentPlayingId(id);
-            setGlobalIsPlaying(true);
-        } else {
-            audioRef.current.play(); // Resume the current audio
-        }
-    };
-
-    const pause = () => {
-        if (audioRef.current) {
-            audioRef.current.pause();
-        }
-        setGlobalIsPlaying(false);
-    };
-
-    const seek = (time) => {
-        if (audioRef.current) {
-            audioRef.current.currentTime = time;
-        }
-    };
-
     return (
-        <AudioContext.Provider
-            value={{ globalIsPlaying, currentPlayingId, play, pause, seek, audioRef }}
-        >
+        <AudioContext.Provider value={{ playingStates, play, pause, seek, stop, audioRefs }}>
             {children}
         </AudioContext.Provider>
     );

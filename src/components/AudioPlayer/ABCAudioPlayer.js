@@ -1,7 +1,5 @@
 import React, { Component } from "react";
-import { Play, Pause, LoaderCircle } from "lucide-react";
-import { useAudio } from "../../contexts/AudioContext"; // Import the context
-import withAudioContext from "./withAudioContext";
+import { Play, Pause, LoaderCircle, SquareIcon as Stop } from "lucide-react";
 
 class ABCAudioPlayer extends Component {
     constructor(props) {
@@ -12,56 +10,72 @@ class ABCAudioPlayer extends Component {
             error: "",
             isLoading: false,
         };
-        this.intervalId = null;
+        //this.intervalId = null;
+        console.log("ABCAudioPlayer::constructor(): ", { props });
     }
 
     componentDidMount() {
-        const { audioRef } = this.props; // AudioRef is coming from context
-        if (audioRef && audioRef.current) {
-            audioRef.current.addEventListener("loadedmetadata", this.handleLoadedMetadata);
-            this.startTimeUpdate();
+        const { id, audioRefs } = this.props; // AudioRef is coming from context
+        if (audioRefs.current[id]) {
+            audioRefs.current[id].addEventListener("loadedmetadata", this.handleLoadedMetadata);
+            audioRefs.current[id].addEventListener("timeupdate", this.handleTimeUpdate);
         }
+    }
+
+    componentDidUpdate() {
+        const { id, audioRefs } = this.props; // AudioRef is coming from context
+        let props = this.props;
+        let state = this.state;
+        console.log("ABCAudioPlayer::componentDidUpdate(): State, props: ", { state, props });
+
+        //if (audioRefs.current[id]) {
+        //}
     }
 
     componentWillUnmount() {
-        const { audioRef } = this.props;
-        if (audioRef && audioRef.current) {
-            audioRef.current.removeEventListener("loadedmetadata", this.handleLoadedMetadata);
-            this.stopTimeUpdate();
+        const { id, audioRefs } = this.props;
+        if (audioRefs.current[id]) {
+            audioRefs.current[id].removeEventListener("loadedmetadata", this.handleLoadedMetadata);
+            audioRefs.current[id].removeEventListener("timeupdate", this.handleTimeUpdate);
         }
     }
 
-    startTimeUpdate = () => {
-        const { audioRef, currentPlayingId, id } = this.props;
-        this.intervalId = setInterval(() => {
-            if (audioRef && audioRef.current && currentPlayingId === id) {
-                this.setState({ currentTime: audioRef.current.currentTime });
-            }
-        }, 1000);
-    };
-
-    stopTimeUpdate = () => {
-        if (this.intervalId) {
-            clearInterval(this.intervalId);
+    handleTimeUpdate = () => {
+        const { id, audioRefs } = this.props;
+        if (audioRefs.current[id]) {
+            this.setState({ currentTime: audioRefs.current[id].currentTime });
         }
     };
 
     handleLoadedMetadata = () => {
-        const { audioRef, currentPlayingId, id } = this.props;
-        if (audioRef && audioRef.current && currentPlayingId === id) {
-            this.setState({ duration: audioRef.current.duration });
+        const { id, audioRefs } = this.props;
+        if (audioRefs.current[id]) {
+            this.setState({ duration: audioRefs.current[id].duration });
         }
     };
 
     togglePlayPause = () => {
-        const { globalIsPlaying, currentPlayingId, id, play, pause, src } = this.props;
-        if (globalIsPlaying && currentPlayingId === id) {
-            pause();
+        const { playingStates, id, play, pause, src } = this.props;
+        if (playingStates[id]) {
+            pause(id);
         } else {
             this.setState({ isLoading: true, error: "" });
             play(id, src);
             this.setState({ isLoading: false });
         }
+    };
+
+    handleStop = () => {
+        const { stop, id } = this.props;
+
+        console.log("ABCAudioPlayer::handleStop(): ", { stop });
+        stop(id);
+    };
+
+    handleSeek = (e) => {
+        console.log("Seeking");
+        const { seek, id } = this.props;
+        seek(id, parseFloat(e.target.value));
     };
 
     formatTime = (time) => {
@@ -76,9 +90,16 @@ class ABCAudioPlayer extends Component {
 
     render() {
         const { currentTime, duration, error, isLoading } = this.state;
-        const { title, url, id, globalIsPlaying, currentPlayingId } = this.props;
+        const { title, url, id, playingStates } = this.props;
 
-        const isThisPlaying = globalIsPlaying && currentPlayingId === id;
+        const isPlaying = playingStates[id] || false;
+
+        console.log("ABCAudioPlayer::render(): Data: ", {
+            currentTime,
+            duration,
+            error,
+            isLoading,
+        });
 
         return (
             <div className="audio-player p-4 rounded-lg mb-4 flex-shrink border border-comfy-dark bg-comfy-accent2 bg-opacity-5 shadow-lg">
@@ -96,7 +117,19 @@ class ABCAudioPlayer extends Component {
                         disabled={isLoading}
                         className="bg-comfy-accent2 bg-opacity-50 text-comfy-dark px-4 py-2 rounded-lg hover:bg-gray-600 transition-colors disabled:opacity-50"
                     >
-                        {isLoading ? <LoaderCircle /> : isThisPlaying ? <Pause /> : <Play />}
+                        {isLoading ? (
+                            <LoaderCircle />
+                        ) : isPlaying ? (
+                            <Pause className="size-5" />
+                        ) : (
+                            <Play className="size-5" />
+                        )}
+                    </button>
+                    <button
+                        onClick={this.handleStop}
+                        className="bg-comfy-accent2 bg-opacity-50 text-comfy-dark px-4 py-2 rounded-lg hover:bg-gray-600 transition-colors ml-2"
+                    >
+                        <Stop className="size-5" />
                     </button>
                     <input
                         type="range"

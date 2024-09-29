@@ -13,14 +13,14 @@ class AudioComparisonPlayer extends ABCAudioPlayer {
 
     toggleAudioSource = () => {
         const { isBeforeAudio } = this.state;
-        const { beforeSrc, afterSrc, play, id, currentAudio } = this.props;
+        const { beforeSrc, afterSrc, play, id, seek, audioRefs } = this.props;
         const newSource = isBeforeAudio ? afterSrc : beforeSrc;
 
         this.setState({ isBeforeAudio: !isBeforeAudio }, () => {
-            if (this.props.globalIsPlaying && this.props.currentPlayingId === id) {
-                const currentTime = currentAudio ? currentAudio.currentTime : 0;
+            if (this.props.playingStates[id]) {
+                const currentTime = audioRefs.current[id] ? audioRefs.current[id].currentTime : 0;
                 play(id, newSource);
-                this.props.seek(currentTime);
+                seek(id, currentTime);
             }
         });
     };
