@@ -10,7 +10,6 @@ import AudioComparisonPlayer from "./AudioComparisonPlayer";
  * @returns {React.Component} AudioGrid component
  */
 const AudioGrid = ({ tracks, isComparison }) => {
-    console.log("AudioGrid::tracks.map(): ", { tracks });
     return (
         <div className="audio-grid grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {tracks.map((track) =>

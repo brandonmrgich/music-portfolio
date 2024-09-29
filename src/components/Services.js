@@ -9,8 +9,6 @@ const Services = ({ isAdmin }) => {
     const { tracks, isLoading, error, isComparison } = useTracks("reel");
     const contactFormRef = useRef(null); // Ref to control the contact form
 
-    console.log({ tracks });
-
     if (isLoading) {
         return <div>Loading tracks...</div>;
     }
@@ -21,8 +19,6 @@ const Services = ({ isAdmin }) => {
 
     return (
         <div className="services p-6 max-w-4xl mx-auto space-y-12">
-            <h1 className="text-4xl font-bold text-center mb-8 text-primary-dark">Services</h1>
-
             <section className="mixing-mastering space-y-4">
                 <h2 className="text-3xl font-semibold text-primary-dark">Mixing and Mastering</h2>
                 <p className="text-lg text-secondary-dark">

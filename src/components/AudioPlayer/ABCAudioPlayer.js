@@ -10,12 +10,12 @@ class ABCAudioPlayer extends Component {
             error: "",
             isLoading: false,
         };
-        //this.intervalId = null;
-        console.log("ABCAudioPlayer::constructor(): ", { props });
     }
 
     componentDidMount() {
-        const { id, audioRefs } = this.props; // AudioRef is coming from context
+        const { id, audioRefs, src } = this.props; // AudioRef is coming from context
+        audioRefs.current[id] = new Audio(src); // On mount create the audio ref
+
         if (audioRefs.current[id]) {
             audioRefs.current[id].addEventListener("loadedmetadata", this.handleLoadedMetadata);
             audioRefs.current[id].addEventListener("timeupdate", this.handleTimeUpdate);
@@ -23,13 +23,14 @@ class ABCAudioPlayer extends Component {
     }
 
     componentDidUpdate() {
-        const { id, audioRefs } = this.props; // AudioRef is coming from context
-        let props = this.props;
-        let state = this.state;
-        console.log("ABCAudioPlayer::componentDidUpdate(): State, props: ", { state, props });
+        const { id, audioRefs } = this.props;
 
-        //if (audioRefs.current[id]) {
-        //}
+        console.log("ComponentDidUpdate", { id, audioRefs });
+
+        if (audioRefs.current[id]) {
+            audioRefs.current[id].addEventListener("loadedmetadata", this.handleLoadedMetadata);
+            audioRefs.current[id].addEventListener("timeupdate", this.handleTimeUpdate);
+        }
     }
 
     componentWillUnmount() {
@@ -42,6 +43,8 @@ class ABCAudioPlayer extends Component {
 
     handleTimeUpdate = () => {
         const { id, audioRefs } = this.props;
+        let currentTime = audioRefs.current[id].currentTIme;
+
         if (audioRefs.current[id]) {
             this.setState({ currentTime: audioRefs.current[id].currentTime });
         }
@@ -49,6 +52,8 @@ class ABCAudioPlayer extends Component {
 
     handleLoadedMetadata = () => {
         const { id, audioRefs } = this.props;
+        let duration = audioRefs.current[id].duration;
+
         if (audioRefs.current[id]) {
             this.setState({ duration: audioRefs.current[id].duration });
         }
@@ -68,12 +73,10 @@ class ABCAudioPlayer extends Component {
     handleStop = () => {
         const { stop, id } = this.props;
 
-        console.log("ABCAudioPlayer::handleStop(): ", { stop });
         stop(id);
     };
 
     handleSeek = (e) => {
-        console.log("Seeking");
         const { seek, id } = this.props;
         seek(id, parseFloat(e.target.value));
     };
@@ -88,21 +91,20 @@ class ABCAudioPlayer extends Component {
         return null;
     }
 
+    // TODO: Rerender component on page change
+    // Get last location and current location with react router
     render() {
         const { currentTime, duration, error, isLoading } = this.state;
         const { title, url, id, playingStates } = this.props;
-
         const isPlaying = playingStates[id] || false;
 
-        console.log("ABCAudioPlayer::render(): Data: ", {
-            currentTime,
-            duration,
-            error,
-            isLoading,
-        });
+        let props = this.props;
+        let state = this.state;
+
+        //console.log("ABCAudioPlayer:render(): ", { props, state });
 
         return (
-            <div className="audio-player p-4 rounded-lg mb-4 flex-shrink border border-comfy-dark bg-comfy-accent2 bg-opacity-5 shadow-lg">
+            <div className="p-4 rounded-lg mb-4 flex-shrink border border-comfy-dark bg-comfy-accent2 bg-opacity-5 shadow-lg transition-all duration-300 ease-in-out transform hover:scale-110 disabled:opacity-50 audio-player">
                 <h3 className="text-lg font-semibold mb-2 text-white">
                     <a
                         href={url || "#"}
@@ -115,21 +117,24 @@ class ABCAudioPlayer extends Component {
                     <button
                         onClick={this.togglePlayPause}
                         disabled={isLoading}
-                        className="bg-comfy-accent2 bg-opacity-50 text-comfy-dark px-4 py-2 rounded-lg hover:bg-gray-600 transition-colors disabled:opacity-50"
+                        className="relative bg-comfy-accent2 bg-opacity-50 text-comfy-dark px-4 py-2 rounded-lg hover:bg-gray-600 transition-all duration-300 ease-in-out transform hover:scale-110 disabled:opacity-50"
                     >
                         {isLoading ? (
-                            <LoaderCircle />
-                        ) : isPlaying ? (
-                            <Pause className="size-5" />
+                            <LoaderCircle className="w-5 h-5 animate-spin" />
                         ) : (
-                            <Play className="size-5" />
+                            <div className="relative w-5 h-5">
+                                <Play
+                                    className={`absolute top-0 left-0 w-5 h-5 transform transition-all duration-300 ease-in-out ${
+                                        isPlaying ? "opacity-0 scale-75" : "opacity-100 scale-100"
+                                    }`}
+                                />
+                                <Pause
+                                    className={`absolute top-0 left-0 w-5 h-5 transform transition-all duration-300 ease-in-out ${
+                                        isPlaying ? "opacity-100 scale-100" : "opacity-0 scale-75"
+                                    }`}
+                                />
+                            </div>
                         )}
-                    </button>
-                    <button
-                        onClick={this.handleStop}
-                        className="bg-comfy-accent2 bg-opacity-50 text-comfy-dark px-4 py-2 rounded-lg hover:bg-gray-600 transition-colors ml-2"
-                    >
-                        <Stop className="size-5" />
                     </button>
                     <input
                         type="range"

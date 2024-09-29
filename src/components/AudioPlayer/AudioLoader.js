@@ -7,6 +7,7 @@ class AudioLoader {
     constructor() {
         this.defaultTrackData = defaultTracks;
     }
+
     static trackTypes = {
         "wip": defaultTracks.WIP,
         "scoring": defaultTracks.SCORING,
@@ -14,11 +15,7 @@ class AudioLoader {
     };
 
     static async getLocalTracks(trackType = "wip") {
-        console.log("AudioLoader::getLocalTracks():", { trackType });
-
         const tracks = this.trackTypes[trackType.toLowerCase()] || this.trackTypes["wip"];
-
-        console.log("AudioLoader::getLocalTracks():", { tracks });
 
         return tracks.map((track) => ({
             ...track,

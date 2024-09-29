@@ -7,38 +7,31 @@ export const AudioProvider = ({ children }) => {
     const audioRefs = useRef({});
 
     const play = (id, src) => {
-        console.log("in play");
+        console.log("AudioProvider::play(): Playing ", { id });
 
-        console.log("AudioProvider::play(): Attempting to play the following audio", {
-            children,
-            id,
-            src,
-            audioRefs,
-        });
-
-        // Stop all other audio
+        // Stop all other audio except for the target
         Object.keys(audioRefs.current).forEach((key) => {
-            if (key !== id && audioRefs.current[key]) {
+            if (parseInt(key) !== id && audioRefs.current[key]) {
                 console.log("There was active audio, paused");
                 stop(key);
             }
         });
 
-        // Play the selected audio
-        if (!audioRefs.current[id]) {
-            audioRefs.current[id] = new Audio(src);
-            console.log("AudioProvider::play(): Creating entry", audioRefs.current[id]);
+        try {
+            // Play the selected audio
+            console.log("AudioProvider::play(): Playing");
+            audioRefs.current[id].play();
+            setPlayingStates((prev) => ({ ...prev, [id]: true }));
+        } catch (e) {
+            console.error("AudioContext::play(): Attempted play on unloaded audio");
         }
-
-        console.log("AudioProvider::play(): Playing");
-        audioRefs.current[id].play();
-        setPlayingStates((prev) => ({ ...prev, [id]: true }));
     };
 
     const pause = (id) => {
         console.log("AudioProvider::pause(): Pausing");
         if (audioRefs.current[id]) {
             audioRefs.current[id].pause();
+
             setPlayingStates((prev) => ({ ...prev, [id]: false }));
         }
     };

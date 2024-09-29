@@ -14,7 +14,6 @@ export const useTracks = (trackType = "wip", trackSrc = "local") => {
             try {
                 setIsLoading(true);
                 let loadedTracks = null;
-                console.log("Hooks::useTracks(): trackType: ", { trackType });
 
                 trackSrc.toLowerCase() === "local"
                     ? (loadedTracks = await AudioLoader.getLocalTracks(trackType))
@@ -33,6 +32,5 @@ export const useTracks = (trackType = "wip", trackSrc = "local") => {
         loadTracks();
     }, [trackType]);
 
-    console.log("Hooks::useTracks(): Returning tracks:", { tracks });
     return { tracks, isLoading, error, isComparison };
 };

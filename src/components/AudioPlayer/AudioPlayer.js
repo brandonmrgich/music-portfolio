@@ -14,7 +14,6 @@ class AudioPlayer extends ABCAudioPlayer {
 
     componentDidMount() {
         super.componentDidMount();
-        console.log("AudioPlayer::componentDidMount(): Mounting");
         const likedTracks = JSON.parse(localStorage.getItem("likedTracks") || "{}");
         this.setState({
             hasLiked: likedTracks[this.props.title] || false,

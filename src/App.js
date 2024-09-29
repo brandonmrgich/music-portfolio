@@ -23,6 +23,7 @@ const App = () => {
         }
     }, []);
 
+    // TODO: underline current page
     return (
         <Router>
             <div className="min-h-screen flex flex-col text-comfy-dark bg-gradient-to-b from-comfy-light to-comfy-medium">
@@ -71,6 +72,7 @@ const App = () => {
                     </ul>
                 </nav>
 
+                {/*TODO: Get location and path with # for refresh error*/}
                 <main className="flex flex-col flex-grow min-h-screen">
                     <Routes>
                         <Route path="/" element={<About />} />

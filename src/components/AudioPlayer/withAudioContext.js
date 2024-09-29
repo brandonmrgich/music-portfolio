@@ -3,8 +3,6 @@ import { useAudio } from "../../contexts/AudioContext";
 
 const withAudioContext = (WrappedComponent) => (props) => {
     const { playingStates, play, pause, seek, stop, audioRefs } = useAudio();
-    console.log("withAudioContext::construction: Wrapped this prop: ", { props });
-    console.log("withAudioContext::construction: ", { play, pause, seek, stop, audioRefs });
     return (
         <WrappedComponent
             {...props}

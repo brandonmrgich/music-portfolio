@@ -8,7 +8,6 @@ import { useTracks } from "../Hooks";
  */
 const Scoring = ({ isAdmin }) => {
     const { tracks, isLoading, error, isComparison } = useTracks("scoring");
-    console.log({ tracks });
 
     if (isLoading) {
         return <div>Loading tracks...</div>;
