@@ -26,14 +26,14 @@ const About = ({ isAdmin }) => {
                 <div className="mb-4 md:mb-0 md:mr-8 flex justify-center">
                     <a href="https://linktr.ee/brandonamrgich">
                         <img
-                            className="border border-secondary-light aspect-square shadow-lg rounded-full"
+                            className="border border-secondary-light aspect-square shadow-lg rounded-full "
                             src={profilePicture}
                             alt="Profile"
                             width="256"
                             height="256"
                         />
                     </a>
-                </div>{" "}
+                </div>
                 <ul className="flex flex-row md:flex-col justify-center gap-4 flex-wrap">
                     <SocialMediaLink
                         href={links.instagram.href}

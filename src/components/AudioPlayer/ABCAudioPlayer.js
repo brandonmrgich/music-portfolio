@@ -1,82 +1,84 @@
 import React, { Component } from "react";
-import { Play, Pause, LoaderCircle } from "lucide-react";
+import { Play, Pause, LoaderCircle, SquareIcon as Stop } from "lucide-react";
 
 class ABCAudioPlayer extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            src: "",
-            isPlaying: false,
             currentTime: 0,
             duration: 0,
             error: "",
             isLoading: false,
-            // currentTrackIndex: 0,
         };
-        this.audioRef = React.createRef();
     }
 
     componentDidMount() {
-        this.audioRef.current.addEventListener("timeupdate", this.handleTimeUpdate);
-        this.audioRef.current.addEventListener("loadedmetadata", this.handleLoadedMetadata);
+        const { id, audioRefs, src } = this.props; // AudioRef is coming from context
+        audioRefs.current[id] = new Audio(src); // On mount create the audio ref
+
+        if (audioRefs.current[id]) {
+            audioRefs.current[id].addEventListener("loadedmetadata", this.handleLoadedMetadata);
+            audioRefs.current[id].addEventListener("timeupdate", this.handleTimeUpdate);
+        }
+    }
+
+    componentDidUpdate() {
+        const { id, audioRefs } = this.props;
+
+        console.log("ComponentDidUpdate", { id, audioRefs });
+
+        if (audioRefs.current[id]) {
+            audioRefs.current[id].addEventListener("loadedmetadata", this.handleLoadedMetadata);
+            audioRefs.current[id].addEventListener("timeupdate", this.handleTimeUpdate);
+        }
     }
 
     componentWillUnmount() {
-        this.audioRef.current.removeEventListener("timeupdate", this.handleTimeUpdate);
-        this.audioRef.current.removeEventListener("loadedmetadata", this.handleLoadedMetadata);
+        const { id, audioRefs } = this.props;
+        if (audioRefs.current[id]) {
+            audioRefs.current[id].removeEventListener("loadedmetadata", this.handleLoadedMetadata);
+            audioRefs.current[id].removeEventListener("timeupdate", this.handleTimeUpdate);
+        }
     }
 
-    // TODO: Update the following to both update the seek bar, as well as start the new audio at the
-    // correct time
-    //componentDidUpdate() {
-    //    this.audioRef.current.removeEventListener("timeupdate", this.handleTimeUpdate);
-    //}
-
     handleTimeUpdate = () => {
-        this.setState({ currentTime: this.audioRef.current.currentTime });
+        const { id, audioRefs } = this.props;
+        let currentTime = audioRefs.current[id].currentTIme;
+
+        if (audioRefs.current[id]) {
+            this.setState({ currentTime: audioRefs.current[id].currentTime });
+        }
     };
 
     handleLoadedMetadata = () => {
-        this.setState({ duration: this.audioRef.current.duration });
+        const { id, audioRefs } = this.props;
+        let duration = audioRefs.current[id].duration;
+
+        if (audioRefs.current[id]) {
+            this.setState({ duration: audioRefs.current[id].duration });
+        }
     };
 
     togglePlayPause = () => {
-        if (this.state.isPlaying) {
-            this.pause();
+        const { playingStates, id, play, pause, src } = this.props;
+        if (playingStates[id]) {
+            pause(id);
         } else {
-            this.play();
+            this.setState({ isLoading: true, error: "" });
+            play(id, src);
+            this.setState({ isLoading: false });
         }
     };
 
-    play = () => {
-        this.setState({ isLoading: true, error: "" });
-        const playPromise = this.audioRef.current.play();
+    handleStop = () => {
+        const { stop, id } = this.props;
 
-        if (playPromise !== undefined) {
-            playPromise
-                .then(() => {
-                    this.setState({ isPlaying: true, isLoading: false });
-                })
-                .catch((error) => {
-                    console.error("Playback failed:", error);
-                    this.setState({
-                        isPlaying: false,
-                        isLoading: false,
-                        error: "Failed to play track, please try again later.",
-                    });
-                });
-        }
-    };
-
-    pause = () => {
-        this.audioRef.current.pause();
-        this.setState({ isPlaying: false });
+        stop(id);
     };
 
     handleSeek = (e) => {
-        const seekTime = e.target.value;
-        this.audioRef.current.currentTime = seekTime;
-        this.setState({ currentTime: seekTime });
+        const { seek, id } = this.props;
+        seek(id, parseFloat(e.target.value));
     };
 
     formatTime = (time) => {
@@ -89,18 +91,20 @@ class ABCAudioPlayer extends Component {
         return null;
     }
 
+    // TODO: Rerender component on page change
+    // Get last location and current location with react router
     render() {
-        const { isPlaying, currentTime, duration, error, isLoading } = this.state;
-        const { title, url, src } = this.props;
+        const { currentTime, duration, error, isLoading } = this.state;
+        const { title, url, id, playingStates } = this.props;
+        const isPlaying = playingStates[id] || false;
 
-        let currentSource = this.state.src || src;
+        let props = this.props;
+        let state = this.state;
 
-        console.log({ currentSource });
-
-        //const currentTrack = tracks[this.state.currentTrackIndex];
+        //console.log("ABCAudioPlayer:render(): ", { props, state });
 
         return (
-            <div className="audio-player p-4 rounded-lg mb-4 flex-shrink border border-comfy-dark bg-comfy-accent2 bg-opacity-5 shadow-lg">
+            <div className="p-4 rounded-lg mb-4 flex-shrink border border-comfy-dark bg-comfy-accent2 bg-opacity-5 shadow-lg transition-all duration-300 ease-in-out transform hover:scale-110 disabled:opacity-50 audio-player">
                 <h3 className="text-lg font-semibold mb-2 text-white">
                     <a
                         href={url || "#"}
@@ -109,18 +113,28 @@ class ABCAudioPlayer extends Component {
                         {title}
                     </a>
                 </h3>
-                <audio
-                    ref={this.audioRef}
-                    src={currentSource}
-                    className="w-full mb-3 rounded-lg border border-gray-700 bg-gray-900"
-                />
                 <div className="flex flex-shrink items-center text-gray-400">
                     <button
                         onClick={this.togglePlayPause}
                         disabled={isLoading}
-                        className="bg-comfy-accent2 bg-opacity-50 text-comfy-dark px-4 py-2 rounded-lg hover:bg-gray-600 transition-colors disabled:opacity-50"
+                        className="relative bg-comfy-accent2 bg-opacity-50 text-comfy-dark px-4 py-2 rounded-lg hover:bg-gray-600 transition-all duration-300 ease-in-out transform hover:scale-110 disabled:opacity-50"
                     >
-                        {isLoading ? <LoaderCircle /> : isPlaying ? <Pause /> : <Play />}
+                        {isLoading ? (
+                            <LoaderCircle className="w-5 h-5 animate-spin" />
+                        ) : (
+                            <div className="relative w-5 h-5">
+                                <Play
+                                    className={`absolute top-0 left-0 w-5 h-5 transform transition-all duration-300 ease-in-out ${
+                                        isPlaying ? "opacity-0 scale-75" : "opacity-100 scale-100"
+                                    }`}
+                                />
+                                <Pause
+                                    className={`absolute top-0 left-0 w-5 h-5 transform transition-all duration-300 ease-in-out ${
+                                        isPlaying ? "opacity-100 scale-100" : "opacity-0 scale-75"
+                                    }`}
+                                />
+                            </div>
+                        )}
                     </button>
                     <input
                         type="range"

@@ -1,7 +1,7 @@
 // src/components/Contact/ContactForm.js
 import React, { useEffect, useRef } from "react";
 import { FaTimes, FaEnvelope } from "react-icons/fa";
-import { useContact } from "./ContactContext";
+import { useContact } from "../../contexts/ContactContext";
 
 const ContactForm = () => {
     const { isFormOpen, closeForm, openForm } = useContact();

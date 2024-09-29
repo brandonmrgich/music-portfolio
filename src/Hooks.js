@@ -14,15 +14,12 @@ export const useTracks = (trackType = "wip", trackSrc = "local") => {
             try {
                 setIsLoading(true);
                 let loadedTracks = null;
-                console.log("Hooks::useTracks(): trackType: ", { trackType });
 
-                if (trackSrc.toLowerCase() === "local") {
-                    loadedTracks = await AudioLoader.getLocalTracks(trackType);
-                } else {
-                    loadedTracks = await AudioLoader.getApiTracks(trackType);
-                }
+                trackSrc.toLowerCase() === "local"
+                    ? (loadedTracks = await AudioLoader.getLocalTracks(trackType))
+                    : (loadedTracks = await AudioLoader.getApiTracks(trackType));
 
-                setTracks(loadedTracks);
+                setTracks(...tracks, loadedTracks);
                 setError(null);
             } catch (err) {
                 console.error("Error loading tracks:", err);

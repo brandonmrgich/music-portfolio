@@ -1,5 +1,6 @@
 import React from "react";
 import ABCAudioPlayer from "./ABCAudioPlayer";
+import withAudioContext from "./withAudioContext";
 
 class AudioComparisonPlayer extends ABCAudioPlayer {
     constructor(props) {
@@ -11,22 +12,18 @@ class AudioComparisonPlayer extends ABCAudioPlayer {
     }
 
     toggleAudioSource = () => {
-        const { isBeforeAudio, currentTime } = this.state;
-        const newSource = isBeforeAudio ? this.props.afterSrc : this.props.beforeSrc;
+        const { isBeforeAudio } = this.state;
+        const { beforeSrc, afterSrc, play, id, seek, audioRefs } = this.props;
+        const newSource = isBeforeAudio ? afterSrc : beforeSrc;
 
-        //this.audioRef.current.pause(); // Pause the current audio
-        this.pause();
-        this.setState({ src: newSource, isBeforeAudio: !isBeforeAudio, currentTime });
-        this.play();
+        this.setState({ isBeforeAudio: !isBeforeAudio }, () => {
+            if (this.props.playingStates[id]) {
+                const currentTime = audioRefs.current[id] ? audioRefs.current[id].currentTime : 0;
+                play(id, newSource);
+                seek(id, currentTime);
+            }
+        });
     };
-
-    // TODO: Phase out
-    //getCurrentAudioSource = () => {
-    //    const { isBeforeAudio } = this.state;
-    //    const { beforeSrc, afterSrc } = this.props;
-    //    console.log({ beforeSrc }, { afterSrc });
-    //    return isBeforeAudio ? beforeSrc : afterSrc;
-    //};
 
     renderAdditionalControls() {
         const { isBeforeAudio } = this.state;
@@ -43,4 +40,4 @@ class AudioComparisonPlayer extends ABCAudioPlayer {
     }
 }
 
-export default AudioComparisonPlayer;
+export default withAudioContext(AudioComparisonPlayer);
