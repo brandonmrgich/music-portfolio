@@ -8,6 +8,10 @@ const AudioComparisonPlayer = (props) => {
         const { beforeSrc, afterSrc, play, id, seek, audioRefs } = props;
         const newSource = isBeforeAudio ? afterSrc : beforeSrc;
 
+        console.log('AudioComparisonPlayer::toggelAudioSource(): ', { props });
+        console.log('State: ');
+        // TODO: There is no playingStates on the proprs. Pass from the ABC
+
         setIsBeforeAudio((prev) => !prev);
 
         if (props.playingStates[id]) {

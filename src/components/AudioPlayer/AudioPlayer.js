@@ -25,7 +25,7 @@ const AudioPlayer = (props) => {
         <button
             onClick={handleLike}
             disabled={hasLiked}
-            className="bg-comfy-accent2 bg-opacity-50 px-2 py-1 rounded text-comfy-dark"
+            className="bg-comfy-accent2 bg-opacity-50 px-2 py-1 rounded text-comfy-dark hover:cursor-pointer"
         >
             Like ({likes})
         </button>

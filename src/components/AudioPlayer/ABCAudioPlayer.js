@@ -12,7 +12,6 @@ const ABCAudioPlayer = ({
     play,
     pause,
     seek,
-    stop,
     renderAdditionalControls,
 }) => {
     const [currentTime, setCurrentTime] = useState(0);
@@ -113,14 +112,15 @@ const ABCAudioPlayer = ({
                     max={duration}
                     value={currentTime}
                     onChange={handleSeek}
-                    className="flex-grow mx-3 accent-comfy-accent2 opacity-60"
+                    className="flex-grow mx-3 accent-comfy-accent2 opacity-60 hover:cursor-pointer"
                 />
-                {renderAdditionalControls()}
                 <span className="text-sm">
                     {formatTime(currentTime)} / {formatTime(duration)}
                 </span>
             </div>
             {error && <span className="text-red-500 mt-2">{error}</span>}
+
+            <div className="mt-3">{renderAdditionalControls()}</div>
         </div>
     );
 };
