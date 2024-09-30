@@ -1,47 +1,37 @@
-import React from "react";
-import ABCAudioPlayer from "./ABCAudioPlayer";
-import withAudioContext from "./withAudioContext";
+import React, { useState, useEffect } from 'react';
+import ABCAudioPlayer from './ABCAudioPlayer';
 
-class AudioPlayer extends ABCAudioPlayer {
-    constructor(props) {
-        super(props);
-        this.state = {
-            ...this.state,
-            likes: 0,
-            hasLiked: false,
-        };
-    }
+const AudioPlayer = (props) => {
+    const [likes, setLikes] = useState(0);
+    const [hasLiked, setHasLiked] = useState(false);
 
-    componentDidMount() {
-        super.componentDidMount();
-        const likedTracks = JSON.parse(localStorage.getItem("likedTracks") || "{}");
-        this.setState({
-            hasLiked: likedTracks[this.props.title] || false,
-            likes: likedTracks[this.props.title] ? 1 : 0,
-        });
-    }
+    useEffect(() => {
+        const likedTracks = JSON.parse(localStorage.getItem('likedTracks') || '{}');
+        setHasLiked(likedTracks[props.title] || false);
+        setLikes(likedTracks[props.title] ? 1 : 0);
+    }, [props.title]);
 
-    handleLike = () => {
-        if (!this.state.hasLiked) {
-            const likedTracks = JSON.parse(localStorage.getItem("likedTracks") || "{}");
-            likedTracks[this.props.title] = true;
-            localStorage.setItem("likedTracks", JSON.stringify(likedTracks));
-            this.setState({ hasLiked: true, likes: 1 });
+    const handleLike = () => {
+        if (!hasLiked) {
+            const likedTracks = JSON.parse(localStorage.getItem('likedTracks') || '{}');
+            likedTracks[props.title] = true;
+            localStorage.setItem('likedTracks', JSON.stringify(likedTracks));
+            setHasLiked(true);
+            setLikes(1);
         }
     };
 
-    renderAdditionalControls() {
-        const { likes, hasLiked } = this.state;
-        return (
-            <button
-                onClick={this.handleLike}
-                disabled={hasLiked}
-                className="bg-comfy-accent2 bg-opacity-50 px-2 py-1 rounded text-comfy-dark"
-            >
-                Like ({likes})
-            </button>
-        );
-    }
-}
+    const renderAdditionalControls = () => (
+        <button
+            onClick={handleLike}
+            disabled={hasLiked}
+            className="bg-comfy-accent2 bg-opacity-50 px-2 py-1 rounded text-comfy-dark"
+        >
+            Like ({likes})
+        </button>
+    );
 
-export default withAudioContext(AudioPlayer);
+    return <ABCAudioPlayer {...props} renderAdditionalControls={renderAdditionalControls} />;
+};
+
+export default AudioPlayer;
