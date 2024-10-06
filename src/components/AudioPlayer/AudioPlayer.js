@@ -1,31 +1,24 @@
 import React, { useState, useEffect } from 'react';
 import ABCAudioPlayer from './ABCAudioPlayer';
-
 import { Heart } from 'lucide-react';
 
-const AudioPlayer = (props) => {
+const AudioPlayer = ({ id, src, title, url }) => {
     const [likes, setLikes] = useState(0);
     const [hasLiked, setHasLiked] = useState(false);
 
     useEffect(() => {
         const likedTracks = JSON.parse(localStorage.getItem('likedTracks') || '{}');
-        setHasLiked(likedTracks[props.title] || false);
-        setLikes(likedTracks[props.title] ? 1 : 0);
-    }, []);
+        setHasLiked(likedTracks[title] || false);
+        setLikes(likedTracks[title] ? 1 : 0);
+    }, [title]);
 
     const handleLike = () => {
-        console.log('Handling like');
         const likedTracks = JSON.parse(localStorage.getItem('likedTracks') || '{}');
-        if (!hasLiked) {
-            likedTracks[props.title] = true;
-            setHasLiked(true);
-            setLikes(likes + 1);
-        } else {
-            likedTracks[props.title] = false;
-            setHasLiked(false);
-            setLikes(likes - 1);
-        }
+        const newLikedState = !hasLiked;
+        likedTracks[title] = newLikedState;
         localStorage.setItem('likedTracks', JSON.stringify(likedTracks));
+        setHasLiked(newLikedState);
+        setLikes(newLikedState ? likes + 1 : likes - 1);
     };
 
     const renderAdditionalControls = () => (
@@ -42,7 +35,15 @@ const AudioPlayer = (props) => {
         </button>
     );
 
-    return <ABCAudioPlayer {...props} renderAdditionalControls={renderAdditionalControls} />;
+    return (
+        <ABCAudioPlayer
+            id={id}
+            src={src}
+            title={title}
+            url={url}
+            renderAdditionalControls={renderAdditionalControls}
+        />
+    );
 };
 
 export default AudioPlayer;

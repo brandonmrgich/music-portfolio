@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useRef, useEffect } from "react";
+import React, { createContext, useContext, useState, useRef, useEffect } from 'react';
 
 const AudioContext = createContext();
 
@@ -7,28 +7,28 @@ export const AudioProvider = ({ children }) => {
     const audioRefs = useRef({});
 
     const play = (id, src) => {
-        console.log("AudioProvider::play(): Playing ", { id });
+        console.log('AudioProvider::play(): Playing ', { id });
 
         // Stop all other audio except for the target
         Object.keys(audioRefs.current).forEach((key) => {
             if (parseInt(key) !== id && audioRefs.current[key]) {
-                console.log("There was active audio, paused");
+                console.log('There was active audio, paused');
                 stop(key);
             }
         });
 
         try {
             // Play the selected audio
-            console.log("AudioProvider::play(): Playing");
+            console.log('AudioProvider::play(): Playing');
             audioRefs.current[id].play();
             setPlayingStates((prev) => ({ ...prev, [id]: true }));
         } catch (e) {
-            console.error("AudioContext::play(): Attempted play on unloaded audio");
+            console.error('AudioContext::play(): Attempted play on unloaded audio');
         }
     };
 
     const pause = (id) => {
-        console.log("AudioProvider::pause(): Pausing");
+        console.log('AudioProvider::pause(): Pausing');
         if (audioRefs.current[id]) {
             audioRefs.current[id].pause();
 
