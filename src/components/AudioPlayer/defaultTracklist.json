@@ -29,12 +29,12 @@
         }
     ],
 
-    "reel": [
+    "REEL": [
         {
             "id": 5,
             "title": "song 1",
-            "beforesrc": "default.mp3",
-            "aftersrc": "default2.mp3",
+            "before": "default.mp3",
+            "after": "default2.mp3",
             "url": "https://google.com"
         }
     ]

@@ -9,8 +9,8 @@ import AudioComparisonPlayer from './AudioComparisonPlayer';
  * @param {boolean} props.isComparison - Flag to determine if comparison players should be used
  * @returns {React.Component} AudioGrid component
  */
-
 const AudioGrid = ({ tracks, isComparison }) => {
+    console.log({ tracks });
     return (
         <div className="audio-grid grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {tracks.map((track) =>
@@ -19,8 +19,8 @@ const AudioGrid = ({ tracks, isComparison }) => {
                         key={track.id}
                         id={track.id}
                         url={track.url}
-                        beforeSrc={track.beforeSrc}
-                        afterSrc={track.afterSrc}
+                        before={track.before}
+                        after={track.after}
                         title={track.title}
                     />
                 ) : (
