@@ -74,16 +74,17 @@ const ABCAudioPlayer = ({
     const isPlaying = playingStates[id] || false;
 
     return (
-        <div className="p-4 rounded-lg mb-4 flex-shrink border border-comfy-dark bg-comfy-accent2 bg-opacity-5 shadow-lg transition-all duration-300 ease-in-out transform hover:scale-110 disabled:opacity-50 audio-player">
+        <div className="p-4 rounded-lg mb-4 border border-comfy-dark bg-comfy-accent2 bg-opacity-5 shadow-lg transition-all duration-300 ease-in-out transform hover:scale-110 disabled:opacity-50 audio-player max-w-sm sm:max-w-md lg:max-w-lg flex flex-col justify-between">
             <h3 className="text-lg font-semibold mb-2 text-white">
                 <a
                     href={url || '#'}
-                    className="text-comfy-accent1 hover:text-comfy-accent2 transition-colors"
+                    className="flex-shrink text-comfy-accent1 hover:text-comfy-accent2 transition-colors"
                 >
                     {title}
                 </a>
             </h3>
-            <div className="flex flex-shrink items-center text-gray-400">
+
+            <div className="flex items-center text-gray-400 space-x-3 mb-2">
                 <button
                     onClick={togglePlayPause}
                     disabled={isLoading}
@@ -106,21 +107,38 @@ const ABCAudioPlayer = ({
                         </div>
                     )}
                 </button>
-                <input
-                    type="range"
-                    min="0"
-                    max={duration}
-                    value={currentTime}
-                    onChange={handleSeek}
-                    className="flex-grow mx-3 accent-comfy-accent2 opacity-60 hover:cursor-pointer"
-                />
-                <span className="text-sm">
-                    {formatTime(currentTime)} / {formatTime(duration)}
-                </span>
-            </div>
-            {error && <span className="text-red-500 mt-2">{error}</span>}
 
-            <div className="mt-3">{renderAdditionalControls()}</div>
+                {error && <span className="text-red-500 mt-2">{error}</span>}
+
+                {/* Footer Section for the Slider and other content */}
+                <div className="mt-auto pt-2">
+                    <div className="flex justify-between items-center mb-2 text-gray-400 text-sm italic">
+                        <span>{formatTime(currentTime)}</span>
+
+                        {/* Placeholder for soundwave content */}
+                        <div className="flex-grow mx-4 flex items-center justify-center">
+                            {/* Add a soundwave or other content here */}
+                            <div className="w-full h-8 bg-gray-300 rounded-lg opacity-60">
+                                <input
+                                    type="range"
+                                    min="0"
+                                    max={duration}
+                                    value={currentTime}
+                                    onChange={handleSeek}
+                                    className="w-full accent-comfy-accent2 opacity-60 hover:cursor-pointer"
+                                />
+                                {/* Placeholder for soundwave visualization */}
+                            </div>
+                        </div>
+
+                        <span>{formatTime(duration)}</span>
+                    </div>
+                </div>
+            </div>
+
+            <div className="mt-3 flex justify-between items-center">
+                {renderAdditionalControls()}
+            </div>
         </div>
     );
 };
