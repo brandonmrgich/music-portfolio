@@ -1,6 +1,6 @@
-import React from "react";
-import AudioPlayer from "./AudioPlayer";
-import AudioComparisonPlayer from "./AudioComparisonPlayer";
+import React from 'react';
+import AudioPlayer from './AudioPlayer';
+import AudioComparisonPlayer from './AudioComparisonPlayer';
 
 /**
  * AudioGrid component to display a grid of audio players.
@@ -9,6 +9,7 @@ import AudioComparisonPlayer from "./AudioComparisonPlayer";
  * @param {boolean} props.isComparison - Flag to determine if comparison players should be used
  * @returns {React.Component} AudioGrid component
  */
+
 const AudioGrid = ({ tracks, isComparison }) => {
     return (
         <div className="audio-grid grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -24,13 +25,13 @@ const AudioGrid = ({ tracks, isComparison }) => {
                     />
                 ) : (
                     <AudioPlayer
-                        url={track.url}
                         key={track.id}
                         id={track.id}
+                        url={track.url}
                         src={track.src}
                         title={track.title}
                     />
-                ),
+                )
             )}
         </div>
     );
