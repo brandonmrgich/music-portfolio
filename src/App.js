@@ -1,23 +1,23 @@
 // App.js
-import React, { useState, useEffect } from "react";
-import { BrowserRouter as Router, Route, Routes, Link } from "react-router-dom";
-import Footer from "./components/Footer";
-import About from "./components/About";
-import InWork from "./components/InWork";
-import Services from "./components/Services";
-import Scoring from "./components/Scoring";
+import React, { useState, useEffect } from 'react';
+import { HashRouter as Router, Route, Routes, Link } from 'react-router-dom';
+import Footer from './components/Footer';
+import About from './components/About';
+import InWork from './components/InWork';
+import Services from './components/Services';
+import Scoring from './components/Scoring';
 
-import ContactButton from "./components/Contact/ContactButton";
-import ContactForm from "./components/Contact/ContactForm";
+import ContactButton from './components/Contact/ContactButton';
+import ContactForm from './components/Contact/ContactForm';
 
-import Logo from "./pictures/asailboat.png";
+import Logo from './pictures/asailboat.png';
 
 const App = () => {
-    const isDevelopment = process.env.REACT_APP_ENV === "development";
+    const isDevelopment = process.env.REACT_APP_ENV === 'development';
     const [isAdmin, setIsAdmin] = useState(isDevelopment);
 
     useEffect(() => {
-        const token = localStorage.getItem("token");
+        const token = localStorage.getItem('token');
         if (token) {
             setIsAdmin(true);
         }
@@ -47,7 +47,8 @@ const App = () => {
                                 to="/in-work"
                                 className="text-comfy-dark hover:text-comfy-accent1 focus:text-comfy-accent2 transition-color"
                             >
-                                Work In Progress
+                                <span className="hidden sm:inline">Work In Progress</span>
+                                <span className="inline sm:hidden">WIP</span>
                             </Link>
                         </li>
                         <li>
