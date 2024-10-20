@@ -20,7 +20,7 @@ const ABCAudioPlayer = ({ id, src, title, url, renderAdditionalControls }) => {
         return `${minutes}:${seconds.toString().padStart(2, '0')}`;
     };
 
-    error && console.log(error)
+    error && console.log(error);
 
     return (
         <div className="p-4 rounded-lg mb-4 border border-comfy-dark bg-comfy-accent2 bg-opacity-5 shadow-lg transition-all duration-300 ease-in-out transform hover:scale-110 disabled:opacity-50 audio-player max-w-sm sm:max-w-md lg:max-w-lg flex flex-col justify-between">

@@ -1,4 +1,3 @@
-// App.js
 import React, { useState, useEffect } from 'react';
 import { HashRouter as Router, Route, Routes, Link } from 'react-router-dom';
 import Footer from './components/Footer';
@@ -23,58 +22,58 @@ const App = () => {
         }
     }, []);
 
-    // TODO: underline current page
     return (
         <Router>
             <div className="min-h-screen flex flex-col text-comfy-dark bg-gradient-to-b from-comfy-light to-comfy-medium">
                 <nav className="p-4 border border-comfy-medium text-xl">
-                    <ul className="flex justify-center space-x-4">
-                        <li>
-                            <a href="https://linktr.ee/brandonamrgich">
-                                <img src={Logo} height="24" width="24" alt="Brandon Mrgich" />
-                            </a>
-                        </li>
-                        <li>
-                            <Link
-                                to="/"
-                                className="text-comfy-dark hover:text-comfy-accent1 focus:text-comfy-accent2 transition-color"
-                            >
-                                About
-                            </Link>
-                        </li>
-                        <li>
-                            <Link
-                                to="/in-work"
-                                className="text-comfy-dark hover:text-comfy-accent1 focus:text-comfy-accent2 transition-color"
-                            >
-                                <span className="hidden sm:inline">Work In Progress</span>
-                                <span className="inline sm:hidden">WIP</span>
-                            </Link>
-                        </li>
-                        <li>
-                            <Link
-                                to="/services"
-                                className="text-comfy-dark hover:text-comfy-accent1 focus:text-comfy-accent2 transition-color"
-                            >
-                                Services
-                            </Link>
-                        </li>
-                        <li>
-                            <Link
-                                to="/scoring"
-                                className="text-comfy-dark hover:text-comfy-accent1 focus:text-comfy-accent2 transition-color"
-                            >
-                                Scoring
-                            </Link>
-                        </li>
-                        <div className="flex justify-center mb-4">
+                    <div className="flex justify-between items-center">
+                        <a href="https://linktr.ee/brandonamrgich">
+                            <img src={Logo} height="36" width="36" alt="Brandon Mrgich" />
+                        </a>
+
+                        <ul className="flex space-x-4">
+                            <li>
+                                <Link
+                                    to="/"
+                                    className="text-comfy-dark hover:text-comfy-accent1 focus:text-comfy-accent2 transition-color"
+                                >
+                                    About
+                                </Link>
+                            </li>
+                            <li>
+                                <Link
+                                    to="/in-work"
+                                    className="text-comfy-dark hover:text-comfy-accent1 focus:text-comfy-accent2 transition-color"
+                                >
+                                    <span className="hidden sm:inline">Work In Progress</span>
+                                    <span className="inline sm:hidden">WIP</span>
+                                </Link>
+                            </li>
+                            <li>
+                                <Link
+                                    to="/services"
+                                    className="text-comfy-dark hover:text-comfy-accent1 focus:text-comfy-accent2 transition-color"
+                                >
+                                    Services
+                                </Link>
+                            </li>
+                            <li>
+                                <Link
+                                    to="/scoring"
+                                    className="text-comfy-dark hover:text-comfy-accent1 focus:text-comfy-accent2 transition-color"
+                                >
+                                    Scoring
+                                </Link>
+                            </li>
+                        </ul>
+
+                        <div>
                             <ContactButton />
                         </div>
-                    </ul>
+                    </div>
                 </nav>
 
-                {/*TODO: Get location and path with # for refresh error*/}
-                <main className="flex flex-col flex-grow min-h-screen">
+                <main className="flex flex-col flex-grow">
                     <Routes>
                         <Route path="/" element={<About />} />
                         <Route path="/about" element={<About isAdmin={isAdmin} />} />
@@ -82,9 +81,9 @@ const App = () => {
                         <Route path="/services" element={<Services isAdmin={isAdmin} />} />
                         <Route path="/scoring" element={<Scoring isAdmin={isAdmin} />} />
                     </Routes>
-                    <Footer />
                 </main>
 
+                <Footer />
                 <ContactForm />
             </div>
         </Router>

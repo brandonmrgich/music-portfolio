@@ -1,10 +1,10 @@
-import React from "react";
-import { SocialMediaLink, Links } from "./SocialMediaLink";
+import React from 'react';
+import { SocialMediaLink, Links } from './SocialMediaLink';
 
 const Footer = () => {
     const links = Links.Streaming;
     return (
-        <footer className=" footer p-6 h-min ">
+        <footer className="footer p-6">
             <section className="links-section mb-8">
                 <ul className="flex justify-center gap-4 flex-wrap">
                     {Object.values(links).map(({ href, icon, colorClass, label }) => (
@@ -17,8 +17,8 @@ const Footer = () => {
                         />
                     ))}
                 </ul>
-                <p className="flex justify-center arr text-xs font-extralight mb-6 text-gray-400 max-h-3">
-                    &copy; 2024 Brandon Mrgich. All rights reserved.
+                <p className="flex justify-center arr text-xs font-extralight mb-6 text-gray-400">
+                    &copy; 1999-2024 Brandon Mrgich. All rights reserved.
                 </p>
             </section>
         </footer>
