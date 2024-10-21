@@ -1,13 +1,13 @@
-import React, { useState, useEffect } from "react";
-import AudioGrid from "./AudioPlayer/AudioGrid";
-import { useTracks } from "../Hooks";
+import React, { useState, useEffect } from 'react';
+import AudioGrid from './AudioPlayer/AudioGrid';
+import { useTracks } from '../Hooks';
 
 /**
  * Scoring page component.
  * @returns {React.Component} The Scoring page component
  */
 const Scoring = ({ isAdmin }) => {
-    const { tracks, isLoading, error, isComparison } = useTracks("scoring");
+    const { tracks, isLoading, error, isComparison } = useTracks('scoring');
 
     if (isLoading) {
         return <div>Loading tracks...</div>;
@@ -18,10 +18,8 @@ const Scoring = ({ isAdmin }) => {
     }
 
     return (
-        <div className="in-work p-6 max-w-4xl mx-auto space-y-12">
-            <h1 className="text-3xl font-bold text-center mb-8 text-primary-dark">
-                Film & Videogame Scoring
-            </h1>
+        <div className="in-work text-center text-balance p-6 max-w-4xl mx-auto space-y-12">
+            <h1 className="text-3xl font-bold mb-8 text-primary-dark">Film & Videogame Scoring</h1>
             <section>
                 <p className="text-lg text-secondary-dark mb-4 text-center">...</p>
                 <p className="text-lg text-secondary-dark mb-4 text-center">

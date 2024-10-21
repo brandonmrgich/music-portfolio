@@ -64,6 +64,7 @@ export const useAudio = (id, src) => {
     }, [src]);
 
     const togglePlayPause = useCallback(() => {
+        console.log('Hooks::togglePlayPause(): Toggling');
         const audio = audioRef.current;
 
         if (isPlaying) {

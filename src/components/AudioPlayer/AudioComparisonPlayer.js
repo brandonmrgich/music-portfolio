@@ -1,5 +1,6 @@
 import React, { useState, useCallback, useEffect } from 'react';
 import ABCAudioPlayer from './ABCAudioPlayer';
+import { FaToggleOn, FaToggleOff } from 'react-icons/fa';
 
 const AudioComparisonPlayer = ({ id, before, after, title, url }) => {
     const [isBeforeAudio, setIsBeforeAudio] = useState(true);
@@ -9,6 +10,8 @@ const AudioComparisonPlayer = ({ id, before, after, title, url }) => {
         setIsBeforeAudio((prev) => !prev);
     }, []);
 
+    const displayHint = useCallback(() => {}, []);
+
     useEffect(() => {
         setCurrentSrc(isBeforeAudio ? before : after);
         console.log('Set src to: ', { currentSrc });
@@ -17,9 +20,20 @@ const AudioComparisonPlayer = ({ id, before, after, title, url }) => {
     const renderAdditionalControls = () => (
         <button
             onClick={toggleAudioSource}
-            className="relative bg-none bg-opacity-80 text-comfy-dark px-4 py-2 transition-all duration-300 ease-in-out transform hover:scale-110 disabled:opacity-50 hover:cursor-pointer"
+            className="text-sm relative bg-none bg-opacity-90 text-comfy-dark px-4 py-2 transition-all duration-300 ease-in-out transform hover:scale-95 disabled:opacity-50 hover:cursor-pointer"
+            onMouseOver={displayHint}
         >
-            {isBeforeAudio ? 'Before' : 'After'}
+            {isBeforeAudio ? (
+                <div className="col-span-2 row-span-1 justify-between">
+                    <FaToggleOff className="text-red-500" />
+                    <span>A</span>
+                </div>
+            ) : (
+                <div>
+                    <FaToggleOn className="text-green-500" />
+                    <span>B</span>
+                </div>
+            )}
         </button>
     );
 

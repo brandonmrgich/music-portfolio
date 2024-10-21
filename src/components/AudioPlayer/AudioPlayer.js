@@ -24,7 +24,7 @@ const AudioPlayer = ({ id, src, title, url }) => {
     const renderAdditionalControls = () => (
         <button
             onClick={handleLike}
-            className="relative bg-none bg-opacity-80 text-comfy-dark transition-all duration-300 ease-in-out transform hover:scale-110 disabled:opacity-50 hover:cursor-pointer"
+            className="relative bg-none bg-opacity-80 text-comfy-dark transition-all duration-300 ease-in-out transform hover:scale-110 disabled:opacity-50 hover:cursor-pointer px-2 py-0"
         >
             <div className="relative justify-between items-start">
                 <Heart

@@ -33,7 +33,6 @@ const ABCAudioPlayer = ({ id, src, title, url, renderAdditionalControls }) => {
                         {title}
                     </a>
                 </h3>
-                <div className="mt-1">{renderAdditionalControls && renderAdditionalControls()}</div>
             </div>
 
             <div className="flex items-center mb-2 py-1 text-sm italic">
@@ -51,28 +50,32 @@ const ABCAudioPlayer = ({ id, src, title, url, renderAdditionalControls }) => {
                 <span className="text-comfy-accent2">{formatTime(duration)}</span>
             </div>
 
-            <button
-                onClick={togglePlayPause}
-                disabled={isLoading}
-                className="w-full bg-comfy-accent2 bg-opacity-50 text-comfy-dark py-2 rounded-md hover:bg-opacity-70 transition-all duration-300 ease-in-out transform hover:scale-95 disabled:opacity-50"
-            >
-                {isLoading ? (
-                    <LoaderCircle className="w-5 h-5 animate-spin mx-auto" />
-                ) : (
-                    <div className="relative w-5 h-5 mx-auto">
-                        <Play
-                            className={`absolute top-0 left-0 w-5 h-5 transform transition-all duration-300 ease-in-out ${
-                                isPlaying ? 'opacity-0 scale-75' : 'opacity-100 scale-100'
-                            }`}
-                        />
-                        <Pause
-                            className={`absolute top-0 left-0 w-5 h-5 transform transition-all duration-300 ease-in-out ${
-                                isPlaying ? 'opacity-100 scale-100' : 'opacity-0 scale-75'
-                            }`}
-                        />
-                    </div>
-                )}
-            </button>
+            <section className="playerControls flex items-center col-auto">
+                <button
+                    onClick={togglePlayPause}
+                    disabled={isLoading}
+                    className="w-full bg-comfy-accent2 bg-opacity-50 text-comfy-dark py-2 rounded-md hover:bg-opacity-70 transition-all duration-300 ease-in-out transform hover:scale-95 disabled:opacity-50"
+                >
+                    {isLoading ? (
+                        <LoaderCircle className="w-5 h-5 animate-spin mx-auto" />
+                    ) : (
+                        <div className="relative w-5 h-5 mx-auto">
+                            <Play
+                                className={`absolute top-0 left-0 w-5 h-5 transform transition-all duration-300 ease-in-out ${
+                                    isPlaying ? 'opacity-0 scale-75' : 'opacity-100 scale-100'
+                                }`}
+                            />
+                            <Pause
+                                className={`absolute top-0 left-0 w-5 h-5 transform transition-all duration-300 ease-in-out ${
+                                    isPlaying ? 'opacity-100 scale-100' : 'opacity-0 scale-75'
+                                }`}
+                            />
+                        </div>
+                    )}
+                </button>
+
+                <div className="mt-1">{renderAdditionalControls && renderAdditionalControls()}</div>
+            </section>
 
             {error && <span className="sm text-red-500 mt-2">{error}</span>}
         </div>

@@ -13,47 +13,8 @@
             "url": "https://google.com"
         },
         {
-            "id": 1,
-            "title": "Song with a very long title that will wrap Song with a very long title that will wrap",
-            "src": "default.mp3",
-            "url": "https://google.com"
-        },
-        {
-            "id": 2,
-            "title": "Closer",
-            "src": "Closer.mp3",
-            "url": "https://google.com"
-        },
-        {
-            "id": 1,
-            "title": "Song with a very long title that will wrap Song with a very long title that will wrap",
-            "src": "default.mp3",
-            "url": "https://google.com"
-        },
-        {
-            "id": 2,
-            "title": "Closer",
-            "src": "Closer.mp3",
-            "url": "https://google.com"
-        },
-        {
-            "id": 1,
-            "title": "Song with a very long title that will wrap Song with a very long title that will wrap",
-            "src": "default.mp3",
-            "url": "https://google.com"
-        },
-        {
-            "id": 2,
-            "title": "Closer",
-            "src": "Closer.mp3",
-            "url": "https://google.com"
-        }
-    ],
-
-    "SCORING": [
-        {
             "id": 3,
-            "title": "default1",
+            "title": "Song with a very long title that will wrap Song with a very long title that will wrap",
             "src": "default.mp3",
             "url": "https://google.com"
         },
@@ -62,12 +23,51 @@
             "title": "Closer",
             "src": "Closer.mp3",
             "url": "https://google.com"
+        },
+        {
+            "id": 5,
+            "title": "Song with a very long title that will wrap Song with a very long title that will wrap",
+            "src": "default.mp3",
+            "url": "https://google.com"
+        },
+        {
+            "id": 6,
+            "title": "Closer",
+            "src": "Closer.mp3",
+            "url": "https://google.com"
+        },
+        {
+            "id": 7,
+            "title": "Song with a very long title that will wrap Song with a very long title that will wrap",
+            "src": "default.mp3",
+            "url": "https://google.com"
+        },
+        {
+            "id": 8,
+            "title": "Closer",
+            "src": "Closer.mp3",
+            "url": "https://google.com"
+        }
+    ],
+
+    "SCORING": [
+        {
+            "id": 9,
+            "title": "default1",
+            "src": "default.mp3",
+            "url": "https://google.com"
+        },
+        {
+            "id": 10,
+            "title": "Closer",
+            "src": "Closer.mp3",
+            "url": "https://google.com"
         }
     ],
 
     "REEL": [
         {
-            "id": 5,
+            "id": 11,
             "title": "song 1",
             "before": "default.mp3",
             "after": "default2.mp3",
