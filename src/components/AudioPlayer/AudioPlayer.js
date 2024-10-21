@@ -24,11 +24,11 @@ const AudioPlayer = ({ id, src, title, url }) => {
     const renderAdditionalControls = () => (
         <button
             onClick={handleLike}
-            className="relative bg-none bg-opacity-80 text-comfy-dark px-4 py-2 transition-all duration-300 ease-in-out transform hover:scale-110 disabled:opacity-50 hover:cursor-pointer"
+            className="relative bg-none bg-opacity-80 text-comfy-dark transition-all duration-300 ease-in-out transform hover:scale-110 disabled:opacity-50 hover:cursor-pointer"
         >
-            <div className="relative">
+            <div className="relative justify-between items-start">
                 <Heart
-                    className={`w-5 h-5 text-red-500 ${hasLiked ? 'fill-current' : 'fill-none'}`}
+                    className={`w-5 h-5 text-comfy-accent1 hover:text-red-500 transition-color duration-500 ${hasLiked ? 'fill-current text-red-500' : 'fill-none'}`}
                 />
                 <span className="text-sm text-comfy-dark">{likes}</span>
             </div>
