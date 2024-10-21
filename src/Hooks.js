@@ -1,6 +1,9 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import AudioLoader from './components/AudioPlayer/AudioLoader';
 
+// TODO: Clean hook vs audio context methods. Currently hook method being used
+// which doesnt preservce context.
+
 export const useTracks = (trackType = 'wip', trackSrc = 'local') => {
     const [tracks, setTracks] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
@@ -38,6 +41,7 @@ export const useTracks = (trackType = 'wip', trackSrc = 'local') => {
 export const useAudio = (id, src) => {
     const [isPlaying, setIsPlaying] = useState(false);
     const [currentTime, setCurrentTime] = useState(0);
+    const [currentVolume, setCurrentVolume] = useState(0);
     const [duration, setDuration] = useState(0);
     const [error, setError] = useState('');
     const [isLoading, setIsLoading] = useState(false);
@@ -90,14 +94,23 @@ export const useAudio = (id, src) => {
         setCurrentTime(audio.currentTime);
     }, []);
 
+    // TODO: Hook slider to actual volume of current audio ref
+    const handleVolume = useCallback((e) => {
+        const audio = audioRef.current;
+        audio.currentVolume = parseFloat(e.target.value);
+        setCurrentVolume(audio.currentVolume);
+    }, []);
+
     return {
         audioRef,
         isPlaying,
         currentTime,
+        currentVolume,
         duration,
         error,
         isLoading,
         togglePlayPause,
         handleSeek,
+        handleVolume,
     };
 };

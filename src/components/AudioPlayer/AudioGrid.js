@@ -10,32 +10,46 @@ import AudioComparisonPlayer from './AudioComparisonPlayer';
  * @returns {React.Component} AudioGrid component
  */
 
+const mapTracks = (tracks, isComparison) => {
+    let gridTracks = [];
+
+    try {
+        gridTracks = tracks.map((track) =>
+            isComparison ? (
+                <AudioComparisonPlayer
+                    key={track.id}
+                    id={track.id}
+                    url={track.url}
+                    before={track.before}
+                    after={track.after}
+                    title={track.title}
+                />
+            ) : (
+                <AudioPlayer
+                    key={track.id}
+                    id={track.id}
+                    url={track.url}
+                    src={track.src}
+                    title={track.title}
+                />
+            )
+        );
+    } catch (e) {
+        console.error(
+            'AudioGrid::mapTracks(): Attempted to populate grid with null or undefined tracks.'
+        );
+    }
+
+    return gridTracks;
+};
+
 // TODO: Separate grid sections by genre/style
 
 const AudioGrid = ({ tracks, isComparison }) => {
     console.log({ tracks });
     return (
         <div className="audio-grid grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {tracks.map((track) =>
-                isComparison ? (
-                    <AudioComparisonPlayer
-                        key={track.id}
-                        id={track.id}
-                        url={track.url}
-                        before={track.before}
-                        after={track.after}
-                        title={track.title}
-                    />
-                ) : (
-                    <AudioPlayer
-                        key={track.id}
-                        id={track.id}
-                        url={track.url}
-                        src={track.src}
-                        title={track.title}
-                    />
-                )
-            )}
+            {mapTracks(tracks, isComparison)}
         </div>
     );
 };
