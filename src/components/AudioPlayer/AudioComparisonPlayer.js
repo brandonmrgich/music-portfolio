@@ -23,8 +23,9 @@ const AudioComparisonPlayer = ({ id, before, after, title, url }) => {
             className="text-sm relative bg-none bg-opacity-90 text-comfy-dark px-4 py-2 transition-all duration-300 ease-in-out transform hover:scale-95 disabled:opacity-50 hover:cursor-pointer"
             onMouseOver={displayHint}
         >
+            {/* TODO: toggle side by side*/}
             {isBeforeAudio ? (
-                <div className="col-span-2 row-span-1 justify-between">
+                <div className="flex flex-grow row-auto">
                     <FaToggleOff className="text-red-500" />
                     <span>A</span>
                 </div>
