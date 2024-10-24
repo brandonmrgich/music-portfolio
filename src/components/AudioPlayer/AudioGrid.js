@@ -48,7 +48,7 @@ const mapTracks = (tracks, isComparison) => {
 const AudioGrid = ({ tracks, isComparison }) => {
     console.log({ tracks });
     return (
-        <div className="audio-grid grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="audio-grid grid sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {mapTracks(tracks, isComparison)}
         </div>
     );

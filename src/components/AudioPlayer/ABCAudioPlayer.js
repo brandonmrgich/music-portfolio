@@ -2,7 +2,11 @@ import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { Play, Pause, LoaderCircle, Volume, Volume1, Volume2, VolumeX } from 'lucide-react';
 import { useAudio } from '../../Hooks'; // New custom hook
 
-const ABCAudioPlayer = ({ id, src, title, url, renderAdditionalControls }) => {
+// TODO: Adding artist to the tracks
+// - change url to url.ARTIST url.SRC
+// - OR
+// - urlArtist, urlSrc
+const ABCAudioPlayer = ({ id, src, title, artist, url, renderAdditionalControls }) => {
     const {
         audioRef,
         isPlaying,
@@ -24,6 +28,9 @@ const ABCAudioPlayer = ({ id, src, title, url, renderAdditionalControls }) => {
 
     const [volumeOpen, setVolumeOpen] = useState(false);
     const volumeRef = useRef(null);
+
+    // TODO: Remove set, add as part of data structure
+    artist = 'Brandon Mrgich';
 
     const openVolume = () => setVolumeOpen(true);
     const closeVolume = () => setVolumeOpen(false);
@@ -47,8 +54,8 @@ const ABCAudioPlayer = ({ id, src, title, url, renderAdditionalControls }) => {
     error && console.log(error);
 
     return (
-        <div className="p-4 rounded-lg mb-4 border border-comfy-dark bg-comfy-accent2 bg-opacity-5 shadow-lg transition-all duration-300 ease-in-out transform hover:scale-110 disabled:opacity-50 audio-player max-w-sm sm:max-w-sm md:max-w-xs lg:max-w-lg flex flex-col justify-between">
-            <div className="flex justify-between items-start snap-start mb-2">
+        <div className="sm:p-4 md:p-4 p-1 max-h-30 sm:max-h-100 md:max-h-100 rounded-lg border border-comfy-dark bg-comfy-accent2 bg-opacity-5 shadow-lg transition-all duration-300 ease-in-out transform hover:scale-110 disabled:opacity-50 audio-player max-w-sm sm:max-w-sm md:max-w-xs lg:max-w-lg flex flex-col justify-between">
+            <div className="flex justify-between items-start snap-start">
                 <h3 className="truncate md:max-w-30 lg:max-w-m text-lg font-semibold text-white hover:text-pretty transition-all duration-700">
                     <a
                         href={url || '#'}
@@ -85,7 +92,16 @@ const ABCAudioPlayer = ({ id, src, title, url, renderAdditionalControls }) => {
                 </div>
             </div>
 
-            <div className="flex items-center mb-2 py-1 text-sm italic">
+            <h4 className="mb-2 truncate md:max-w-30 lg:max-w-sm text-md font-light text-white hover:text-pretty transition-all duration-700">
+                <a
+                    href={url || '#'}
+                    className="max-w-xs opacity-80 text-comfy-accent1 hover:text-comfy-accent2 transition-all duration-300"
+                >
+                    {artist}
+                </a>
+            </h4>
+
+            <div className="mb-2 mt-2 flex items-center text-sm italic">
                 <span className="text-comfy-accent2">{formatTime(currentTime)}</span>
                 <div className="flex-grow mx-4 flex items-center justify-center">
                     <input
@@ -104,7 +120,7 @@ const ABCAudioPlayer = ({ id, src, title, url, renderAdditionalControls }) => {
                 <button
                     onClick={togglePlayPause}
                     disabled={isLoading}
-                    className="w-full bg-comfy-accent2 bg-opacity-50 text-comfy-dark py-2 rounded-md hover:bg-opacity-70 transition-all duration-300 ease-in-out transform hover:scale-95 disabled:opacity-50"
+                    className="py-1.5 w-full bg-comfy-accent2 bg-opacity-50 text-comfy-dark rounded-md hover:bg-opacity-70 transition-all duration-300 ease-in-out transform hover:scale-95 disabled:opacity-50"
                 >
                     {isLoading ? (
                         <LoaderCircle className="w-5 h-5 animate-spin mx-auto" />
