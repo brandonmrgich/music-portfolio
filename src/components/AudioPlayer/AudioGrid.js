@@ -23,6 +23,7 @@ const mapTracks = (tracks, isComparison) => {
                     before={track.before}
                     after={track.after}
                     title={track.title}
+                    artist={track.artist}
                 />
             ) : (
                 <AudioPlayer
@@ -31,6 +32,7 @@ const mapTracks = (tracks, isComparison) => {
                     links={track.links}
                     src={track.src}
                     title={track.title}
+                    artist={track.artist}
                 />
             )
         );

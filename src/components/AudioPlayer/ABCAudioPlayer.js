@@ -2,6 +2,8 @@ import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { Play, Pause, LoaderCircle, Volume, Volume1, Volume2, VolumeX } from 'lucide-react';
 import { useAudio } from '../../Hooks'; // New custom hook
 
+// TODO: Add optional image, default is current theme, else if image, set as player card background
+// with opacity lowered
 const ABCAudioPlayer = ({ id, src, title, artist, links, renderAdditionalControls }) => {
     const {
         audioRef,
@@ -16,17 +18,8 @@ const ABCAudioPlayer = ({ id, src, title, artist, links, renderAdditionalControl
         handleVolume,
     } = useAudio(id, src);
 
-    const formatTime = (time) => {
-        const minutes = Math.floor(time / 60);
-        const seconds = Math.floor(time % 60);
-        return `${minutes}:${seconds.toString().padStart(2, '0')}`;
-    };
-
     const [volumeOpen, setVolumeOpen] = useState(false);
     const volumeRef = useRef(null);
-
-    // TODO: Remove set, add as part of data structure
-    artist = 'Brandon Mrgich';
 
     const openVolume = () => setVolumeOpen(true);
     const closeVolume = () => setVolumeOpen(false);
@@ -46,6 +39,12 @@ const ABCAudioPlayer = ({ id, src, title, artist, links, renderAdditionalControl
             document.removeEventListener('mousedown', handleClickOutside);
         };
     }, [volumeOpen]);
+
+    const formatTime = (time) => {
+        const minutes = Math.floor(time / 60);
+        const seconds = Math.floor(time % 60);
+        return `${minutes}:${seconds.toString().padStart(2, '0')}`;
+    };
 
     error && console.log(error);
 

@@ -2,7 +2,7 @@ import React, { useState, useCallback, useEffect } from 'react';
 import ABCAudioPlayer from './ABCAudioPlayer';
 import { FaToggleOn, FaToggleOff } from 'react-icons/fa';
 
-const AudioComparisonPlayer = ({ id, before, after, title, links }) => {
+const AudioComparisonPlayer = ({ id, before, after, title, artist, links }) => {
     const [isBeforeAudio, setIsBeforeAudio] = useState(true);
     const [currentSrc, setCurrentSrc] = useState(before);
 
@@ -23,7 +23,7 @@ const AudioComparisonPlayer = ({ id, before, after, title, links }) => {
             className="text-sm relative bg-none bg-opacity-90 text-comfy-dark px-4 py-2 transition-all duration-300 ease-in-out transform hover:scale-95 disabled:opacity-50 hover:cursor-pointer"
             onMouseOver={displayHint}
         >
-            {/* TODO: toggle side by side*/}
+            {/* TODO: fix toggle side by side*/}
             {isBeforeAudio ? (
                 <div className="flex flex-grow row-auto">
                     <FaToggleOff className="text-red-500" />
@@ -43,6 +43,7 @@ const AudioComparisonPlayer = ({ id, before, after, title, links }) => {
             id={id}
             src={currentSrc}
             title={title}
+            artist={artist}
             links={links}
             renderAdditionalControls={renderAdditionalControls}
         />

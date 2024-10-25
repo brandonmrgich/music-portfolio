@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import ABCAudioPlayer from './ABCAudioPlayer';
 import { Heart } from 'lucide-react';
 
-const AudioPlayer = ({ id, src, title, links }) => {
+const AudioPlayer = ({ id, src, title, artist, links }) => {
     const [likes, setLikes] = useState(0);
     const [hasLiked, setHasLiked] = useState(false);
 
@@ -40,6 +40,7 @@ const AudioPlayer = ({ id, src, title, links }) => {
             id={id}
             src={src}
             title={title}
+            artist={artist}
             links={links}
             renderAdditionalControls={renderAdditionalControls}
         />
