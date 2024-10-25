@@ -2,7 +2,7 @@ import React, { useState, useCallback, useEffect } from 'react';
 import ABCAudioPlayer from './ABCAudioPlayer';
 import { FaToggleOn, FaToggleOff } from 'react-icons/fa';
 
-const AudioComparisonPlayer = ({ id, before, after, title, url }) => {
+const AudioComparisonPlayer = ({ id, before, after, title, links }) => {
     const [isBeforeAudio, setIsBeforeAudio] = useState(true);
     const [currentSrc, setCurrentSrc] = useState(before);
 
@@ -43,7 +43,7 @@ const AudioComparisonPlayer = ({ id, before, after, title, url }) => {
             id={id}
             src={currentSrc}
             title={title}
-            url={url}
+            links={links}
             renderAdditionalControls={renderAdditionalControls}
         />
     );

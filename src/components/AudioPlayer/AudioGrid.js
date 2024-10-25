@@ -19,7 +19,7 @@ const mapTracks = (tracks, isComparison) => {
                 <AudioComparisonPlayer
                     key={track.id}
                     id={track.id}
-                    url={track.url}
+                    links={track.links}
                     before={track.before}
                     after={track.after}
                     title={track.title}
@@ -28,7 +28,7 @@ const mapTracks = (tracks, isComparison) => {
                 <AudioPlayer
                     key={track.id}
                     id={track.id}
-                    url={track.url}
+                    links={track.links}
                     src={track.src}
                     title={track.title}
                 />
@@ -48,7 +48,7 @@ const mapTracks = (tracks, isComparison) => {
 const AudioGrid = ({ tracks, isComparison }) => {
     console.log({ tracks });
     return (
-        <div className="audio-grid grid sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="audio-grid grid justify-self-center sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {mapTracks(tracks, isComparison)}
         </div>
     );

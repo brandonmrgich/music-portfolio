@@ -8,6 +8,8 @@ body {
     padding: 0;
     min-height: 100vh; /* Ensures the body takes at least the full viewport height */
     font-family: Arial, sans-serif; /* Optional: Set a global font */
+    overflow-wrap: normal;
+    /*TODO: Color wrap around "root" region*/
 }
 
 a {

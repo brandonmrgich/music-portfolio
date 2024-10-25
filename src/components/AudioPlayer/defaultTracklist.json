@@ -3,75 +3,79 @@
         {
             "id": 1,
             "title": "Song with a very long title that will wrap Song with a very long title that will wrap",
+            "artist": "Artist Name",
             "src": "default.mp3",
-            "url": "https://google.com"
+            "links": {
+                "artist": "https://google.com",
+                "song": "https://google.com"
+            }
         },
         {
             "id": 2,
             "title": "Closer",
+            "artist": "Artist Name",
             "src": "Closer.mp3",
-            "url": "https://google.com"
+            "links": {
+                "artist": "https://google.com",
+                "song": "https://google.com"
+            }
         },
         {
             "id": 3,
             "title": "Song with a very long title that will wrap Song with a very long title that will wrap",
+            "artist": "Artist Name",
             "src": "default.mp3",
-            "url": "https://google.com"
+            "links": {
+                "artist": "https://google.com",
+                "song": "https://google.com"
+            }
         },
         {
             "id": 4,
             "title": "Closer",
+            "artist": "Artist Name",
             "src": "Closer.mp3",
-            "url": "https://google.com"
-        },
-        {
-            "id": 5,
-            "title": "Song with a very long title that will wrap Song with a very long title that will wrap",
-            "src": "default.mp3",
-            "url": "https://google.com"
-        },
-        {
-            "id": 6,
-            "title": "Closer",
-            "src": "Closer.mp3",
-            "url": "https://google.com"
-        },
-        {
-            "id": 7,
-            "title": "Song with a very long title that will wrap Song with a very long title that will wrap",
-            "src": "default.mp3",
-            "url": "https://google.com"
-        },
-        {
-            "id": 8,
-            "title": "Closer",
-            "src": "Closer.mp3",
-            "url": "https://google.com"
+            "links": {
+                "artist": "https://google.com",
+                "song": "https://google.com"
+            }
         }
     ],
 
     "SCORING": [
         {
-            "id": 9,
+            "id": 5,
             "title": "default1",
+            "artist": "Artist Name",
             "src": "default.mp3",
-            "url": "https://google.com"
+            "links": {
+                "artist": "https://google.com",
+                "song": "https://google.com"
+            }
         },
         {
-            "id": 10,
+            "id": 6,
             "title": "Closer",
+            "artist": "Artist Name",
             "src": "Closer.mp3",
-            "url": "https://google.com"
+            "links": {
+                "artist": "https://google.com",
+                "song": "https://google.com"
+            }
         }
     ],
 
     "REEL": [
         {
-            "id": 11,
+            "id": 7,
             "title": "song 1",
+            "artist": "Artist Name",
             "before": "default.mp3",
             "after": "default2.mp3",
-            "url": "https://google.com"
+            "links": {
+                "artist": "https://google.com",
+                "song": "https://google.com"
+            }
         }
     ]
 }

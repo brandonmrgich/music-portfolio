@@ -20,9 +20,11 @@ const Services = ({ isAdmin }) => {
     }
 
     return (
-        <div className="text-center block text-balance services p-6 max-w-4xl mx-auto space-y-12">
-            <section className="mixing-mastering space-y-4">
-                <h2 className=" text-3xl font-semibold text-primary-dark">Mixing & Mastering</h2>
+        <div className="">
+            <section className="mixing-mastering space-y-6 text-center block text-balance services p-6 max-w-4xl mx-auto ">
+                <h2 className="mb-4 text-3xl font-semibold text-primary-dark">
+                    Mixing & Mastering
+                </h2>
                 <p className="text-lg text-secondary-dark">
                     I have a passion for taking a song and bringing it to a whole other level. My
                     goal is to make the track easy to listen to, maintaining balanced dynamics while
@@ -36,12 +38,13 @@ const Services = ({ isAdmin }) => {
                 <p className="text-lg text-secondary-dark italic">
                     (I may request to feature them here on my site!)
                 </p>
-            </section>
 
-            <section className="sample-reel space-y-4">
                 <h2 className="text-xl font-semibold text-primary-dark">
                     Here's a few tracks I'm particularly proud of:
                 </h2>
+            </section>
+
+            <section className="sample-reel max-w-4xl mx-auto space-y-12">
                 <AudioGrid tracks={tracks} isComparison={isComparison} />
             </section>
 

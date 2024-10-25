@@ -18,11 +18,12 @@ const Scoring = ({ isAdmin }) => {
     }
 
     return (
-        <div className="in-work text-center text-balance p-6 max-w-4xl mx-auto space-y-12">
-            <h1 className="text-3xl font-bold mb-8 text-primary-dark">Film & Videogame Scoring</h1>
-            <section>
-                <p className="text-lg text-secondary-dark mb-4 text-center">...</p>
-                <p className="text-lg text-secondary-dark mb-4 text-center">
+        <div className="in-work ">
+            <section className="text-center text-balance p-6 max-w-4xl mx-auto space-y-6 ">
+                <h2 className="text-3xl font-semibold mb-4 text-primary-dark">
+                    Film & Videogame Scoring
+                </h2>
+                <p className="text-lg text-secondary-dark ">
                     Here are some tracks that made it into various projects, just as Gamejams, Film
                     Festivals, etc
                 </p>

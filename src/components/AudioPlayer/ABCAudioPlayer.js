@@ -2,11 +2,7 @@ import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { Play, Pause, LoaderCircle, Volume, Volume1, Volume2, VolumeX } from 'lucide-react';
 import { useAudio } from '../../Hooks'; // New custom hook
 
-// TODO: Adding artist to the tracks
-// - change url to url.ARTIST url.SRC
-// - OR
-// - urlArtist, urlSrc
-const ABCAudioPlayer = ({ id, src, title, artist, url, renderAdditionalControls }) => {
+const ABCAudioPlayer = ({ id, src, title, artist, links, renderAdditionalControls }) => {
     const {
         audioRef,
         isPlaying,
@@ -54,11 +50,11 @@ const ABCAudioPlayer = ({ id, src, title, artist, url, renderAdditionalControls 
     error && console.log(error);
 
     return (
-        <div className="sm:p-4 md:p-4 p-1 max-h-30 sm:max-h-100 md:max-h-100 rounded-lg border border-comfy-dark bg-comfy-accent2 bg-opacity-5 shadow-lg transition-all duration-300 ease-in-out transform hover:scale-110 disabled:opacity-50 audio-player max-w-sm sm:max-w-sm md:max-w-xs lg:max-w-lg flex flex-col justify-between">
+        <div className="sm:p-4 md:p-4 p-1 max-h-30 sm:max-h-100 md:max-h-100 rounded-lg border border-comfy-dark bg-comfy-accent2 bg-opacity-5 shadow-lg transition-all duration-300 ease-in-out transform md:hover:scale-110 lg:hover:scale-110 disabled:opacity-50 audio-player max-w-sm sm:max-w-sm md:max-w-xs lg:max-w-lg flex flex-col justify-between">
             <div className="flex justify-between items-start snap-start">
                 <h3 className="truncate md:max-w-30 lg:max-w-m text-lg font-semibold text-white hover:text-pretty transition-all duration-700">
                     <a
-                        href={url || '#'}
+                        href={links.song || '#'}
                         className="max-w-xs text-comfy-accent1 hover:text-comfy-accent2 transition-all duration-300"
                     >
                         {title}
@@ -94,7 +90,7 @@ const ABCAudioPlayer = ({ id, src, title, artist, url, renderAdditionalControls 
 
             <h4 className="mb-2 truncate md:max-w-30 lg:max-w-sm text-md font-light text-white hover:text-pretty transition-all duration-700">
                 <a
-                    href={url || '#'}
+                    href={links.artist || '#'}
                     className="max-w-xs opacity-80 text-comfy-accent1 hover:text-comfy-accent2 transition-all duration-300"
                 >
                     {artist}

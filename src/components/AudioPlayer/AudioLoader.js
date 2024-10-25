@@ -23,6 +23,7 @@ class AudioLoader {
             src: track.src ? `/audio/${trackType}/${track.src}` : null,
             before: track.before ? `/audio/${trackType}/${track.before}` : null,
             after: track.after ? `/audio/${trackType}/${track.after}` : null,
+            links: track.links ? `/audio/${trackType}/${track.links}` : null,
         }));
     }
 

@@ -24,7 +24,7 @@ const App = () => {
 
     return (
         <Router>
-            <div className="min-h-screen flex flex-col text-comfy-dark bg-gradient-to-b from-comfy-light to-comfy-medium">
+            <div className="w-full min-h-screen flex flex-col text-comfy-dark bg-gradient-to-b from-comfy-light to-comfy-medium">
                 <nav className="p-4 border border-comfy-medium text-xl">
                     <div className="flex justify-between items-center">
                         <a href="https://linktr.ee/brandonamrgich">
