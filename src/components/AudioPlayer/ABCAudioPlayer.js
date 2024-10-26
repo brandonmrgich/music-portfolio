@@ -1,28 +1,32 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { Play, Pause, LoaderCircle, Volume, Volume1, Volume2, VolumeX } from 'lucide-react';
-import { useAudio } from '../../Hooks'; // New custom hook
+import { useAudio } from '../../contexts/AudioContext';
 
 // TODO: Add optional image, default is current theme, else if image, set as player card background
 // with opacity lowered
 const ABCAudioPlayer = ({ id, src, title, artist, links, renderAdditionalControls }) => {
     const {
-        audioRef,
-        isPlaying,
-        currentTime,
-        currentVolume,
-        duration,
         error,
-        isLoading,
-        togglePlayPause,
-        handleSeek,
-        handleVolume,
-    } = useAudio(id, src);
+        play,
+        pause,
+        seek,
+        setVolume,
+        playingStates,
+        currentTimes,
+        durations,
+        volumes,
+        initializeAudio,
+    } = useAudio();
 
+    const isPlaying = playingStates[id];
+    const currentTime = currentTimes[id] || 0;
+    const duration = durations[id] || 0;
+    const volume = volumes[id] || 0.5;
     const [volumeOpen, setVolumeOpen] = useState(false);
-    const volumeRef = useRef(null);
 
     const openVolume = () => setVolumeOpen(true);
     const closeVolume = () => setVolumeOpen(false);
+    const volumeRef = useRef(null);
 
     useEffect(() => {
         const handleClickOutside = (event) => {
@@ -39,6 +43,10 @@ const ABCAudioPlayer = ({ id, src, title, artist, links, renderAdditionalControl
             document.removeEventListener('mousedown', handleClickOutside);
         };
     }, [volumeOpen]);
+
+    useEffect(() => {
+        initializeAudio(id, src);
+    }, [src]);
 
     const formatTime = (time) => {
         const minutes = Math.floor(time / 60);
@@ -66,19 +74,20 @@ const ABCAudioPlayer = ({ id, src, title, artist, links, renderAdditionalControl
                             ref={volumeRef}
                             type="range"
                             min="0"
-                            max="100"
-                            value={currentVolume}
-                            onChange={handleVolume}
+                            max="1"
+                            step="0.01"
+                            value={volume}
+                            onChange={(e) => setVolume(id, parseFloat(e.target.value))}
                             className="max-w-s md:max-w-30 lg:max-w-20 accent-comfy-accent2 opacity-60 hover:cursor-pointer col-end-1 "
                         />
                     )}
 
                     <button onClick={openVolume}>
-                        {currentVolume <= 0 ? (
+                        {volume <= 0 ? (
                             <VolumeX />
-                        ) : currentVolume > 0 && currentVolume <= 33 ? (
+                        ) : volume > 0 && volume <= 33 ? (
                             <Volume />
-                        ) : currentVolume > 33 && currentVolume <= 66 ? (
+                        ) : volume > 33 && volume <= 66 ? (
                             <Volume1 />
                         ) : (
                             <Volume2 />
@@ -104,7 +113,7 @@ const ABCAudioPlayer = ({ id, src, title, artist, links, renderAdditionalControl
                         min="0"
                         max={duration}
                         value={currentTime}
-                        onChange={handleSeek}
+                        onChange={(e) => seek(id, e.target.value)}
                         className="w-full accent-comfy-accent2 opacity-60 hover:cursor-pointer"
                     />
                 </div>
@@ -113,26 +122,23 @@ const ABCAudioPlayer = ({ id, src, title, artist, links, renderAdditionalControl
 
             <section className="playerControls flex items-center col-auto">
                 <button
-                    onClick={togglePlayPause}
-                    disabled={isLoading}
-                    className="py-1.5 w-full bg-comfy-accent2 bg-opacity-50 text-comfy-dark rounded-md hover:bg-opacity-70 transition-all duration-300 ease-in-out transform hover:scale-95 disabled:opacity-50"
+                    onClick={() => (isPlaying ? pause(id) : play(id, src))}
+                    className="py-1.5 w-full bg-comfy-accent2 bg-opacity-50 text-comfy-dark
+                    rounded-md hover:bg-opacity-70 transition-all duration-300 ease-in-out transform
+                    hover:scale-95 disabled:opacity-50"
                 >
-                    {isLoading ? (
-                        <LoaderCircle className="w-5 h-5 animate-spin mx-auto" />
-                    ) : (
-                        <div className="relative w-5 h-5 mx-auto">
-                            <Play
-                                className={`absolute top-0 left-0 w-5 h-5 transform transition-all duration-300 ease-in-out ${
-                                    isPlaying ? 'opacity-0 scale-75' : 'opacity-100 scale-100'
-                                }`}
-                            />
-                            <Pause
-                                className={`absolute top-0 left-0 w-5 h-5 transform transition-all duration-300 ease-in-out ${
-                                    isPlaying ? 'opacity-100 scale-100' : 'opacity-0 scale-75'
-                                }`}
-                            />
-                        </div>
-                    )}
+                    <div className="relative w-5 h-5 mx-auto">
+                        <Play
+                            className={`absolute top-0 left-0 w-5 h-5 transform transition-all duration-300 ease-in-out ${
+                                isPlaying ? 'opacity-0 scale-75' : 'opacity-100 scale-100'
+                            }`}
+                        />
+                        <Pause
+                            className={`absolute top-0 left-0 w-5 h-5 transform transition-all duration-300 ease-in-out ${
+                                isPlaying ? 'opacity-100 scale-100' : 'opacity-0 scale-75'
+                            }`}
+                        />
+                    </div>
                 </button>
 
                 <div className="mt-1">{renderAdditionalControls && renderAdditionalControls()}</div>

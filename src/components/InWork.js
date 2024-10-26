@@ -1,13 +1,15 @@
-import React, { useState, useEffect } from "react";
-import AudioGrid from "./AudioPlayer/AudioGrid";
-import { useTracks } from "../Hooks";
+import React, { useState, useEffect } from 'react';
+import AudioGrid from './AudioPlayer/AudioGrid';
+import { useTracks } from '../Hooks';
 
 /**
  * In Work page component.
  * @returns {React.Component} The In Work page component
  */
 const InWork = ({ isAdmin }) => {
-    const { tracks, isLoading, error, isComparison } = useTracks("wip");
+    const { tracks, isLoading, error, isComparison } = useTracks('wip');
+
+    console.log('InWork: Tracks: ', { tracks });
 
     if (isLoading) {
         return <div>Loading tracks...</div>;
@@ -22,6 +24,7 @@ const InWork = ({ isAdmin }) => {
             <p className="text-lg text-gray-700 mb-4 text-center">
                 Here are some songs and demos I'm currently working on:
             </p>
+
             <AudioGrid tracks={tracks} isComparison={isComparison} />
         </div>
     );
