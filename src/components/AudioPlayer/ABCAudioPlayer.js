@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useCallback, useRef } from 'react';
-import { Play, Pause, LoaderCircle, Volume, Volume1, Volume2, VolumeX } from 'lucide-react';
+import React, { useState, useEffect, useRef } from 'react';
+import { Play, Pause, Volume, Volume1, Volume2, VolumeX } from 'lucide-react';
 import { useAudio } from '../../contexts/AudioContext';
 
 // TODO: Add optional image, default is current theme, else if image, set as player card background
@@ -21,12 +21,30 @@ const ABCAudioPlayer = ({ id, src, title, artist, links, renderAdditionalControl
     const isPlaying = playingStates[id];
     const currentTime = currentTimes[id] || 0;
     const duration = durations[id] || 0;
-    const volume = volumes[id] || 0.5;
+    const volume = volumes[id] || 0;
     const [volumeOpen, setVolumeOpen] = useState(false);
 
     const openVolume = () => setVolumeOpen(true);
     const closeVolume = () => setVolumeOpen(false);
     const volumeRef = useRef(null);
+
+    const formatTime = (time) => {
+        const minutes = Math.floor(time / 60);
+        const seconds = Math.floor(time % 60);
+        return `${minutes}:${seconds.toString().padStart(2, '0')}`;
+    };
+
+    const renderVolumeIcon = () => {
+        if (volume <= 0) {
+            return <VolumeX />;
+        } else if (volume > 0 && volume <= 0.33) {
+            return <Volume />;
+        } else if (volume > 0.33 && volume <= 0.66) {
+            return <Volume1 />;
+        } else {
+            return <Volume2 />;
+        }
+    };
 
     useEffect(() => {
         const handleClickOutside = (event) => {
@@ -49,12 +67,6 @@ const ABCAudioPlayer = ({ id, src, title, artist, links, renderAdditionalControl
     useEffect(() => {
         initializeAudio(id, src);
     }, [src]);
-
-    const formatTime = (time) => {
-        const minutes = Math.floor(time / 60);
-        const seconds = Math.floor(time % 60);
-        return `${minutes}:${seconds.toString().padStart(2, '0')}`;
-    };
 
     error && console.log(error);
 
@@ -84,17 +96,7 @@ const ABCAudioPlayer = ({ id, src, title, artist, links, renderAdditionalControl
                         />
                     )}
 
-                    <button onClick={openVolume}>
-                        {volume <= 0 ? (
-                            <VolumeX />
-                        ) : volume > 0 && volume <= 33 ? (
-                            <Volume />
-                        ) : volume > 33 && volume <= 66 ? (
-                            <Volume1 />
-                        ) : (
-                            <Volume2 />
-                        )}
-                    </button>
+                    <button onClick={openVolume}>{renderVolumeIcon()}</button>
                 </div>
             </div>
 
