@@ -6,15 +6,17 @@ import { useAudio } from '../../contexts/AudioContext';
 const AudioComparisonPlayer = ({ id, before, after, title, artist, links }) => {
     //const [currentSrc, setCurrentSrc] = useState(before);
 
-    const { play, toggleSource } = useAudio();
+    const { toggleSource } = useAudio();
     const [isBeforeAudio, setIsBeforeAudio] = useState(true);
+
+    const handleToggle = () => {
+        toggleSource(id, before, after, isBeforeAudio);
+        setIsBeforeAudio(!isBeforeAudio);
+    };
 
     const renderAdditionalControls = () => (
         <button
-            onClick={() => {
-                toggleSource(id, before, after);
-                setIsBeforeAudio(!isBeforeAudio);
-            }}
+            onClick={handleToggle}
             className="text-sm relative bg-none bg-opacity-90 text-comfy-dark px-4 py-2 transition-all duration-300 ease-in-out transform hover:scale-95 disabled:opacity-50 hover:cursor-pointer"
         >
             {isBeforeAudio ? (

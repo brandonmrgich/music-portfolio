@@ -40,7 +40,9 @@ class AudioLoader {
             validTracks.push({
                 ...track,
                 id: track.id || `${trackType}-${track.filename}`,
-                src: track.src ? `/${basePath}${track.src}` : null,
+                // TODO: src doesnt exist, default to the before track. Later if data is malformed
+                // and only one of the before/after files exist, this will break
+                src: track.src ? `/${basePath}${track.src}` : `/${basePath}${track.before}`,
                 before: track.before ? `/${basePath}${track.before}` : null,
                 after: track.after ? `/${basePath}${track.after}` : null,
                 links: track.links ? `/${basePath}${track.links}` : null,

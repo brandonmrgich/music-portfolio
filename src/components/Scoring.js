@@ -18,8 +18,8 @@ const Scoring = ({ isAdmin }) => {
     }
 
     return (
-        <div className="in-work ">
-            <section className="text-center text-balance p-6 max-w-4xl mx-auto space-y-6 ">
+        <div className="in-work p-6 max-w-4xl mx-auto space-y-12">
+            <section className="text-center text-balance p-6 max-w-4xl mx-auto space-y-6 block">
                 <h2 className="text-3xl font-semibold mb-4 text-primary-dark">
                     Film & Videogame Scoring
                 </h2>

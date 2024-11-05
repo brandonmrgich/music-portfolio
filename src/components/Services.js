@@ -20,9 +20,9 @@ const Services = ({ isAdmin }) => {
     }
 
     return (
-        <div className="">
-            <section className="mixing-mastering space-y-6 text-center block text-balance services p-6 max-w-4xl mx-auto ">
-                <h2 className="mb-4 text-3xl font-semibold text-primary-dark">
+        <div className="p-6 max-w-4xl mx-auto space-y-12">
+            <section className="text-center block text-balance services p-6 max-w-4xl mx-auto ">
+                <h2 className="text-3xl font-semibold mb-4 text-primary-dark">
                     Mixing & Mastering
                 </h2>
                 <p className="text-lg text-secondary-dark">
@@ -44,9 +44,7 @@ const Services = ({ isAdmin }) => {
                 </h2>
             </section>
 
-            <section className="sample-reel max-w-4xl mx-auto space-y-12">
-                <AudioGrid tracks={tracks} isComparison={isComparison} />
-            </section>
+            <AudioGrid tracks={tracks} isComparison={isComparison} />
 
             {isAdmin && (
                 <section className="admin space-y-4">

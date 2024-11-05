@@ -102,12 +102,73 @@ export const AudioProvider = ({ children }) => {
         }
     };
 
-    const toggleSource = (id, beforeSrc, afterSrc) => {
-        const newSrc = currentSrcs[id] === beforeSrc ? afterSrc : beforeSrc;
-        audioRefs.current[id].play();
-        setPlayingStates((prev) => ({ ...prev, [id]: true }));
-        setCurrentSrcs((prev) => ({ ...prev, [id]: newSrc }));
+    const toggleSource = (id, beforeSrc, afterSrc, isBeforeAudio) => {
+        const newSrc = isBeforeAudio ? afterSrc : beforeSrc;
+
+        const oldAudio = audioRefs.current[id];
+        let oldVolume = oldAudio.volume;
+        let oldCurrentTime = oldAudio.currentTime || 0;
+
+        stop(id);
+        //audioRefs.current[id] = null;
+
+        // Set the new audio references and sources
+        // TODO: Initialize doesnt persist for the new reference
+        initializeAudio(id, newSrc);
+        //setPlayingStates((prev) => ({ ...prev, [id]: true }));
+        //setCurrentSrcs((prev) => ({ ...prev, [id]: newSrc }));
+
+        // Preserve the current volume and playback position.
+        setVolume(id, oldVolume);
+        seek(id, oldCurrentTime);
+
+        play(id, newSrc);
+        //newAudio.play();
+
+        const newAudio = audioRefs.current[id];
+
+        newAudio.addEventListener('timeupdate', () => {
+            setCurrentTimes((prev) => ({ ...prev, [id]: newAudio.currentTime }));
+        });
+
+        console.log({
+            id,
+            beforeSrc,
+            afterSrc,
+            oldAudio,
+            newAudio,
+            isBeforeAudio,
+            oldCurrentTime,
+            oldVolume,
+            newSrc,
+        });
     };
+
+    //const toggleSource = (id, beforeSrc, afterSrc) => {
+    //    let currentSrc = currentSrcs[id];
+    //    const newSrc = currentSrc === beforeSrc ? afterSrc : beforeSrc;
+    //    let currentAudioRef = audioRefs.current[id];
+
+    //    // TODO: Play has not been clicked yet, currentSrc is undefined
+    //    if (currentSrc === undefined && currentAudioRef) {
+    //        console.log('AudioContext::toggleSource(): First toggle');
+    //    }
+
+    //    audioRefs.current[id].play();
+    //    console.log({ audioRefs });
+
+    //    setPlayingStates((prev) => ({ ...prev, [id]: true }));
+    //    setCurrentSrcs((prev) => ({ ...prev, [id]: newSrc }));
+
+    //    console.log('AudioContext::toggleSource(): ', {
+    //        id,
+    //        beforeSrc,
+    //        afterSrc,
+    //        currentSrc,
+    //        newSrc,
+    //        currentAudioRef,
+    //    });
+    //};
 
     useEffect(() => {
         return () => {
