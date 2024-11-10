@@ -9,8 +9,6 @@ import { useTracks } from '../Hooks';
 const InWork = ({ isAdmin }) => {
     const { tracks, isLoading, error, isComparison } = useTracks('wip');
 
-    console.log('InWork: Tracks: ', { tracks });
-
     if (isLoading) {
         return <div>Loading tracks...</div>;
     }

@@ -38,6 +38,7 @@ export const useTracks = (trackType = 'wip', trackSrc = 'local') => {
     return { tracks, isLoading, error, isComparison };
 };
 
+// TODO: Phase this old way of handling audio out, in favor of the context
 export const useAudio = (id, src) => {
     const [isPlaying, setIsPlaying] = useState(false);
     const [currentTime, setCurrentTime] = useState(0);

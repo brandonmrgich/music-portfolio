@@ -67,7 +67,10 @@ const ABCAudioPlayer = ({ id, src, title, artist, links, renderAdditionalControl
     //
     useEffect(() => {
         initializeAudio(id, src);
-    }, [src]);
+        return () => {
+            pause(id); // Ensure audio stops on component unmount
+        };
+    }, []);
 
     error && console.log(error);
 

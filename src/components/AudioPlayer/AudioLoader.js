@@ -25,11 +25,6 @@ class AudioLoader {
             const beforeExists = track.before && (await fileExists(`${basePath}${track.before}`));
             const afterExists = track.after && (await fileExists(`${basePath}${track.after}`));
 
-            // TODO: Fix check for if file exists
-            console.log(srcExists);
-            console.log(beforeExists);
-            console.log(afterExists);
-
             if (
                 (trackType == 'reel' && !beforeExists && !afterExists) ||
                 (trackType != 'reel' && !srcExists)
