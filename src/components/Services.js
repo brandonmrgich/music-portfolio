@@ -6,10 +6,6 @@ import AudioGrid from './AudioPlayer/AudioGrid';
 const Services = ({ isAdmin }) => {
     const { tracks, isLoading, error, isComparison } = useTracks('reel');
 
-    if (isLoading) {
-        return <div>Loading tracks...</div>;
-    }
-
     if (error) {
         return <div>Error: {error}</div>;
     }
@@ -39,7 +35,7 @@ const Services = ({ isAdmin }) => {
                 </h2>
             </section>
 
-            <AudioGrid tracks={tracks} isComparison={isComparison} />
+            <AudioGrid tracks={tracks} isComparison={isComparison} isLoading={isLoading} />
 
             {isAdmin && (
                 <section className="admin space-y-4">

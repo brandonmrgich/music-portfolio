@@ -9,10 +9,6 @@ import { useTracks } from '../Hooks';
 const Scoring = ({ isAdmin }) => {
     const { tracks, isLoading, error, isComparison } = useTracks('scoring');
 
-    if (isLoading) {
-        return <div>Loading tracks...</div>;
-    }
-
     if (error) {
         return <div>Error: {error}</div>;
     }
@@ -28,7 +24,7 @@ const Scoring = ({ isAdmin }) => {
                     Festivals, etc
                 </p>
             </section>
-            <AudioGrid tracks={tracks} isComparison={isComparison} />
+            <AudioGrid tracks={tracks} isComparison={isComparison} isLoading={isLoading} />
         </div>
     );
 };

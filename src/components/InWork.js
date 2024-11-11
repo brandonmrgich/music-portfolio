@@ -9,10 +9,6 @@ import { useTracks } from '../Hooks';
 const InWork = ({ isAdmin }) => {
     const { tracks, isLoading, error, isComparison } = useTracks('wip');
 
-    if (isLoading) {
-        return <div>Loading tracks...</div>;
-    }
-
     if (error) {
         return <div>Error: {error}</div>;
     }
@@ -23,7 +19,7 @@ const InWork = ({ isAdmin }) => {
                 Here are some songs and demos I'm currently working on:
             </p>
 
-            <AudioGrid tracks={tracks} isComparison={isComparison} />
+            <AudioGrid tracks={tracks} isComparison={isComparison} isLoading={isLoading} />
         </div>
     );
 };

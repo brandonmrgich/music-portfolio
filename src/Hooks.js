@@ -6,7 +6,7 @@ import AudioLoader from './components/AudioPlayer/AudioLoader';
 
 export const useTracks = (trackType = 'wip', trackSrc = 'local') => {
     const [tracks, setTracks] = useState([]);
-    const [isLoading, setIsLoading] = useState(true);
+    const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState(null);
 
     // Only sample reel tracks are comparison tracks
@@ -15,8 +15,8 @@ export const useTracks = (trackType = 'wip', trackSrc = 'local') => {
     useEffect(() => {
         const loadTracks = async () => {
             try {
-                setIsLoading(true);
                 let loadedTracks = null;
+                setIsLoading(true);
 
                 trackSrc.toLowerCase() === 'local'
                     ? (loadedTracks = await AudioLoader.getLocalTracks(trackType))
