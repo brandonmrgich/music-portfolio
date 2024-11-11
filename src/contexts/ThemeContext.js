@@ -14,9 +14,7 @@ export const ThemeProvider = ({ children }) => {
         setDarkMode(!darkMode);
     };
 
-    useEffect(() => {
-        console.log('Changing theme');
-    }, [darkMode]);
+    useEffect(() => {}, [darkMode]);
 
     return (
         <ThemeContext.Provider value={{ darkMode, toggleDarkMode }}>

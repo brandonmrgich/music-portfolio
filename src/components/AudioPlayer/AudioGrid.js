@@ -48,7 +48,6 @@ const mapTracks = (tracks, isComparison) => {
 // TODO: Separate grid sections by genre/style
 
 const AudioGrid = ({ tracks, isComparison }) => {
-    console.log({ tracks });
     return (
         <div className="audio-grid grid justify-self-center sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {mapTracks(tracks, isComparison)}

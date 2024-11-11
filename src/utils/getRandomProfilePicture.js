@@ -1,14 +1,13 @@
-import React from "react";
-import defaultPfp from "../pictures/profile-default.jpg";
+import React from 'react';
+import defaultPfp from '../pictures/profile-default.jpg';
 
 // Get a random pfp
 export function getRandomProfilePicture() {
     const images = require.context(
-        "../pictures",
+        '../pictures',
         false,
-        /^\.\/profile-.*\.(png|jpe?g|svg|gif|bmp|webp|aif)$/,
+        /^\.\/profile-.*\.(png|jpe?g|svg|gif|bmp|webp|aif)$/
     );
-    console.log({ images });
 
     let image = defaultPfp;
     try {
@@ -16,7 +15,7 @@ export function getRandomProfilePicture() {
         const randomIndex = Math.floor(Math.random() * imageKeys.length);
         image = images(imageKeys[randomIndex]);
     } catch {
-        console.error("Falling back to default image");
+        console.error('Falling back to default image');
     }
     return image;
 }

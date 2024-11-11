@@ -49,7 +49,6 @@ export const useAudio = (id, src) => {
     const audioRef = useRef(null);
 
     useEffect(() => {
-        console.log('Source is updating...');
         audioRef.current = new Audio(src);
         const audio = audioRef.current;
 
@@ -69,7 +68,6 @@ export const useAudio = (id, src) => {
     }, [src]);
 
     const togglePlayPause = useCallback(() => {
-        console.log('Hooks::togglePlayPause(): Toggling');
         const audio = audioRef.current;
 
         if (isPlaying) {

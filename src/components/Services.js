@@ -1,15 +1,10 @@
-import React, { useRef, useState, useEffect } from 'react';
+import React from 'react';
 import AudioUpload from '../admin/AudioUpload';
 import { useTracks } from '../Hooks';
 import AudioGrid from './AudioPlayer/AudioGrid';
-import { FaCheckCircle, FaExclamationCircle } from 'react-icons/fa';
-import ContactButton from './Contact/ContactButton';
 
 const Services = ({ isAdmin }) => {
     const { tracks, isLoading, error, isComparison } = useTracks('reel');
-    const contactFormRef = useRef(null); // Ref to control the contact form
-
-    console.log({ tracks });
 
     if (isLoading) {
         return <div>Loading tracks...</div>;

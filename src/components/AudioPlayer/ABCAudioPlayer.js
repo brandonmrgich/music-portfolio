@@ -21,7 +21,7 @@ const ABCAudioPlayer = ({ id, src, title, artist, links, renderAdditionalControl
     const isPlaying = playingStates[id];
     const currentTime = currentTimes[id] || 0;
     const duration = durations[id] || 0;
-    const volume = volumes[id] || 0;
+    const volume = volumes[id] !== undefined ? volumes[id] : 0.5;
     const [volumeOpen, setVolumeOpen] = useState(false);
 
     const openVolume = () => setVolumeOpen(true);
@@ -62,13 +62,11 @@ const ABCAudioPlayer = ({ id, src, title, artist, links, renderAdditionalControl
         };
     }, [volumeOpen]);
 
-    // TODO: This works until it is comparion.
-    // When comparison, each toggle will re init
-    //
     useEffect(() => {
-        initializeAudio(id, src);
+        initializeAudio(id, src, volume);
+
         return () => {
-            pause(id); // Ensure audio stops on component unmount
+            //pause(id); // Uncomment to stop the audio when user leaves the page
         };
     }, []);
 
@@ -77,7 +75,7 @@ const ABCAudioPlayer = ({ id, src, title, artist, links, renderAdditionalControl
     return (
         <div className="sm:p-4 md:p-4 p-1 max-h-30 sm:max-h-100 md:max-h-100 rounded-lg border border-comfy-dark bg-comfy-accent2 bg-opacity-5 shadow-lg transition-all duration-300 ease-in-out transform md:hover:scale-110 lg:hover:scale-110 disabled:opacity-50 audio-player max-w-sm sm:max-w-sm md:max-w-xs lg:max-w-lg flex flex-col justify-between">
             <div className="flex justify-between items-start snap-start">
-                <h3 className="truncate md:max-w-30 lg:max-w-m text-lg font-semibold text-white hover:text-pretty transition-all duration-700">
+                <h3 className="truncate md:max-w-30 lg:max-w-m text-lg font-semibold text-comfy-accent1 hover:text-pretty transition-all duration-700">
                     <a
                         href={links.song || '#'}
                         className="max-w-xs text-comfy-accent1 hover:text-comfy-accent2 transition-all duration-300"

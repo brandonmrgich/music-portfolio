@@ -9,22 +9,28 @@ export const AudioProvider = ({ children }) => {
     const [volumes, setVolumes] = useState({});
     const [currentSrcs, setCurrentSrcs] = useState({});
     const audioRefs = useRef({});
+    const DEFAULT_VOLUME = 0.5;
 
     const initializeAudio = (id, src) => {
-        setNewAudioSrc(id, src);
-        addAudioEventListeners(id);
+        const existingAudio = audioRefs.current[id];
+
+        // TODO: This is hacky
+        // Only initialize if this specific audio has not been initialized yet
+        if (!existingAudio?.initialized) {
+            console.info('AudioProvider::initializeAudio(): Initialized audio: ', { id, src });
+            setNewAudioSrc(id, src);
+            addAudioEventListeners(id);
+            audioRefs.current[id].initialized = true; // Set the initialized flag to prevent multiple inits of the audio component
+        }
     };
 
-    const setNewAudioSrc = (id, src) => {
-        //audioRefs.current[id] = null
+    const setNewAudioSrc = (id, src, defaultVolume = DEFAULT_VOLUME) => {
         audioRefs.current[id] = new Audio(src);
-        console.log('AudioContext::setNewAudioSrc(): newly set ref: ', { audioRefs });
+        audioRefs.current[id].volume = volumes[id] !== undefined ? volumes[id] : defaultVolume;
     };
 
-    // Updated addAudioEventListeners with named functions
     const addAudioEventListeners = (id) => {
         const audio = audioRefs.current[id];
-        audio.volume = volumes[id] || 0.5;
 
         audio.addEventListener('loadedmetadata', () => handleLoadedMetadata(id));
         audio.addEventListener('timeupdate', () => handleTimeUpdate(id));
@@ -59,13 +65,12 @@ export const AudioProvider = ({ children }) => {
     };
 
     const play = (id, src) => {
-        console.log('Playing', { id, src });
         stopAllExcept(id);
 
         if (audioRefs.current[id] == undefined) {
-            //console.log(err);
             setPlayingStates((prev) => ({ ...prev, [id]: false }));
             setCurrentSrcs(null);
+            return;
         }
 
         audioRefs.current[id].play();
@@ -74,7 +79,6 @@ export const AudioProvider = ({ children }) => {
     };
 
     const stopAllExcept = (id) => {
-        // TODO: Dont call stop if its not even playing
         Object.keys(audioRefs.current).forEach((key) => {
             if (key != id && audioRefs.current[key]) {
                 stop(key);
@@ -82,22 +86,19 @@ export const AudioProvider = ({ children }) => {
         });
     };
 
-    const pause = (id) => {
-        console.log('Pausing');
-        audioRefs.current[id]?.pause();
-        setPlayingStates((prev) => ({ ...prev, [id]: false }));
-    };
-
     const stop = (id) => {
-        console.log('Stopping: ', id);
         if (audioRefs.current[id]) {
             audioRefs.current[id].pause();
             audioRefs.current[id].currentTime = 0;
 
             setPlayingStates((prev) => ({ ...prev, [id]: false }));
             setCurrentTimes((prev) => ({ ...prev, [id]: 0 }));
-            setVolumes((prev) => ({ ...prev, [id]: 0 }));
         }
+    };
+
+    const pause = (id) => {
+        audioRefs.current[id]?.pause();
+        setPlayingStates((prev) => ({ ...prev, [id]: false }));
     };
 
     const seek = (id, time) => {
@@ -117,7 +118,7 @@ export const AudioProvider = ({ children }) => {
     const toggleSource = (id, beforeSrc, afterSrc, isBeforeAudio) => {
         const newSrc = isBeforeAudio ? afterSrc : beforeSrc;
         const oldAudio = audioRefs.current[id];
-        const oldVolume = oldAudio ? oldAudio.volume : 0.5;
+        const oldVolume = oldAudio ? oldAudio.volume : DEFAULT_VOLUME;
         const oldCurrentTime = oldAudio ? oldAudio.currentTime : 0;
 
         cleanupAudio(id); // Clean up the old audio instance and listeners
@@ -128,45 +129,6 @@ export const AudioProvider = ({ children }) => {
 
         play(id, newSrc); // Start playing the new audio
     };
-
-    //const toggleSource = (id, beforeSrc, afterSrc, isBeforeAudio) => {
-    //    let newSrc = isBeforeAudio ? afterSrc : beforeSrc;
-
-    //    let oldAudio = audioRefs.current[id];
-    //    let oldVolume = oldAudio.volume;
-    //    let oldCurrentTime = oldAudio.currentTime || 0;
-
-    //    let ref = audioRefs.current[id];
-
-    //    console.log('AudioProvider::toggleSource(): ', { ref });
-
-    //    console.log('AudioProvider::toggleSource(): Pausing old audio', { oldAudio });
-    //    oldAudio.pause();
-    //    setPlayingStates((prev) => ({ ...prev, [id]: false }));
-
-    //    // Set the new audio references and sources
-    //    // TODO: Initialize doesnt persist for the new reference
-    //    audioRefs.current[id] = null;
-    //    initializeAudio(id, newSrc);
-
-    //    //cleanupListeners(id);
-    //    //setNewAudioSrc(id, newSrc);
-    //    //addAudioEventListeners(id);
-
-    //    //setPlayingStates((prev) => ({ ...prev, [id]: true }));
-    //    //setCurrentSrcs((prev) => ({ ...prev, [id]: newSrc }));
-
-    //    // Preserve the current volume and playback position.
-    //    setVolume(id, oldVolume);
-    //    seek(id, oldCurrentTime);
-
-    //    play(id, newSrc);
-    //    //newAudio.play();
-
-    //    //newAudio.addEventListener('timeupdate', () => {
-    //    //    setCurrentTimes((prev) => ({ ...prev, [id]: newAudio.currentTime }));
-    //    //});
-    //};
 
     useEffect(() => {
         return () => {

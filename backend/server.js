@@ -1,16 +1,14 @@
-const express = require("express");
-const { ensureFolderExists } = require("./helpers/fileHelpers");
-const { PROFILE_PICTURE_FOLDER, DATA_FOLDER, PORT } = require("./config/config");
-const AudioTypes = require("./schema/audioTypes");
-const authRoutes = require("./routes/authRoutes");
-const audioRoutes = require("./routes/audioRoutes");
-const profileRoutes = require("./routes/profileRoutes");
-const servicesRoutes = require("./routes/servicesRoutes");
+const express = require('express');
+const { ensureFolderExists } = require('./helpers/fileHelpers');
+const { PROFILE_PICTURE_FOLDER, DATA_FOLDER, PORT } = require('./config/config');
+const AudioTypes = require('./schema/audioTypes');
+const authRoutes = require('./routes/authRoutes');
+const audioRoutes = require('./routes/audioRoutes');
+const profileRoutes = require('./routes/profileRoutes');
+const servicesRoutes = require('./routes/servicesRoutes');
 
 const app = express();
 app.use(express.json());
-
-console.log(AudioTypes.AudioTypes.AUDIO_WIP);
 
 // Ensure all required folders exist
 (async () => {
@@ -30,5 +28,5 @@ app.use(profileRoutes);
 app.use(servicesRoutes);
 
 app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`);
+    console.info(`Server running on port ${PORT}`);
 });
