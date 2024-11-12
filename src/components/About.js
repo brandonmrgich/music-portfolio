@@ -20,7 +20,16 @@ const About = ({ isAdmin }) => {
 
     return (
         <div className="about p-6 max-w-4xl mx-auto space-y-12 ">
-            <h1 className="text-4xl font-bold text-center mb-6 ">Brandon Mrgich</h1>
+            <h1 className="text-4xl font-bold text-center mb-4 ">Brandon Mrgich</h1>
+            <h4 className="text-xl text-center mb-6">
+                For inquiries, email me at:&nbsp;
+                <a
+                    href="mailto:musicwithmrgich@gmail.com"
+                    className="text-comfy-accent1 font-medium underline hover:text-comfy-accent2 transition-colors duration-300"
+                >
+                    musicwithmrgich@gmail.com
+                </a>
+            </h4>
 
             <div className="flex flex-col items-center md:flex-row md:items-start mb-8 flex-wrap">
                 <div className="mb-4 md:mb-0 md:mr-8 flex justify-center">

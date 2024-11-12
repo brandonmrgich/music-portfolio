@@ -1,7 +1,7 @@
 // src/components/Contact/ContactForm.js
-import React, { useEffect, useRef } from "react";
-import { FaTimes, FaEnvelope } from "react-icons/fa";
-import { useContact } from "../../contexts/ContactContext";
+import React, { useEffect, useRef } from 'react';
+import { FaTimes, FaEnvelope } from 'react-icons/fa';
+import { useContact } from '../../contexts/ContactContext';
 
 const ContactForm = () => {
     const { isFormOpen, closeForm, openForm } = useContact();
@@ -15,14 +15,15 @@ const ContactForm = () => {
         };
 
         if (isFormOpen) {
-            document.addEventListener("mousedown", handleClickOutside);
+            document.addEventListener('mousedown', handleClickOutside);
         }
 
         return () => {
-            document.removeEventListener("mousedown", handleClickOutside);
+            document.removeEventListener('mousedown', handleClickOutside);
         };
     }, [isFormOpen, closeForm]);
 
+    // TODO: Changed fixed so that bounds of screen are not forcefully changed on mobile
     return (
         <div>
             {/* Envelope icon button always visible */}
