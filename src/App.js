@@ -43,7 +43,7 @@ const App = () => {
                 {darkMode && <div className="absolute inset-0 bg-overlay blur-lg"></div>}
 
                 <nav className="relative z-10 p-4 border border-comfy-medium text-xl">
-                    <div className="flex justify-between items-center">
+                    <div className="flex justify-between items-center max-w-full overflow-hidden">
                         <section className="ml-4 flex flex-row justify-between">
                             <a href="https://linktr.ee/brandonamrgich">
                                 <img src={Logo} height="36" width="36" alt="Brandon Mrgich" />
@@ -67,7 +67,9 @@ const App = () => {
                                     to="/in-work"
                                     className="text-comfy-dark hover:text-comfy-accent1 focus:text-comfy-accent2 transition-color"
                                 >
-                                    <span className="hidden sm:inline">Work In Progress</span>
+                                    <span className="hidden sm:inline md:inline">
+                                        Work In Progress
+                                    </span>
                                     <span className="inline sm:hidden">WIP</span>
                                 </Link>
                             </li>
@@ -88,8 +90,9 @@ const App = () => {
                                 </Link>
                             </li>
                         </ul>
-
-                        <ContactButton />
+                        <div className="flex-shrink-0">
+                            <ContactButton />
+                        </div>
                     </div>
                 </nav>
 
@@ -104,7 +107,9 @@ const App = () => {
                 </main>
 
                 <Footer />
-                <ContactForm />
+                <div>
+                    <ContactForm />
+                </div>
             </div>
         </Router>
     );
