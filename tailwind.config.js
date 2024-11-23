@@ -36,7 +36,7 @@ module.exports = {
                 },
                 comfy: {
                     accent1: '#B9807D',
-                    accent2: '#467599', // Updated accent
+                    accent2: '#467599',
                     tertiary: '#A199B2',
                     light: '#F2EBE3',
                     medium: '#E5D7C6',
@@ -50,7 +50,7 @@ module.exports = {
                     medium: '#1d1e18',
                     dark: '#353535',
                 },
-                overlay: 'rgba(0, 0, 0, 0.5)', // Add semi-transparent overlay
+                overlay: 'rgba(0, 0, 0, .5)', // Add semi-transparent overlay
             },
             backgroundSize: {
                 'size-200': '200%',
@@ -63,7 +63,31 @@ module.exports = {
                 lg: '16px',
                 xl: '32px', // Optional: add an extreme blur for artistic effects
             },
+            spacing: {
+                128: '32rem', // Add larger spacing scale
+                144: '36rem',
+            },
+            gridTemplateColumns: {
+                // Custom grid templates
+                'auto-fit': 'repeat(auto-fit, minmax(240px, 1fr))',
+                'custom-layout': 'repeat(3, 1fr)', // Example of custom grid
+            },
+            boxShadow: {
+                'inner-dark': 'inset 0 4px 6px rgba(0, 0, 0, 0.1)',
+                'outer-light': '0 4px 6px rgba(255, 255, 255, 0.1)',
+            },
         },
     },
-    plugins: [require('@tailwindcss/forms')],
+    plugins: [
+        require('@tailwindcss/forms'),
+        require('@tailwindcss/typography'), // Add typography plugin for better text formatting
+        require('@tailwindcss/aspect-ratio'), // Add aspect-ratio plugin for responsive media elements
+    ],
+    screens: {
+        'sm': '640px',
+        'md': '768px',
+        'lg': '1024px',
+        'xl': '1280px',
+        '2xl': '1536px',
+    },
 };
