@@ -89,9 +89,7 @@ const App = () => {
                             </li>
                         </ul>
 
-                        <div>
-                            <ContactButton />
-                        </div>
+                        <div>{/*<ContactButton />*/}</div>
                     </div>
                 </nav>
 
@@ -106,7 +104,7 @@ const App = () => {
                 </main>
 
                 <Footer />
-                <ContactForm />
+                <div>{/*<ContactForm />*/}</div>
             </div>
         </Router>
     );
