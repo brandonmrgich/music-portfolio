@@ -5,7 +5,7 @@ const AnimatedLoadingText = () => {
     const randomizeStrength = 12;
 
     return (
-        <div className="text-xl font-semibold text-gray-700 flex space-x-1 cursor-default">
+        <div className="text-xl font-semibold text-gray-700 flex space-x-1 cursor-default w-full max-w-xs sm:max-w-sm md:max-w-md lg:max-w-lg justify-center">
             {['L', 'o', 'a', 'd', 'i', 'n', 'g', ' ', 't', 'r', 'a', 'c', 'k', 's', '...'].map(
                 (letter, index) => (
                     <span

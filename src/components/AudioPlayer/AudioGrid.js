@@ -50,7 +50,9 @@ const mapTracks = (tracks, isComparison) => {
 
 const AudioGrid = ({ tracks, isComparison, isLoading = False }) => {
     return isLoading ? (
-        <AnimatedLoadingText />
+        <div className="justify-self-center">
+            <AnimatedLoadingText />
+        </div>
     ) : (
         <div className="audio-grid place-items-center justify-center w-full flex flex-col sm:grid sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {mapTracks(tracks, isComparison)}
