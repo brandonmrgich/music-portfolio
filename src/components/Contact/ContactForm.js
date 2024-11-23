@@ -1,11 +1,17 @@
 // src/components/Contact/ContactForm.js
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { FaTimes, FaEnvelope } from 'react-icons/fa';
 import { useContact } from '../../contexts/ContactContext';
 
 const ContactForm = () => {
     const { isFormOpen, closeForm, openForm } = useContact();
     const formRef = useRef(null);
+
+    const { setFormName, formName } = useState('');
+    const { setFormEmail, formEmail } = useState('');
+    const { setFormMessage, formMessage } = useState('');
+
+    const sendMessage = () => {};
 
     useEffect(() => {
         const handleClickOutside = (event) => {
@@ -52,21 +58,25 @@ const ContactForm = () => {
                             placeholder="Your Name"
                             className="w-full p-3 border rounded bg-comfy-light bg-opacity-25 border-comfy-dark text-comfy-dark placeholder-comfy-dark focus:outline-none focus:ring-2 focus:ring-comfy-dark"
                             required
+                            content={formName}
                         />
                         <input
                             type="email"
                             placeholder="Your Email"
                             className="w-full p-3 border rounded bg-comfy-light bg-opacity-25 border-comfy-dark text-comfy-dark placeholder-comfy-dark focus:outline-none focus:ring-2 focus:ring-comfy-dark"
                             required
+                            content={formEmail}
                         />
                         <textarea
                             placeholder="Your Message"
                             className="w-full p-3 border rounded bg-comfy-light bg-opacity-25 border-comfy-dark text-comfy-dark placeholder-comfy-dark resize-none focus:outline-none focus:ring-2 focus:ring-comfy-dark"
                             required
+                            content={formMessage}
                         ></textarea>
                         <button
                             type="submit"
                             className="w-full bg-comfy-light bg-opacity-50 text-comfy-dark px-4 py-2 rounded-lg hover:bg-gray-600 transition-colors"
+                            onClick={sendMessage()}
                         >
                             Send
                         </button>
