@@ -46,6 +46,29 @@ const ABCAudioPlayer = ({ id, src, title, artist, links, renderAdditionalControl
         }
     };
 
+    // State management for text fade w/ volume slider
+    const [maskStyle, setMaskStyle] = useState({
+        WebkitMaskImage: 'linear-gradient(to right, rgba(0, 0, 0, 1) 20%, rgba(0, 0, 0, 0))',
+        maskImage: 'linear-gradient(to right, rgba(0, 0, 0, 1) 20%, rgba(0, 0, 0, 0))',
+    });
+
+    // useEffect to update mask style when volumeOpen changes
+    useEffect(() => {
+        if (volumeOpen) {
+            setMaskStyle({
+                WebkitMaskImage:
+                    'linear-gradient(to right, rgba(0, 0, 0, 1) 60%, rgba(0, 0, 0, .3))',
+                maskImage: 'linear-gradient(to right, rgba(0, 0, 0, 1) 60%, rgba(0, 0, 0, .3))',
+            });
+        } else {
+            setMaskStyle({
+                WebkitMaskImage:
+                    'linear-gradient(to right, rgba(0, 0, 0, 1) 40%, rgba(0, 0, 0, .6))',
+                maskImage: 'linear-gradient(to right, rgba(0, 0, 0, 1) 40%, rgba(0, 0, 0, .6))',
+            });
+        }
+    }, [volumeOpen]);
+
     useEffect(() => {
         const handleClickOutside = (event) => {
             if (volumeRef.current && !volumeRef.current.contains(event.target)) {
@@ -73,18 +96,22 @@ const ABCAudioPlayer = ({ id, src, title, artist, links, renderAdditionalControl
     error && console.log(error);
 
     return (
-        <div className="sm:p-4 md:p-4 p-1 max-h-30 sm:max-h-100 md:max-h-100 rounded-lg border border-comfy-dark bg-comfy-accent2 bg-opacity-5 shadow-lg transition-all duration-300 ease-in-out transform md:hover:scale-110 lg:hover:scale-110 disabled:opacity-50 audio-player max-w-sm sm:max-w-sm md:max-w-xs lg:max-w-lg flex flex-col justify-between">
-            <div className="flex justify-between items-start snap-start">
-                <h3 className="truncate md:max-w-30 lg:max-w-m text-lg font-semibold text-comfy-accent1 hover:text-pretty transition-all duration-700">
+        <div className="sm:p-4 md:p-4 p-1 max-h-30 sm:max-h-100 md:max-h-100 rounded-lg border border-comfy-dark bg-comfy-accent2 bg-opacity-5 shadow-lg transition-all duration-300 ease-in-out transform md:hover:scale-110 lg:hover:scale-110 disabled:opacity-50 audio-player max-w-sm sm:max-w-sm md:max-w-xs lg:max-w-lg flex flex-col w-full ">
+            <div className="flex justify-between items-start snap-start gap-2">
+                <h3
+                    className={`flex-grow ${volumeOpen && title.length > 20 ? 'max-w-[calc(100%-9rem)]' : 'max-w-full'} 
+      truncate break-words overflow-hidden whitespace-nowrap text-lg font-semibold text-comfy-accent1 hover:text-pretty transition-all duration-900`}
+                    style={maskStyle}
+                >
                     <a
                         href={links.song || '#'}
-                        className="max-w-xs text-comfy-accent1 hover:text-comfy-accent2 transition-all duration-300"
+                        className="block text-comfy-accent1 hover:text-comfy-accent2 transition-all duration-400"
                     >
                         {title}
                     </a>
                 </h3>
 
-                <div className="flex justify-between items-start">
+                <div className="flex items-center gap-2">
                     {volumeOpen && (
                         <input
                             ref={volumeRef}
@@ -94,10 +121,9 @@ const ABCAudioPlayer = ({ id, src, title, artist, links, renderAdditionalControl
                             step="0.01"
                             value={volume}
                             onChange={(e) => setVolume(id, parseFloat(e.target.value))}
-                            className="max-w-s md:max-w-30 lg:max-w-20 accent-comfy-accent2 opacity-60 hover:cursor-pointer col-end-1 "
+                            className="mt-1 w-36 sm:w-36 md:w-24 accent-comfy-accent2 opacity-60 hover:cursor-pointer"
                         />
                     )}
-
                     <button onClick={openVolume}>{renderVolumeIcon()}</button>
                 </div>
             </div>

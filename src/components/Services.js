@@ -10,8 +10,9 @@ const Services = ({ isAdmin }) => {
         return <div>Error: {error}</div>;
     }
 
+    //<div className="p-6 max-w-4xl mx-auto space-y-12">
     return (
-        <div className="p-6 max-w-4xl mx-auto space-y-12">
+        <div className="services p-4 sm:p-6 max-w-4xl mx-auto space-y-12">
             <section className="text-center block text-balance services p-6 max-w-4xl mx-auto ">
                 <h2 className="text-3xl font-semibold mb-4 text-primary-dark">
                     Mixing & Mastering

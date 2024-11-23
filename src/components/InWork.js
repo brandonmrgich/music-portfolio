@@ -14,7 +14,7 @@ const InWork = ({ isAdmin }) => {
     }
 
     return (
-        <div className="in-work p-6 max-w-4xl mx-auto space-y-12">
+        <div className="in-work p-4 sm:p-6 max-w-4xl mx-auto space-y-12">
             <p className="text-lg text-gray-700 mb-4 text-center">
                 Here are some songs and demos I'm currently working on:
             </p>

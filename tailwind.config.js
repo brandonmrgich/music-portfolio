@@ -84,6 +84,7 @@ module.exports = {
         require('@tailwindcss/aspect-ratio'), // Add aspect-ratio plugin for responsive media elements
     ],
     screens: {
+        'xsm': '480px',
         'sm': '640px',
         'md': '768px',
         'lg': '1024px',
