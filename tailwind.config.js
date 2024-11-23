@@ -1,4 +1,5 @@
 module.exports = {
+    darkMode: 'class', // Enables class-based dark mode
     content: ['./src/**/*.{js,jsx,ts,tsx}'],
     theme: {
         extend: {
@@ -35,16 +36,12 @@ module.exports = {
                 },
                 comfy: {
                     accent1: '#B9807D',
-                    // accent2: "#8D9A75",
-                    //accent2: "#8B8C8A",
-                    accent2: '#467599',
+                    accent2: '#467599', // Updated accent
                     tertiary: '#A199B2',
                     light: '#F2EBE3',
                     medium: '#E5D7C6',
                     dark: '#3F3E40',
                 },
-
-                // TODO: temp colors, set dark mode colors of the hexvalues above.
                 comfydark: {
                     accent1: '#D1AE9F',
                     accent2: '#a6987c',
@@ -53,6 +50,18 @@ module.exports = {
                     medium: '#1d1e18',
                     dark: '#353535',
                 },
+                overlay: 'rgba(0, 0, 0, 0.5)', // Add semi-transparent overlay
+            },
+            backgroundSize: {
+                'size-200': '200%',
+                'size-300': '300%',
+            },
+            blur: {
+                xs: '2px',
+                sm: '4px',
+                md: '8px',
+                lg: '16px',
+                xl: '32px', // Optional: add an extreme blur for artistic effects
             },
         },
     },

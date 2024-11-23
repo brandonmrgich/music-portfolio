@@ -10,9 +10,27 @@ body {
     font-family: Arial, sans-serif; /* Optional: Set a global font */
     overflow-wrap: normal;
     /*TODO: Color wrap around "root" region*/
+
+    background-color: #1d1e18; /* Adjust to match your dark theme colors */
+    color: #e5d7c6; /* Adjust text color for better contrast */
 }
 
 a {
     @apply text-primary-dark2 hover:text-linktree-accent focus:text-linktree-accent active:text-linktree-accent;
     cursor: pointer;
+}
+
+.background-effect {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1; /* Ensure it stays behind all content */
+    pointer-events: none; /* Prevent the overlay from blocking clicks */
+}
+
+.navbar {
+    position: relative;
+    z-index: 10; /* Ensure links are above everything else */
 }

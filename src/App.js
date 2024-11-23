@@ -11,14 +11,13 @@ import ContactButton from './components/Contact/ContactButton';
 import ContactForm from './components/Contact/ContactForm';
 
 import Logo from './pictures/asailboat.png';
-import { Moon, Sun, SunMoon, SunDim, LucideMoonStar } from 'lucide-react';
-import { useDarkMode } from './contexts/ThemeContext';
+import { SunMoon, Sun } from 'lucide-react';
 
 const App = () => {
     const isDevelopment = process.env.REACT_APP_ENV === 'development';
     const [isAdmin, setIsAdmin] = useState(isDevelopment);
 
-    const { darkMode, toggleDarkMode } = useTheme(); // Get darkmode function from context
+    const { darkMode, toggleDarkMode } = useTheme(); // Use dark mode from context
 
     useEffect(() => {
         const token = localStorage.getItem('token');
@@ -29,16 +28,28 @@ const App = () => {
 
     return (
         <Router>
-            <div className="w-full min-h-screen flex flex-col text-comfy-dark bg-gradient-to-b from-comfy-light to-comfy-medium">
-                <nav className="p-4 border border-comfy-medium text-xl">
+            <div
+                className={`w-full min-h-screen flex flex-col ${
+                    darkMode
+                        ? 'text-comfydark-light bg-cover bg-center bg-fixed'
+                        : 'text-comfy-dark bg-gradient-to-b from-comfy-light to-comfy-medium'
+                }`}
+                style={{
+                    ...(darkMode && {
+                        backgroundImage: "url('/background1.jpg')",
+                    }),
+                }}
+            >
+                {darkMode && <div className="absolute inset-0 bg-overlay blur-lg"></div>}
+
+                <nav className="relative z-10 p-4 border border-comfy-medium text-xl">
                     <div className="flex justify-between items-center">
-                        <section className="ml-4 flex flex-row justify-between ">
+                        <section className="ml-4 flex flex-row justify-between">
                             <a href="https://linktr.ee/brandonamrgich">
                                 <img src={Logo} height="36" width="36" alt="Brandon Mrgich" />
                             </a>
-
                             <button onClick={toggleDarkMode} className="mx-4 scale-110">
-                                {darkMode ? <Sun className="" /> : <SunMoon className="" />}
+                                {darkMode ? <Sun /> : <SunMoon />}
                             </button>
                         </section>
 
@@ -84,7 +95,7 @@ const App = () => {
                     </div>
                 </nav>
 
-                <main className="flex flex-col flex-grow">
+                <main className="flex flex-col flex-grow relative z-10">
                     <Routes>
                         <Route path="/" element={<About />} />
                         <Route path="/about" element={<About isAdmin={isAdmin} />} />
