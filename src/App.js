@@ -44,11 +44,16 @@ const App = () => {
 
                 <nav className="relative z-10 p-4 border border-comfy-medium text-xl">
                     <div className="flex justify-between items-center max-w-full overflow-hidden">
-                        <section className="ml-4 flex flex-row justify-between">
-                            <a href="https://linktr.ee/brandonamrgich">
+                        {}
+                        <section className="ml-1 sm:ml-3 flex flex-row justify-between items-center">
+                            <a href="https://linktr.ee/brandonamrgich" className="hidden sm:block">
                                 <img src={Logo} height="36" width="36" alt="Brandon Mrgich" />
                             </a>
-                            <button onClick={toggleDarkMode} className="mx-4 scale-110">
+
+                            <button
+                                onClick={toggleDarkMode}
+                                className="mx-1 sm:mx-3 scale-70 sm:scale-100 text-sm sm:text-base"
+                            >
                                 {darkMode ? <Sun /> : <SunMoon />}
                             </button>
                         </section>
