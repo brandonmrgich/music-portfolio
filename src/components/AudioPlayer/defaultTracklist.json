@@ -12,29 +12,9 @@
         },
         {
             "id": 2,
-            "title": "Closer",
+            "title": "default",
             "artist": "Artist Name",
-            "src": "Closer.mp3",
-            "links": {
-                "artist": "https://google.com",
-                "song": "https://google.com"
-            }
-        },
-        {
-            "id": 3,
-            "title": "Song with a very long title that will wrap Song with a very long title that will wrap",
-            "artist": "Artist Name",
-            "src": "default.mp3",
-            "links": {
-                "artist": "https://google.com",
-                "song": "https://google.com"
-            }
-        },
-        {
-            "id": 4,
-            "title": "Closer",
-            "artist": "Artist Name",
-            "src": "Closer.mp3",
+            "src": "default2.mp3",
             "links": {
                 "artist": "https://google.com",
                 "song": "https://google.com"
@@ -44,30 +24,10 @@
 
     "SCORING": [
         {
-            "id": 5,
-            "title": "default1",
+            "id": 3,
+            "title": "default",
             "artist": "Artist Name",
             "src": "default.mp3",
-            "links": {
-                "artist": "https://google.com",
-                "song": "https://google.com"
-            }
-        },
-        {
-            "id": 6,
-            "title": "default2",
-            "artist": "Artist Name",
-            "src": "default2.mp3",
-            "links": {
-                "artist": "https://google.com",
-                "song": "https://google.com"
-            }
-        },
-        {
-            "id": 7,
-            "title": "FileDoesntExist",
-            "artist": "Artist Name",
-            "src": "fileDoesntExist.mp3",
             "links": {
                 "artist": "https://google.com",
                 "song": "https://google.com"
@@ -77,41 +37,8 @@
 
     "REEL": [
         {
-            "id": 8,
-            "title": "song 1",
-            "artist": "Artist Name",
-            "before": "default.mp3",
-            "after": "default2.mp3",
-            "links": {
-                "artist": "https://google.com",
-                "song": "https://google.com"
-            }
-        },
-        {
-            "id": 9,
-            "title": "song 1",
-            "artist": "Artist Name",
-            "before": "default.mp3",
-            "after": "default2.mp3",
-            "links": {
-                "artist": "https://google.com",
-                "song": "https://google.com"
-            }
-        },
-        {
-            "id": 10,
-            "title": "song 1",
-            "artist": "Artist Name",
-            "before": "default.mp3",
-            "after": "default2.mp3",
-            "links": {
-                "artist": "https://google.com",
-                "song": "https://google.com"
-            }
-        },
-        {
-            "id": 11,
-            "title": "song 1",
+            "id": 4,
+            "title": "Audio Comparison",
             "artist": "Artist Name",
             "before": "default.mp3",
             "after": "default2.mp3",
