@@ -19,7 +19,7 @@ app.use(bodyParser.json()); // Parse JSON bodies for POST requests
 //app.use('/api/audio', audioRoutes);  // All audio-related endpoints will be prefixed with /api/audio
 app.use('/api/send-email', emailRoutes); // Email-related endpoints
 //app.use('/api/upload', uploadRoutes);  // File upload routes
-app.use('api/heartbeat', hbRoutes);
+app.use('/api/heartbeat', hbRoutes);
 
 // Serve the frontend build files (Currently nothing frontend being served)
 //app.use(express.static(path.join(__dirname, '../build')));

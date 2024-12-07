@@ -1,13 +1,22 @@
 #!/bin/bash
 
+MSGPRE="[DEPLOY]"
+
+if [ -f /Users/brandon/.extendedEnv ]; then
+    . /Users/brandon/.extendedEnv
+else
+    echo "${MSGPRE}: ~/.extendedEnv required"
+    exit 1
+fi
+
 # Define variables
-SERVER="oracle-node-admin"                        # SSH alias
-USER="node-admin"                                 # User on the server
-BACKEND_DIR="/home/$USER/music-portfolio-backend" # Path to backend
-TAR_NAME="music-portfolio-backend.tar.gz"         # Tarball name
-LOCAL_TAR_PATH="${HOME}/tmp/${TAR_NAME}"          # Temporary path for tarball (using ~/tmp)
-PM2_PROCESS_NAME="backend-server"                 # PM2 process name
-LOCAL_BACKEND_DIR="../backend"                    # Local backend directory to tar (relative path)
+SERVER="oracle-node-admin"                          # SSH alias
+USER="node-admin"                                   # User on the server
+BACKEND_DIR="/home/$USER/music-portfolio-backend"   # Path to backend
+TAR_NAME="music-portfolio-backend.tar.gz"           # Tarball name
+LOCAL_TAR_PATH="${HOME}/tmp/${TAR_NAME}"            # Temporary path for tarball (using ~/tmp)
+PM2_PROCESS_NAME="backend-server"                   # PM2 process name
+LOCAL_BACKEND_DIR="${MUSIC_PORTFOLIO_ROOT}/backend" # Local backend directory to tar (relative path)
 
 # Check if dry-run flag is passed
 DRY_RUN=false
