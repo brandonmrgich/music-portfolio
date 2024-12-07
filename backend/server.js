@@ -1,64 +1,35 @@
-//const express = require('express');
-//const nodemailer = require('@sendgrid/mail');
-//require('dotenv').config();
-//
-//const app = express();
-//const port = 5000;
-//
-//// Set SendGrid API Key
-//nodemailer.setApiKey(process.env.SENDGRID_API_KEY);
-//
-//app.use(express.json());
-//
-//app.post('/send-email', async (req, res) => {
-//    const { name, email, message } = req.body;
-//
-//    const msg = {
-//        to: 'musicwithmrgich@gmail.com', // Your email
-//        from: email,
-//        subject: `Portfolio Contact from: ${name}`,
-//        text: `Name: ${name}\nEmail: ${email}\nMessage: ${message}`,
-//    };
-//
-//    try {
-//        await nodemailer.send(msg);
-//        res.status(200).send('Message sent successfully');
-//    } catch (error) {
-//        res.status(500).send('Failed to send message');
-//    }
-//});
-//
-//app.listen(port, () => {
-//    console.log(`Server running at http://localhost:${port}`);
+const express = require('express');
+const bodyParser = require('body-parser');
+const path = require('path');
+
+// Import API routes
+//const audioRoutes = require('./routes/audio');
+const emailRoutes = require('./routes/email');
+//const uploadRoutes = require('./routes/upload');
+const hbRoutes = require('./routes/heartbeat');
+
+const app = express();
+const port = 5000;
+
+// Middleware
+app.use(bodyParser.json()); // Parse JSON bodies for POST requests
+// TODO: Auth
+
+// Use the routes
+//app.use('/api/audio', audioRoutes);  // All audio-related endpoints will be prefixed with /api/audio
+app.use('/api/send-email', emailRoutes); // Email-related endpoints
+//app.use('/api/upload', uploadRoutes);  // File upload routes
+app.use('api/heartbeat', hbRoutes);
+
+// Serve the frontend build files (Currently nothing frontend being served)
+//app.use(express.static(path.join(__dirname, '../build')));
+
+// Catch-all for frontend routing (if needed)
+//app.get('*', (req, res) => {
+//    res.sendFile(path.join(__dirname, '../build/index.html'));
 //});
 
-// using Twilio SendGrid's v3 Node.js Library
-// https://github.com/sendgrid/sendgrid-nodejs
-
-require('dotenv').config({ path: './sendgrid.env' });
-
-const sgMail = require('@sendgrid/mail');
-sgMail.setApiKey(process.env.SENDGRID_API_KEY);
-
-// Assuming these values are coming from your form
-const formName = 'Test'; // Example name from form
-const formEmail = 'bmrgich@gmail.com'; // Example user email from form
-const formMessage = ';asdfj;alksdjfl;askjdfl;kasjdf;lkasdj'; // Example message from form
-
-const msg = {
-    to: 'musicwithmrgich@gmail.com',
-    from: 'contact@brandonmrgich.com',
-    replyTo: formEmail, // This ensures replies go to the user's email
-    subject: `Message from ${formName}`,
-    text: formMessage,
-    html: `<strong>${formMessage}</strong>`,
-};
-
-sgMail
-    .send(msg)
-    .then(() => {
-        console.log('Email sent');
-    })
-    .catch((error) => {
-        console.error(error);
-    });
+// Start the server
+app.listen(port, () => {
+    console.log(`Server running at http://localhost:${port}`);
+});
