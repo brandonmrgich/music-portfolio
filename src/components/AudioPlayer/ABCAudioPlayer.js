@@ -3,7 +3,7 @@ import { Play, Pause, Volume, Volume1, Volume2, VolumeX } from 'lucide-react';
 import { useAudio } from '../../contexts/AudioContext';
 
 // TODO: Add optional image, default is current theme, else if image, set as player card background
-// with opacity lowered
+// with opacity lowered.
 const ABCAudioPlayer = ({ id, src, title, artist, links, renderAdditionalControls }) => {
     const {
         error,
