@@ -2,6 +2,7 @@ import { wait } from "@testing-library/user-event/dist/utils";
 import React from "react";
 
 import {
+    FaGoogle,
     FaSpotify,
     FaYoutube,
     FaApple,
@@ -15,6 +16,12 @@ import AudiusIcon from "../pictures/audius-icon.jpeg";
 
 const Links = {
     Social: {
+        drive: {
+            href: "https://drive.google.com/drive/folders/1hm2CJ6tT-SMXo8PPzm14gXQzQxj5gIEB",
+            icon: FaGoogle,
+            colorClass: "text-green-600",
+            label: "Google Drive",
+        },
         instagram: {
             href: "https://instagram.com/brandonmrgichmusic",
             icon: FaInstagram,
