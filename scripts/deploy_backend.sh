@@ -1,6 +1,5 @@
 #!/bin/bash
 
-
 MSGPRE="[DEPLOY]"
 
 if [ -f /Users/brandon/.extendedEnv ]; then
@@ -19,7 +18,10 @@ DOCKER_CONTAINER_NAME="music-portfolio-backend"
 TAR_NAME="backend.tar.gz"
 LOCAL_TAR_PATH="${HOME}/tmp/${TAR_NAME}"
 
+# Config
 DRY_RUN=false
+SSH_FLAGS="-v"
+
 if [[ "$1" == "--dry-run" ]]; then
     DRY_RUN=true
     echo "Dry-run mode activated. No changes will be made."
@@ -54,9 +56,13 @@ else
     echo "[DRY-RUN] Tarball would be copied to $SERVER:$BACKEND_DIR"
 fi
 
-log_action "Deploying Docker container on AWS..."
-ssh $SERVER <<EOF
+log_action "Deploying Docker container on ${SERVER}..."
+ssh ${SSH_FLAGS} $SERVER <<"EOF" #EOF requires quotes for remote code exec
     set -e
+
+    echo "[INFO] System: $(uname -a)"
+    echo "[INFO] Executing as user: $(whoami)"
+
     echo "[DEPLOY] Loading Docker image..."
     docker load -i $BACKEND_DIR/$TAR_NAME
 

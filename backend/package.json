@@ -4,7 +4,9 @@
     "main": "server.js",
     "scripts": {
         "test": "echo \"Error: no test specified\" && exit 1",
-        "start": "nodemon server.js"
+        "start": "exec ../scripts/run_backend.sh",
+        "start-nodemon": "nodemon server.js",
+        "deploy": "exec ../scripts/deploy_backend.sh"
     },
     "keywords": [],
     "author": "",
