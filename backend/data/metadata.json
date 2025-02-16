@@ -1,0 +1,51 @@
+{
+    "WIP": [
+        {
+            "id": 1,
+            "title": "Song with a very long title that will wrap Song with a very long title that will wrap",
+            "artist": "Artist Name",
+            "src": "default.mp3",
+            "links": {
+                "artist": "https://google.com",
+                "song": "https://google.com"
+            }
+        },
+        {
+            "id": 2,
+            "title": "default",
+            "artist": "Artist Name",
+            "src": "default2.mp3",
+            "links": {
+                "artist": "https://google.com",
+                "song": "https://google.com"
+            }
+        }
+    ],
+
+    "SCORING": [
+        {
+            "id": 3,
+            "title": "default",
+            "artist": "Artist Name",
+            "src": "default.mp3",
+            "links": {
+                "artist": "https://google.com",
+                "song": "https://google.com"
+            }
+        }
+    ],
+
+    "REEL": [
+        {
+            "id": 4,
+            "title": "Audio Comparison",
+            "artist": "Artist Name",
+            "before": "default.mp3",
+            "after": "default2.mp3",
+            "links": {
+                "artist": "https://google.com",
+                "song": "https://google.com"
+            }
+        }
+    ]
+}

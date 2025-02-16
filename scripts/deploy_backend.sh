@@ -130,7 +130,7 @@ ssh ${SSH_FLAGS} $SERVER env "${REMOTE_ENV[@]}" 'bash -s' <<'EOF' #EOF requires 
     fi
 
     echo "[DEPLOY] Running new container..."
-    docker run --platform ${PLATFORM_ARG} -d --name $DOCKER_CONTAINER_NAME -p 5000:5000 $DOCKER_IMAGE_NAME
+    docker run --platform ${PLATFORM_ARG} -d --name $DOCKER_CONTAINER_NAME -p 5000:5000 -e NODE_ENV=production $DOCKER_IMAGE_NAME
 
     echo "[DEPLOY] Deployment complete, cleaning up."
 EOF

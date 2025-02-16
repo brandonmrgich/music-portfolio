@@ -5,7 +5,7 @@
     "scripts": {
         "test": "echo \"Error: no test specified\" && exit 1",
         "start": "exec ../scripts/run_backend.sh",
-        "start-nodemon": "nodemon server.js",
+        "startgnodemon": "NODE_ENV=development nodemon server.js",
         "deploy": "exec ../scripts/deploy_backend.sh"
     },
     "keywords": [],

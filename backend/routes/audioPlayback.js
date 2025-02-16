@@ -1,6 +1,6 @@
 const express = require('express');
 const AWS = require('aws-sdk');
-const { s3, AUDIO_DIRECTORY, isDev } = require('../config');
+const { s3, AUDIO_DIRECTORY, isDev } = require('../server_config');
 const fs = require('fs');
 const path = require('path');
 const router = express.Router();

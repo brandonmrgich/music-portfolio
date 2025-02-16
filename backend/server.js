@@ -6,7 +6,7 @@ const cors = require('cors');
 // Import API routes
 const emailRoutes = require('./routes/email');
 const hbRoutes = require('./routes/heartbeat');
-//const audioRoutes = require('./routes/audio');
+const audioRoutes = require('./routes/audioPlayback');
 
 const app = express();
 const port = 5000;
@@ -29,7 +29,7 @@ app.use(bodyParser.json()); // Parse JSON bodies for POST requests
 // Use the routes
 app.use('/api/send-email', emailRoutes); // Email-related endpoints
 app.use('/api/heartbeat', hbRoutes);
-//app.use('/api/audio', audioRoutes);
+app.use('/api/audioPlayback', audioRoutes);
 
 // Start the server
 app.listen(port, () => {
