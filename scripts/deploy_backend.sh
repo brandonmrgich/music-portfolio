@@ -100,6 +100,12 @@ ssh ${SSH_FLAGS} $SERVER env "${REMOTE_ENV[@]}" 'bash -s' <<'EOF' #EOF requires 
 
     mkdir -p ${BACKEND_DIR}
 
+    res=`which docker`
+    
+    if [ -z "${res}" ]; then
+        sudo apt install -y docker 
+    fi
+
     # Check if Docker is running and start it if not
     if ! systemctl is-active --quiet docker; then
         echo "[INFO] Docker is not running, starting Docker..."
@@ -130,7 +136,7 @@ ssh ${SSH_FLAGS} $SERVER env "${REMOTE_ENV[@]}" 'bash -s' <<'EOF' #EOF requires 
     fi
 
     echo "[DEPLOY] Running new container..."
-    docker run --platform ${PLATFORM_ARG} -d --name $DOCKER_CONTAINER_NAME -p 5000:5000 -e NODE_ENV=production $DOCKER_IMAGE_NAME
+    docker run --platform ${PLATFORM_ARG} -d --restart unless-stopped --name $DOCKER_CONTAINER_NAME -p 5000:5000 -e NODE_ENV=production $DOCKER_IMAGE_NAME
 
     echo "[DEPLOY] Deployment complete, cleaning up."
 EOF

@@ -1,6 +1,6 @@
 import React from 'react';
 import AudioUpload from '../admin/AudioUpload';
-import { useTracks } from '../Hooks';
+import { useTracks } from '../hooks/UseTracks';
 import AudioGrid from './AudioPlayer/AudioGrid';
 
 const Services = ({ isAdmin }) => {

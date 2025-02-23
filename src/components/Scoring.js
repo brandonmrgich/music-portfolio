@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import AudioGrid from './AudioPlayer/AudioGrid';
-import { useTracks } from '../Hooks';
+import { useTracks } from '../hooks/UseTracks';
 
 /**
  * Scoring page component.

@@ -1,35 +1,29 @@
+// server.js
 const express = require('express');
 const bodyParser = require('body-parser');
-const path = require('path');
 const cors = require('cors');
 
+// Import configurations and middleware
+const corsOptions = require('./config/cors');
+const s3Middleware = require('./middleware/s3Middleware');
+
 // Import API routes
-const emailRoutes = require('./routes/email');
-const hbRoutes = require('./routes/heartbeat');
-const audioRoutes = require('./routes/audioPlayback');
+const emailRoutes = require('./routes/emailRoutes');
+const hbRoutes = require('./routes/heartbeatRoutes');
+const tracksRoutes = require('./routes/tracksRoutes');
 
 const app = express();
-const port = 5000;
+const port = 5000; // 80 & 443 reverse proxied via nginx on prod
 
-// CORS configuration
-const corsOptions = {
-    origin: 'https://brandonmrgich.com', // Allow requests from this frontend domain
-    methods: 'GET,POST,PUT,DELETE', // Allow only these HTTP methods
-    allowedHeaders: 'Content-Type', // Allow only specific headers
-    credentials: true, // Allow cookies, if necessary
-};
+// Apply middleware
+app.use(cors(corsOptions)); // Apply CORS
+app.use(bodyParser.json()); // Parse JSON request bodies
+app.use(s3Middleware); // Attach S3 client to all requests
 
-// Apply CORS middleware
-app.use(cors(corsOptions));
-
-// Middleware
-app.use(bodyParser.json()); // Parse JSON bodies for POST requests
-// TODO: Auth
-
-// Use the routes
-app.use('/api/send-email', emailRoutes); // Email-related endpoints
-app.use('/api/heartbeat', hbRoutes);
-app.use('/api/audioPlayback', audioRoutes);
+// Use API routes
+app.use('/send-email', emailRoutes);
+app.use('/heartbeat', hbRoutes);
+app.use('/tracks', tracksRoutes);
 
 // Start the server
 app.listen(port, () => {
