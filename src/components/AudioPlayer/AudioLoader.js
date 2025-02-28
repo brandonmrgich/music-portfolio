@@ -47,18 +47,18 @@ class AudioLoader {
         return validTracks;
     }
 
-    static async getAPITracks(trackType = 'wip') {
-        try {
-            const response = await fetch(`/api/audio/${trackType}`);
-            if (!response.ok) {
-                throw new Error('Failed to fetch audio files from API');
-            }
-            return await response.json();
-        } catch (error) {
-            console.error('Error fetching API tracks:', error);
-            return [];
-        }
-    }
+    //static async getAPITracks(trackType = 'wip') {
+    //    try {
+    //        const response = await fetch(`/api/audio/${trackType}`);
+    //        if (!response.ok) {
+    //            throw new Error('Failed to fetch audio files from API');
+    //        }
+    //        return await response.json();
+    //    } catch (error) {
+    //        console.error('Error fetching API tracks:', error);
+    //        return [];
+    //    }
+    //}
 
     static async getAllTracks(trackType = 'wip') {
         const [localTracks, apiTracks] = await Promise.all([
