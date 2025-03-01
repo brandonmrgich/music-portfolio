@@ -4,4 +4,11 @@ const sanitizeTrackType = (type) => {
     return type.replace(/^"|"$/g, '').toUpperCase().trim();
 };
 
-module.exports = sanitizeTrackType;
+const sanitizeQuotes = (someString) => {
+    if (typeof someString !== 'string') return '';
+    // Remove quotes
+
+    return someString ? someString.trim().replace(/^"(.*)"$/, '$1') : someString;
+};
+
+module.exports = { sanitizeTrackType, sanitizeQuotes };

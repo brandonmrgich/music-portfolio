@@ -21,8 +21,9 @@ const port = 5000; // 80 & 443 reverse proxied via nginx on prod
 
 // Apply middleware
 app.use(configMiddleware);
-app.use(cors(corsOptions)); // Apply CORS
+app.use(express.urlencoded({ extended: true })); // For form-data URL encoding
 app.use(bodyParser.json()); // Parse JSON request bodies
+app.use(cors(corsOptions)); // Apply CORS
 app.use(s3Middleware); // Attach S3 client to all requests
 
 // Use API routes

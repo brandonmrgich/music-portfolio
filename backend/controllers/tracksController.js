@@ -2,10 +2,9 @@ const path = require('path');
 const manifestPath = path.resolve(__dirname, '../data/manifest.json');
 const { v4: uuidv4 } = require('uuid');
 const fs = require('fs');
-const sanitizeTrackType = require('../utils/santizeTrackType');
+const { sanitizeTrackType, sanitizeQuotes } = require('../utils/santizeTrackType');
 
 const BUCKET_NAME = process.env.AWS_BUCKET_NAME;
-console.log(BUCKET_NAME);
 
 const loadManifest = () => {
     if (fs.existsSync(manifestPath)) {
@@ -19,13 +18,13 @@ const saveManifest = (data) => {
 };
 
 const backupManifestToS3 = async (s3, manifest) => {
-    return;
-    // TODO: fix socket break
     const manifestBackupKey = 'state/manifest.json';
     const tempBackupKey = `state/manifest_temp_${uuidv4()}.json`;
 
+    const MSGPRE = '[S3 Manifest Backup]';
+
     try {
-        console.log(`Uploading temp manifest: ${tempBackupKey}...`);
+        console.log(`${MSGPRE} Uploading temp manifest: ${tempBackupKey}...`);
         // Step 1: Upload the temp file
         await s3
             .upload({
@@ -35,19 +34,22 @@ const backupManifestToS3 = async (s3, manifest) => {
                 ContentType: 'application/json',
             })
             .promise();
-        console.log('Temp upload complete.');
+        console.log(`${MSGPRE} Temp upload complete.`);
 
-        // Step 2: Ensure the temp file exists before renaming
-        const tempFileCheck = await s3
-            .headObject({
+        const data = await s3
+            .listObjectsV2({
                 Bucket: BUCKET_NAME,
-                Key: tempBackupKey,
+                Prefix: tempBackupKey,
+                MaxKeys: 1,
             })
             .promise();
 
+        const fileExists = data.Contents.length > 0;
+        //console.log('data: ', { data });
+
         // If the temp file exists, proceed with renaming
-        if (tempFileCheck) {
-            console.log(`Temp file confirmed, proceeding with renaming...`);
+        if (fileExists) {
+            console.log(`${MSGPRE} Temp file confirmed, proceeding with overwrite...`);
 
             // Step 3: Use `putObject` to overwrite the main manifest with the temp file's content
             await s3
@@ -58,7 +60,7 @@ const backupManifestToS3 = async (s3, manifest) => {
                     ContentType: 'application/json',
                 })
                 .promise();
-            console.log('Manifest overwrite complete.');
+            console.log(`${MSGPRE} Manifest overwrite complete.`);
 
             // Step 4: Delete the temp file
             await s3
@@ -67,13 +69,14 @@ const backupManifestToS3 = async (s3, manifest) => {
                     Key: tempBackupKey,
                 })
                 .promise();
-            console.log('Temp file deleted.');
+            console.log(`${MSGPRE} Temp file deleted.`);
         }
     } catch (error) {
         console.error('Error during manifest backup:', error);
         throw new Error('Manifest backup process failed');
     }
 };
+
 // **GET /tracks** - Retrieve all tracks
 const getTracks = async (req, res) => {
     const manifest = loadManifest();
@@ -95,22 +98,33 @@ const getTracksByType = async (req, res) => {
 
 const uploadTrack = async (req, res) => {
     const { type, title, artist, links } = req.body;
-    let trackType = sanitizeTrackType(type);
+
+    const sanitizedType = sanitizeTrackType(type);
+    const sanitizedTitle = sanitizeQuotes(title);
+    const sanitizedArtist = sanitizeQuotes(artist);
+    const sanitizedLinks = links
+        ? typeof links === 'string'
+            ? JSON.parse(sanitizeQuotes(links))
+            : links
+        : {};
+
     const s3 = req.s3;
     const files = req.files || []; // Safely handle missing files
 
     // Validate required fields
-    if (!type || !title || !artist) {
-        return res.status(400).json({ error: 'Missing required metadata (type, title, artist)' });
+    if (!sanitizedType || !sanitizedTitle || !sanitizedArtist || !sanitizedLinks) {
+        return res
+            .status(400)
+            .json({ error: 'Missing required metadata (type, title, artist, links{}})' });
     }
 
-    if (trackType === 'REEL' && (!files || files.length !== 2)) {
+    if (sanitizedType === 'REEL' && (!files || files.length !== 2)) {
         return res
             .status(400)
             .json({ error: 'REEL type requires exactly two files (before and after)' });
     }
 
-    if (trackType !== 'REEL' && files.length != 1) {
+    if (sanitizedType !== 'REEL' && files.length != 1) {
         return res.status(400).json({ error: 'WIP and SCORING types require exactly one file' });
     }
 
@@ -124,13 +138,13 @@ const uploadTrack = async (req, res) => {
     let s3BeforeKey;
     let s3AfterKey;
 
-    // If trackType is 'REEL', expect a second file for 'after'
-    if (trackType === 'REEL' && files.length > 1) {
+    // If sanitizedType is 'REEL', expect a second file for 'after'
+    if (sanitizedType === 'REEL' && files.length > 1) {
         afterFile = files[1]; // Safely get the second file for the 'after' track
     }
 
     // Upload the first (before) file
-    s3BeforeKey = `tracks/${trackType.toLowerCase()}/${id}_${beforeFile.originalname}`;
+    s3BeforeKey = `tracks/${sanitizedType.toLowerCase()}/${id}_${beforeFile.originalname}`;
 
     try {
         // Upload the 'before' file to S3
@@ -144,8 +158,8 @@ const uploadTrack = async (req, res) => {
             .promise();
 
         // If it's a REEL, upload the 'after' file as well, if it exists
-        if (trackType === 'REEL' && afterFile) {
-            s3AfterKey = `tracks/${trackType.toLowerCase()}/${id}_version2_${afterFile.originalname}`;
+        if (sanitizedType === 'REEL' && afterFile) {
+            s3AfterKey = `tracks/${sanitizedType.toLowerCase()}/${id}_version2_${afterFile.originalname}`;
 
             // Upload the 'after' file to S3
             await s3
@@ -158,29 +172,28 @@ const uploadTrack = async (req, res) => {
                 .promise();
         }
 
-        // Parse links (default to empty object if undefined or invalid)
-        const parsedLinks = links ? JSON.parse(links) : {};
-
-        // Define the track object to be added
+        // Define the track base object to be added
         const track = {
             id,
-            title,
-            artist,
-            links: parsedLinks,
+            title: sanitizedTitle,
+            artist: sanitizedArtist,
+            links: sanitizedLinks,
         };
 
         // Handle specific type cases
-        if (trackType === 'REEL') {
+        if (sanitizedType === 'REEL') {
             track.before = s3BeforeKey;
             track.after = s3AfterKey;
             manifest.REEL.push(track);
         } else {
             track.src = s3BeforeKey;
-            manifest[trackType].push(track);
+            manifest[sanitizedType].push(track);
         }
 
         // Save the updated manifest
         saveManifest(manifest);
+
+        // TODO: entry
         await backupManifestToS3(s3, manifest);
 
         // Respond with success
@@ -268,15 +281,30 @@ const updateTrackById = async (req, res) => {
     const s3 = req.s3;
     const manifest = loadManifest();
 
+    const sanitizedTitle = sanitizeQuotes(title);
+    const sanitizedArtist = sanitizeQuotes(artist);
+    const sanitizedLinks = links
+        ? typeof links === 'string'
+            ? JSON.parse(sanitizeQuotes(links))
+            : links
+        : {};
+
     let trackFound = false;
 
-    ['WIP', 'REEL'].forEach((type) => {
+    ['WIP', 'REEL', 'SCORING'].forEach((type) => {
         manifest[type] = manifest[type].map((track) => {
             console.log(`audio.js::put(/tracks/:id): ${track}`);
+
             if (track.id == id) {
                 trackFound = true;
-                return { ...track, title, artist, links: JSON.parse(links || '{}') };
+                return {
+                    ...track,
+                    title: sanitizedTitle,
+                    artist: sanitizedArtist,
+                    links: sanitizedLinks,
+                };
             }
+
             return track;
         });
     });
