@@ -1,5 +1,16 @@
 {
-  "WIP": [],
+  "WIP": [
+    {
+      "id": "1b3c4748-58bf-4f9a-9b59-993db2fe300e",
+      "title": "\"Test Upload\"",
+      "artist": "\"Brandon Mrgich\"",
+      "links": {
+        "artist": "https://brandonmrgich.com",
+        "song": "https://google.com"
+      },
+      "src": "tracks/wip/1b3c4748-58bf-4f9a-9b59-993db2fe300e_Recursion copy.mp3"
+    }
+  ],
   "SCORING": [],
   "REEL": []
 }

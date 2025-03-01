@@ -1,7 +1,7 @@
 const { getS3Instance } = require('../utils/S3Helper');
 
 const getS3Heartbeat = (req, res) => {
-    const s3 = getS3Instance();
+    const s3 = req.s3; // getS3Instance();
 
     s3.listBuckets((err, data) => {
         if (err) {

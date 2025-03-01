@@ -19,11 +19,14 @@ const saveManifest = (data) => {
 };
 
 const backupManifestToS3 = async (s3, manifest) => {
+    return;
+    // TODO: fix socket break
     const manifestBackupKey = 'state/manifest.json';
     const tempBackupKey = `state/manifest_temp_${uuidv4()}.json`;
 
-    // Upload the manifest as a temporary object first
     try {
+        console.log(`Uploading temp manifest: ${tempBackupKey}...`);
+        // Step 1: Upload the temp file
         await s3
             .upload({
                 Bucket: BUCKET_NAME,
@@ -32,26 +35,43 @@ const backupManifestToS3 = async (s3, manifest) => {
                 ContentType: 'application/json',
             })
             .promise();
+        console.log('Temp upload complete.');
 
-        // If successful, rename to the main backup key
-        await s3
-            .copyObject({
-                Bucket: BUCKET_NAME,
-                CopySource: `${BUCKET_NAME}/${tempBackupKey}`,
-                Key: manifestBackupKey,
-            })
-            .promise();
-
-        // Delete the temporary object
-        await s3
-            .deleteObject({
+        // Step 2: Ensure the temp file exists before renaming
+        const tempFileCheck = await s3
+            .headObject({
                 Bucket: BUCKET_NAME,
                 Key: tempBackupKey,
             })
             .promise();
+
+        // If the temp file exists, proceed with renaming
+        if (tempFileCheck) {
+            console.log(`Temp file confirmed, proceeding with renaming...`);
+
+            // Step 3: Use `putObject` to overwrite the main manifest with the temp file's content
+            await s3
+                .putObject({
+                    Bucket: BUCKET_NAME,
+                    Key: manifestBackupKey,
+                    Body: JSON.stringify(manifest, null, 2), // Put the content of the new manifest here
+                    ContentType: 'application/json',
+                })
+                .promise();
+            console.log('Manifest overwrite complete.');
+
+            // Step 4: Delete the temp file
+            await s3
+                .deleteObject({
+                    Bucket: BUCKET_NAME,
+                    Key: tempBackupKey,
+                })
+                .promise();
+            console.log('Temp file deleted.');
+        }
     } catch (error) {
-        console.error('Error backing up manifest to S3:', error);
-        throw new Error('Failed to backup manifest to S3');
+        console.error('Error during manifest backup:', error);
+        throw new Error('Manifest backup process failed');
     }
 };
 // **GET /tracks** - Retrieve all tracks
@@ -76,12 +96,22 @@ const getTracksByType = async (req, res) => {
 const uploadTrack = async (req, res) => {
     const { type, title, artist, links } = req.body;
     let trackType = sanitizeTrackType(type);
-    const files = req.files || []; // Safely handle missing files
     const s3 = req.s3;
+    const files = req.files || []; // Safely handle missing files
 
-    // Check for missing required fields
-    if (!files.length || !type || !title || !artist || (trackType === 'REEL' && files.length < 2)) {
-        return res.status(400).json({ error: 'Missing required fields or files' });
+    // Validate required fields
+    if (!type || !title || !artist) {
+        return res.status(400).json({ error: 'Missing required metadata (type, title, artist)' });
+    }
+
+    if (trackType === 'REEL' && (!files || files.length !== 2)) {
+        return res
+            .status(400)
+            .json({ error: 'REEL type requires exactly two files (before and after)' });
+    }
+
+    if (trackType !== 'REEL' && files.length != 1) {
+        return res.status(400).json({ error: 'WIP and SCORING types require exactly one file' });
     }
 
     // Load manifest and generate unique ID
@@ -151,6 +181,7 @@ const uploadTrack = async (req, res) => {
 
         // Save the updated manifest
         saveManifest(manifest);
+        await backupManifestToS3(s3, manifest);
 
         // Respond with success
         res.json({ message: 'Track uploaded successfully', track });
@@ -160,66 +191,6 @@ const uploadTrack = async (req, res) => {
     }
 };
 
-// **POST /tracks** - Upload a new track
-//const uploadTrack = async (req, res) => {
-//    const { type, title, artist, links } = req.body;
-//    let trackType = sanitizeTrackType(type);
-//    const file = req.file;
-//    const s3 = req.s3;
-//
-//    // Check for missing required fields
-//    if (!file || !type || !title || !artist) {
-//        return res.status(400).json({ error: 'Missing required fields' });
-//    }
-//
-//    // Load manifest and generate unique ID
-//    const manifest = loadManifest();
-//    const id = uuidv4();
-//    const s3Key = `tracks/${trackType.toLowerCase()}/${id}_${file.originalname}`;
-//
-//    try {
-//        // Upload file to S3
-//        await s3
-//            .upload({
-//                Bucket: BUCKET_NAME,
-//                Key: s3Key,
-//                Body: file.buffer,
-//                ContentType: file.mimetype,
-//            })
-//            .promise();
-//
-//        // Parse links (default to empty object if undefined or invalid)
-//        const parsedLinks = links ? JSON.parse(links) : {};
-//
-//        // Define the track object to be added
-//        const track = {
-//            id,
-//            title,
-//            artist,
-//            links: parsedLinks,
-//        };
-//
-//        // Handle specific type cases
-//        if (trackType === 'REEL') {
-//            track.before = s3Key;
-//            track.after = `tracks/${type.toLowerCase()}/${id}_version2_${file.originalname}`;
-//
-//            manifest.REEL.push(track);
-//        } else {
-//            track.src = s3Key;
-//            manifest[trackType].push(track);
-//        }
-//
-//        // Save the updated manifest
-//        saveManifest(manifest);
-//
-//        // Respond with success
-//        res.json({ message: 'Track uploaded successfully', track });
-//    } catch (error) {
-//        console.error(error); // Log the error for debugging
-//        res.status(500).json({ error: 'Failed to upload track: ' + error });
-//    }
-//};
 // **DELETE /tracks/:id** - Delete a track
 const deleteTrackById = async (req, res) => {
     const { id } = req.params;
@@ -281,6 +252,7 @@ const deleteTrackById = async (req, res) => {
         // Remove the track from the manifest
         manifest[trackType].splice(trackIndex, 1);
         saveManifest(manifest);
+        await backupManifestToS3(s3, manifest);
 
         res.json({ message: 'Track deleted successfully' });
     } catch (error) {
@@ -314,6 +286,7 @@ const updateTrackById = async (req, res) => {
     }
 
     saveManifest(manifest);
+    await backupManifestToS3(s3, manifest);
     res.json({ message: 'Track updated successfully' });
 };
 

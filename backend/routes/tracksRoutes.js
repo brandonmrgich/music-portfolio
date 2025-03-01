@@ -25,7 +25,7 @@ router.delete('/:id', deleteTrackById); // Delete track by ID
 router.put('/:id', updateTrackById); // Update track by ID
 
 // Routes for manifest-related operations
-router.post('/manifest', upload.single('file'), syncManifest); // For syncing manifest
-router.get('/manifest', getManifest); // For retrieving the manifest
+//router.post('/manifest', upload.single('file'), syncManifest);
+//router.get('/manifest', getManifest);
 
 module.exports = router;
