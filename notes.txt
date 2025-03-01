@@ -1,0 +1,4 @@
+
+for api src / before / after links, use signed urls
+
+when fetching track cache it once, use it while cached avoid extra calls

@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
 import AudioGrid from './AudioPlayer/AudioGrid';
 import { useTracks } from '../hooks/UseTracks';
+//import {WIP} from '../AudioPlayer/TrackTypes';
 
 /**
  * In Work page component.
@@ -8,6 +8,7 @@ import { useTracks } from '../hooks/UseTracks';
  */
 const InWork = ({ isAdmin }) => {
     const { tracks, isLoading, error, isComparison } = useTracks('wip');
+    console.log('InWork(): ', { tracks });
 
     if (error) {
         return <div>Error: {error}</div>;

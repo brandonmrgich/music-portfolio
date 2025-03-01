@@ -77,10 +77,52 @@ const backupManifestToS3 = async (s3, manifest) => {
     }
 };
 
+const getSignedUrl = (key, s3) => {
+    const params = {
+        Bucket: BUCKET_NAME,
+        Key: key,
+        Expires: 300, // URL expires in 5 minutes
+    };
+    return s3.getSignedUrl('getObject', params);
+};
+
 // **GET /tracks** - Retrieve all tracks
 const getTracks = async (req, res) => {
     const manifest = loadManifest();
-    res.json(manifest);
+    const s3 = req.s3;
+
+    // Iterate through all tracks and generate signed URLs
+    const signedTracks = await Promise.all(
+        Object.keys(manifest).map(async (type) => {
+            return {
+                type,
+                tracks: await Promise.all(
+                    manifest[type].map(async (track) => {
+                        // For REEL type, we need to generate signed URLs for both 'before' and 'after'
+                        if (track.before && track.after) {
+                            return {
+                                ...track,
+                                before: getSignedUrl(track.before, s3),
+                                after: getSignedUrl(track.after, s3),
+                            };
+                        }
+
+                        // For WIP and SCORING types, just the 'src' field
+                        if (track.src) {
+                            return {
+                                ...track,
+                                src: getSignedUrl(track.src, s3),
+                            };
+                        }
+
+                        return track; // In case the track doesn't have URLs
+                    })
+                ),
+            };
+        })
+    );
+
+    res.json(signedTracks);
 };
 
 // **GET /tracks/:type** - Retrieve tracks by type (WIP or REEL)
@@ -88,66 +130,61 @@ const getTracksByType = async (req, res) => {
     const { type } = req.params;
     let trackType = sanitizeTrackType(type);
     const manifest = loadManifest();
+    const s3 = req.s3;
 
     if (!manifest[trackType]) {
         return res.status(400).json({ error: 'Invalid track type' });
     }
 
-    res.json(manifest[trackType]);
+    // Generate signed URLs for tracks
+    const signedTracks = manifest[trackType].map((track) => {
+        if (trackType === 'REEL') {
+            return {
+                ...track,
+                before: track.before ? getSignedUrl(track.before, s3) : null,
+                after: track.after ? getSignedUrl(track.after, s3) : null,
+            };
+        }
+        return {
+            ...track,
+            src: track.src ? getSignedUrl(track.src, s3) : null,
+        };
+    });
+
+    res.json(signedTracks);
 };
 
 const uploadTrack = async (req, res) => {
     const { type, title, artist, links } = req.body;
-
     const sanitizedType = sanitizeTrackType(type);
     const sanitizedTitle = sanitizeQuotes(title);
     const sanitizedArtist = sanitizeQuotes(artist);
-    const sanitizedLinks = links
-        ? typeof links === 'string'
-            ? JSON.parse(sanitizeQuotes(links))
-            : links
-        : {};
+    const sanitizedLinks = links ? JSON.parse(sanitizeQuotes(links)) : {};
 
     const s3 = req.s3;
-    const files = req.files || []; // Safely handle missing files
+    const files = req.files || [];
 
-    // Validate required fields
     if (!sanitizedType || !sanitizedTitle || !sanitizedArtist || !sanitizedLinks) {
-        return res
-            .status(400)
-            .json({ error: 'Missing required metadata (type, title, artist, links{}})' });
+        return res.status(400).json({ error: 'Missing required metadata' });
     }
 
-    if (sanitizedType === 'REEL' && (!files || files.length !== 2)) {
-        return res
-            .status(400)
-            .json({ error: 'REEL type requires exactly two files (before and after)' });
+    if (sanitizedType === 'REEL' && files.length !== 2) {
+        return res.status(400).json({ error: 'REEL requires exactly two files' });
     }
 
-    if (sanitizedType !== 'REEL' && files.length != 1) {
-        return res.status(400).json({ error: 'WIP and SCORING types require exactly one file' });
+    if (sanitizedType !== 'REEL' && files.length !== 1) {
+        return res.status(400).json({ error: 'WIP and SCORING require exactly one file' });
     }
 
-    // Load manifest and generate unique ID
     const manifest = loadManifest();
     const id = uuidv4();
+    const beforeFile = files[0];
+    let afterFile = files.length > 1 ? files[1] : null;
 
-    // Define file variables for before and after
-    const beforeFile = files[0]; // Safely get the first file
-    let afterFile;
-    let s3BeforeKey;
-    let s3AfterKey;
-
-    // If sanitizedType is 'REEL', expect a second file for 'after'
-    if (sanitizedType === 'REEL' && files.length > 1) {
-        afterFile = files[1]; // Safely get the second file for the 'after' track
-    }
-
-    // Upload the first (before) file
-    s3BeforeKey = `tracks/${sanitizedType.toLowerCase()}/${id}_${beforeFile.originalname}`;
+    const s3BeforeKey = `tracks/${sanitizedType.toLowerCase()}/${id}_${beforeFile.originalname}`;
+    let s3AfterKey = null;
 
     try {
-        // Upload the 'before' file to S3
         await s3
             .upload({
                 Bucket: BUCKET_NAME,
@@ -157,11 +194,8 @@ const uploadTrack = async (req, res) => {
             })
             .promise();
 
-        // If it's a REEL, upload the 'after' file as well, if it exists
         if (sanitizedType === 'REEL' && afterFile) {
             s3AfterKey = `tracks/${sanitizedType.toLowerCase()}/${id}_version2_${afterFile.originalname}`;
-
-            // Upload the 'after' file to S3
             await s3
                 .upload({
                     Bucket: BUCKET_NAME,
@@ -172,35 +206,24 @@ const uploadTrack = async (req, res) => {
                 .promise();
         }
 
-        // Define the track base object to be added
         const track = {
             id,
             title: sanitizedTitle,
             artist: sanitizedArtist,
             links: sanitizedLinks,
+            ...(sanitizedType === 'REEL'
+                ? { before: s3BeforeKey, after: s3AfterKey }
+                : { src: s3BeforeKey }),
         };
 
-        // Handle specific type cases
-        if (sanitizedType === 'REEL') {
-            track.before = s3BeforeKey;
-            track.after = s3AfterKey;
-            manifest.REEL.push(track);
-        } else {
-            track.src = s3BeforeKey;
-            manifest[sanitizedType].push(track);
-        }
-
-        // Save the updated manifest
+        manifest[sanitizedType].push(track);
         saveManifest(manifest);
-
-        // TODO: entry
         await backupManifestToS3(s3, manifest);
 
-        // Respond with success
         res.json({ message: 'Track uploaded successfully', track });
     } catch (error) {
-        console.error(error); // Log the error for debugging
-        res.status(500).json({ error: 'Failed to upload track: ' + error });
+        console.error(error);
+        res.status(500).json({ error: 'Failed to upload track' });
     }
 };
 
@@ -214,10 +237,8 @@ const deleteTrackById = async (req, res) => {
     let trackIndex = -1;
     let track = null;
 
-    // Find the track in the manifest, regardless of its type
     ['WIP', 'REEL', 'SCORING'].forEach((type) => {
         manifest[type].forEach((t, index) => {
-            console.log(`audio.js::delete(/tracks/:id): ${t}`);
             if (t.id == id) {
                 trackType = type;
                 trackIndex = index;
@@ -231,45 +252,24 @@ const deleteTrackById = async (req, res) => {
     }
 
     try {
-        // Check if it's a REEL type and delete both before and after files
         if (trackType === 'REEL') {
             if (track.before) {
-                await s3
-                    .deleteObject({
-                        Bucket: BUCKET_NAME,
-                        Key: track.before,
-                    })
-                    .promise();
+                await s3.deleteObject({ Bucket: BUCKET_NAME, Key: track.before }).promise();
             }
-
             if (track.after) {
-                await s3
-                    .deleteObject({
-                        Bucket: BUCKET_NAME,
-                        Key: track.after,
-                    })
-                    .promise();
+                await s3.deleteObject({ Bucket: BUCKET_NAME, Key: track.after }).promise();
             }
         } else {
-            // Otherwise, delete the single src file
-            if (track.src) {
-                await s3
-                    .deleteObject({
-                        Bucket: BUCKET_NAME,
-                        Key: track.src,
-                    })
-                    .promise();
-            }
+            await s3.deleteObject({ Bucket: BUCKET_NAME, Key: track.src }).promise();
         }
 
-        // Remove the track from the manifest
         manifest[trackType].splice(trackIndex, 1);
         saveManifest(manifest);
         await backupManifestToS3(s3, manifest);
 
         res.json({ message: 'Track deleted successfully' });
     } catch (error) {
-        console.error('S3 Deletion Error:', error);
+        console.error(error);
         res.status(500).json({ error: 'Failed to delete track' });
     }
 };

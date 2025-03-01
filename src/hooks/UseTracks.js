@@ -1,32 +1,36 @@
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect } from 'react';
+import { fetchTracksByType } from '../services/tracks';
 import AudioLoader from '../components/AudioPlayer/AudioLoader';
 
-// TODO: Clean hook vs audio context methods. Currently hook method being used
-// which doesnt preserve context.
-
-export const useTracks = (trackType = 'wip', trackSrc = 'local') => {
+export const useTracks = (trackType = 'wip') => {
     const [tracks, setTracks] = useState([]);
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState(null);
-
-    // Only sample reel tracks are comparison tracks
     const isComparison = trackType.toLowerCase() === 'reel';
 
     useEffect(() => {
         const loadTracks = async () => {
+            setIsLoading(true);
+            setError(null);
+
             try {
-                let loadedTracks = null;
-                setIsLoading(true);
+                const apiTracks = await fetchTracksByType(trackType);
 
-                trackSrc.toLowerCase() === 'local'
-                    ? (loadedTracks = await AudioLoader.getLocalTracks(trackType))
-                    : (loadedTracks = await AudioLoader.getApiTracks(trackType));
+                // Check if tracks are empty, throw an error if so
+                if (!apiTracks || apiTracks.length === 0) {
+                    throw new Error('No tracks fetched, defaulting');
+                }
 
-                setTracks(...tracks, loadedTracks);
-                setError(null);
-            } catch (err) {
-                console.error('Error loading tracks:', err);
-                setError('Failed to load audio tracks. Please try again later.');
+                setTracks(apiTracks);
+            } catch (apiError) {
+                console.error('API request failed, falling back to local tracks:', apiError);
+                try {
+                    const localTracks = await AudioLoader.getLocalTracks(trackType);
+                    setTracks(localTracks);
+                } catch (localError) {
+                    console.error('Failed to load local tracks as fallback:', localError);
+                    setError('Failed to load tracks from both API and local sources.');
+                }
             } finally {
                 setIsLoading(false);
             }

@@ -1,8 +1,8 @@
 import { fetchData, postData, putData, deleteData } from './api';
 
 // Fetch all tracks
-export const fetchTracks = async (type = '') => {
-    const url = type ? `/tracks?type=${type}` : '/tracks';
+export const fetchTracks = async () => {
+    const url = '/tracks';
     try {
         const tracks = await fetchData(url); // Calls API via axios
         return tracks;
@@ -16,6 +16,17 @@ export const fetchTracks = async (type = '') => {
 export const fetchTrackById = async (id) => {
     try {
         const track = await fetchData(`/tracks/${id}`);
+        return track;
+    } catch (error) {
+        console.error('Error fetching track by ID:', error);
+        throw error;
+    }
+};
+
+// Fetch tracks by type
+export const fetchTracksByType = async (type) => {
+    try {
+        const track = await fetchData(`/tracks/${type}`);
         return track;
     } catch (error) {
         console.error('Error fetching track by ID:', error);

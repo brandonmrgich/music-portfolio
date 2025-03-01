@@ -13,15 +13,16 @@ export const AudioProvider = ({ children }) => {
 
     const initializeAudio = (id, src) => {
         const existingAudio = audioRefs.current[id];
+        //console.info('AudioProvider::initializeAudio(): Initialized audio: ', { id, src });
 
         // TODO: This is hacky
         // Only initialize if this specific audio has not been initialized yet
-        if (!existingAudio?.initialized) {
-            console.info('AudioProvider::initializeAudio(): Initialized audio: ', { id, src });
-            setNewAudioSrc(id, src);
-            addAudioEventListeners(id);
-            audioRefs.current[id].initialized = true; // Set the initialized flag to prevent multiple inits of the audio component
-        }
+        //if (!existingAudio?.initialized) {
+        console.info('AudioProvider::initializeAudio(): Initialized audio: ', { id, src });
+        setNewAudioSrc(id, src);
+        addAudioEventListeners(id);
+        audioRefs.current[id].initialized = true; // Set the initialized flag to prevent multiple inits of the audio component
+        // }
     };
 
     const setNewAudioSrc = (id, src, defaultVolume = DEFAULT_VOLUME) => {
@@ -65,18 +66,40 @@ export const AudioProvider = ({ children }) => {
     };
 
     const play = (id, src) => {
+        console.log(`Attempting to play ${id}:`, audioRefs.current[id]);
+
         stopAllExcept(id);
 
         if (audioRefs.current[id] == undefined) {
+            console.warn(`play(${id}) failed: Audio instance not initialized.`);
             setPlayingStates((prev) => ({ ...prev, [id]: false }));
             setCurrentSrcs(null);
             return;
         }
 
-        audioRefs.current[id].play();
-        setPlayingStates((prev) => ({ ...prev, [id]: true }));
-        setCurrentSrcs((prev) => ({ ...prev, [id]: src }));
+        audioRefs.current[id]
+            .play()
+            .then(() => {
+                console.info(`Playing audio ${id}`);
+                setPlayingStates((prev) => ({ ...prev, [id]: true }));
+                setCurrentSrcs((prev) => ({ ...prev, [id]: src }));
+            })
+            .catch((err) => console.error(`Error playing ${id}:`, err));
     };
+
+    //const play = (id, src) => {
+    //    stopAllExcept(id);
+
+    //    if (audioRefs.current[id] == undefined) {
+    //        setPlayingStates((prev) => ({ ...prev, [id]: false }));
+    //        setCurrentSrcs(null);
+    //        return;
+    //    }
+
+    //    audioRefs.current[id].play();
+    //    setPlayingStates((prev) => ({ ...prev, [id]: true }));
+    //    setCurrentSrcs((prev) => ({ ...prev, [id]: src }));
+    //};
 
     const stopAllExcept = (id) => {
         Object.keys(audioRefs.current).forEach((key) => {

@@ -12,7 +12,7 @@ const AudioGrid = ({ tracks, isComparison, isLoading }) => {
         );
     }
 
-    if (!tracks.length) {
+    if (!tracks || !tracks.length) {
         return <p className="text-center text-gray-500">No tracks available.</p>;
     }
 

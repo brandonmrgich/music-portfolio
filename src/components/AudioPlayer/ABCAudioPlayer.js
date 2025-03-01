@@ -86,6 +86,7 @@ const ABCAudioPlayer = ({ id, src, title, artist, links, renderAdditionalControl
     }, [volumeOpen]);
 
     useEffect(() => {
+        console.log('Initing audio');
         initializeAudio(id, src, volume);
 
         return () => {
