@@ -1,16 +1,36 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import AudioUpload from '../admin/AudioUpload';
 import { useTracks } from '../hooks/UseTracks';
 import AudioGrid from './AudioPlayer/AudioGrid';
+import AudioLoader from './AudioPlayer/AudioLoader';
 
 const Services = ({ isAdmin }) => {
-    const { tracks, isLoading, error, isComparison } = useTracks('reel');
+    //const { tracks, isLoading, error, isComparison } = useTracks('reel');
+    const [tracks, setTracks] = useState(null);
+    const [isLoading, setIsLoading] = useState(true);
 
-    if (error) {
-        return <div>Error: {error}</div>;
-    }
+    useEffect(() => {
+        console.log('Scoring::Tracks updated, mount');
+        const fetch = async () => {
+            try {
+                //const { tracks, isLoading, error, isComparison } = useTracks('wip');
+                // TODO: REMOVE: forcing local tracks for debug
+                const localTracks = await AudioLoader.getLocalTracks('scoring');
 
-    //<div className="p-6 max-w-4xl mx-auto space-y-12">
+                setTracks(localTracks);
+                setIsLoading(false);
+            } catch (e) {
+                console.error(e);
+            }
+        };
+
+        fetch();
+
+        return () => {
+            console.log('Scoring:: unmount');
+        };
+    }, []);
+
     return (
         <div className="services p-4 sm:p-6 max-w-4xl mx-auto space-y-12">
             <section className="text-center block text-balance services p-6 max-w-4xl mx-auto ">
@@ -36,7 +56,7 @@ const Services = ({ isAdmin }) => {
                 </h2>
             </section>
 
-            <AudioGrid tracks={tracks} isComparison={isComparison} isLoading={isLoading} />
+            <AudioGrid tracks={tracks} isComparison={true} isLoading={false} />
 
             {isAdmin && (
                 <section className="admin space-y-4">

@@ -1,14 +1,64 @@
 {
   "WIP": [
     {
-      "id": "042796ee-f102-45e6-b3ef-bfbf5a6b894e",
+      "id": "bf9ff237-8c70-4bc8-b6c4-2c86c123b72f",
       "title": "Test Upload",
       "artist": "Brandon Mrgich",
       "links": {
         "artist": "https://brandonmrgich.com",
         "song": "https://google.com"
       },
-      "src": "tracks/wip/042796ee-f102-45e6-b3ef-bfbf5a6b894e_Share copy.mp3"
+      "src": "tracks/wip/bf9ff237-8c70-4bc8-b6c4-2c86c123b72f_Share copy.mp3"
+    },
+    {
+      "id": "bc8fea5e-c536-44cf-a692-3095e870cac6",
+      "title": "To Be You - Acoustic",
+      "artist": "Brandon Mrgich",
+      "links": {
+        "artist": "",
+        "song": ""
+      },
+      "src": "tracks/wip/bc8fea5e-c536-44cf-a692-3095e870cac6_ToBeYou-take7.mp3"
+    },
+    {
+      "id": "242c5fd2-eb50-4a76-809f-fbc952cc2bfb",
+      "title": "It's Alright",
+      "artist": "Brandon Mrgich",
+      "links": {
+        "artist": "https://brandonmrgich.com",
+        "song": "https://google.com"
+      },
+      "src": "tracks/wip/242c5fd2-eb50-4a76-809f-fbc952cc2bfb_ItsAlright.mp3"
+    },
+    {
+      "id": "fd0949ee-1562-4d59-9e82-3364ed6a3e02",
+      "title": "Waking Up",
+      "artist": "Brandon Mrgich",
+      "links": {
+        "artist": "https://brandonmrgich.com",
+        "song": "https://google.com"
+      },
+      "src": "tracks/wip/fd0949ee-1562-4d59-9e82-3364ed6a3e02_WakingUp.mp3"
+    },
+    {
+      "id": "47f070a0-995b-428a-898b-8fc8ccbee545",
+      "title": "Losing Control",
+      "artist": "Brandon Mrgich",
+      "links": {
+        "artist": "https://brandonmrgich.com",
+        "song": "https://google.com"
+      },
+      "src": "tracks/wip/47f070a0-995b-428a-898b-8fc8ccbee545_Guitar-guitar-detuned (Losing Control).mp3"
+    },
+    {
+      "id": "d1576cab-c8e4-4d8a-bef7-f976aa249b2b",
+      "title": "To Be You",
+      "artist": "Brandon Mrgich",
+      "links": {
+        "artist": "https://brandonmrgich.com",
+        "song": "https://google.com"
+      },
+      "src": "tracks/wip/d1576cab-c8e4-4d8a-bef7-f976aa249b2b_ToBeYou-StudioTake4.mp3"
     }
   ],
   "SCORING": [],

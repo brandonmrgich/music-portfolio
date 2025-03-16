@@ -127,6 +127,7 @@ const getTracks = async (req, res) => {
 
 // **GET /tracks/:type** - Retrieve tracks by type (WIP or REEL)
 const getTracksByType = async (req, res) => {
+    console.log('[API] Tracks request made');
     const { type } = req.params;
     let trackType = sanitizeTrackType(type);
     const manifest = loadManifest();

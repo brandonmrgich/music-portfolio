@@ -86,13 +86,13 @@ const ABCAudioPlayer = ({ id, src, title, artist, links, renderAdditionalControl
     }, [volumeOpen]);
 
     useEffect(() => {
-        console.log('Initing audio');
+        console.log('init audio');
         initializeAudio(id, src, volume);
 
         return () => {
             //pause(id); // Uncomment to stop the audio when user leaves the page
         };
-    }, []);
+    }, [src]);
 
     error && console.log(error);
 

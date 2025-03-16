@@ -1,17 +1,46 @@
 import React, { useState, useEffect } from 'react';
 import AudioGrid from './AudioPlayer/AudioGrid';
 import { useTracks } from '../hooks/UseTracks';
+import AudioLoader from './AudioPlayer/AudioLoader';
 
 /**
  * Scoring page component.
  * @returns {React.Component} The Scoring page component
  */
 const Scoring = ({ isAdmin }) => {
-    const { tracks, isLoading, error, isComparison } = useTracks('scoring');
+    //const { tracks, isLoading, error, isComparison } = useTracks('scoring');
+    const [tracks, setTracks] = useState(null);
+    const [isLoading, setIsLoading] = useState(true);
 
-    if (error) {
-        return <div>Error: {error}</div>;
-    }
+    const renderAudioGrid = () => {
+        if (tracks && tracks.length > 0) {
+            return <AudioGrid tracks={tracks} isComparison={false} isLoading={false} />;
+        }
+
+        return <p>No tracks available</p>;
+    };
+
+    useEffect(() => {
+        console.log('Scoring::Tracks updated, mount');
+        const fetch = async () => {
+            try {
+                //const { tracks, isLoading, error, isComparison } = useTracks('wip');
+                // TODO: REMOVE: forcing local tracks for debug
+                const localTracks = await AudioLoader.getLocalTracks('scoring');
+
+                setTracks(localTracks);
+                setIsLoading(false);
+            } catch (e) {
+                console.error(e);
+            }
+        };
+
+        fetch();
+
+        return () => {
+            console.log('Scoring:: unmount');
+        };
+    }, []);
 
     return (
         <div className="scoring p-4 sm:p-6 max-w-4xl mx-auto space-y-12">
@@ -24,7 +53,8 @@ const Scoring = ({ isAdmin }) => {
                     Festivals, etc
                 </p>
             </section>
-            <AudioGrid tracks={tracks} isComparison={isComparison} isLoading={isLoading} />
+            {renderAudioGrid()}
+            {/*<AudioGrid tracks={tracks} isComparison={isComparison} isLoading={isLoading} />*/}
         </div>
     );
 };

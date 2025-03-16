@@ -18,10 +18,11 @@ export const AudioProvider = ({ children }) => {
         // TODO: This is hacky
         // Only initialize if this specific audio has not been initialized yet
         //if (!existingAudio?.initialized) {
-        console.info('AudioProvider::initializeAudio(): Initialized audio: ', { id, src });
+        //
         setNewAudioSrc(id, src);
         addAudioEventListeners(id);
         audioRefs.current[id].initialized = true; // Set the initialized flag to prevent multiple inits of the audio component
+
         // }
     };
 
