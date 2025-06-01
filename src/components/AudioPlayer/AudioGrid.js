@@ -47,4 +47,20 @@ const AudioGrid = ({ tracks, isComparison, isLoading }) => {
     );
 };
 
-export default AudioGrid;
+const renderAudioGrid = (tracks, isComparison, isLoading) => {
+    if (isLoading) {
+        return (
+            <div className="justify-self-center">
+                <AnimatedLoadingText />
+            </div>
+        );
+    }
+
+    if (tracks && tracks.length > 0) {
+        return <AudioGrid tracks={tracks} isComparison={isComparison} isLoading={isLoading} />;
+    }
+
+    return <p className="justify-self-center">No tracks available</p>;
+};
+
+export { AudioGrid, renderAudioGrid };

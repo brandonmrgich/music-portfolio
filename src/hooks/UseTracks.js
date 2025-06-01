@@ -18,20 +18,13 @@ export const useTracks = (trackType = 'wip') => {
 
                 // Check if tracks are empty, throw an error if so
                 if (!apiTracks || apiTracks.length === 0) {
-                    throw new Error('No tracks fetched, defaulting');
+                    throw new Error(`No tracks available for ${trackType} track type`);
                 }
 
                 setTracks(apiTracks);
-            } catch (apiError) {
-                console.error('API request failed, falling back to local tracks:', apiError);
-
-                try {
-                    const localTracks = await AudioLoader.getLocalTracks(trackType);
-                    setTracks(localTracks);
-                } catch (localError) {
-                    console.error('Failed to load local tracks as fallback:', localError);
-                    setError('Failed to load tracks from both API and local sources.');
-                }
+            } catch (err) {
+                console.error('There was an error when fetching tracks.', err);
+                setError(err);
             } finally {
                 setIsLoading(false);
             }

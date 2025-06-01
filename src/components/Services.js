@@ -1,30 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import AudioUpload from '../admin/AudioUpload';
+import AudioGrid, { renderAudioGrid } from './AudioPlayer/AudioGrid';
 import { useTracks } from '../hooks/UseTracks';
-import AudioGrid from './AudioPlayer/AudioGrid';
-import AudioLoader from './AudioPlayer/AudioLoader';
 
 const Services = ({ isAdmin }) => {
-    //const { tracks, isLoading, error, isComparison } = useTracks('reel');
-    const [tracks, setTracks] = useState(null);
-    const [isLoading, setIsLoading] = useState(true);
+    const { tracks, isLoading, error, isComparison } = useTracks('reel');
 
     useEffect(() => {
-        const fetch = async () => {
-            try {
-                //const { tracks, isLoading, error, isComparison } = useTracks('wip');
-                // TODO: REMOVE: forcing local tracks for debug
-                const localTracks = await AudioLoader.getLocalTracks('scoring');
-
-                setTracks(localTracks);
-                setIsLoading(false);
-            } catch (e) {
-                console.error(e);
-            }
-        };
-
-        fetch();
-    }, []);
+        if (error) console.error(error);
+    }, [tracks]);
 
     return (
         <div className="services p-4 sm:p-6 max-w-4xl mx-auto space-y-12">
@@ -51,14 +35,13 @@ const Services = ({ isAdmin }) => {
                 </h2>
             </section>
 
-            <AudioGrid tracks={tracks} isComparison={true} isLoading={false} />
+            {renderAudioGrid(tracks, isComparison, isLoading)}
 
-            {isAdmin && (
-                <section className="admin space-y-4">
-                    <h2 className="text-2xl font-semibold text-gray-800">Admin</h2>
+            {/*{isAdmin && (
+                <section className="admin space-y-4 justify-self-center">
                     <AudioUpload />
                 </section>
-            )}
+            )} */}
         </div>
     );
 };
