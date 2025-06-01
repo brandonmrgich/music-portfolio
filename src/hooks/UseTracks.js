@@ -10,7 +10,6 @@ export const useTracks = (trackType = 'wip') => {
 
     useEffect(() => {
         const loadTracks = async () => {
-            console.log('1 -- Loading tracks via api');
             setIsLoading(true);
             setError(null);
 

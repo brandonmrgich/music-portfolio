@@ -7,7 +7,6 @@ const AudioPlayer = ({ id, src, title, artist, links }) => {
     const [hasLiked, setHasLiked] = useState(false);
 
     useEffect(() => {
-        console.log('Audio player reset');
         const likedTracks = JSON.parse(localStorage.getItem('likedTracks') || '{}');
         setHasLiked(likedTracks[title] || false);
         setLikes(likedTracks[title] ? 1 : 0);
@@ -35,13 +34,6 @@ const AudioPlayer = ({ id, src, title, artist, links }) => {
             </div>
         </button>
     );
-
-    useEffect(() => {
-        console.log('audio player built with props: ', { id, src, title, artist, links });
-        return () => {
-            console.log('unmount audio player');
-        };
-    });
 
     return (
         <ABCAudioPlayer

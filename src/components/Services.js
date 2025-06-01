@@ -10,7 +10,6 @@ const Services = ({ isAdmin }) => {
     const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
-        console.log('Scoring::Tracks updated, mount');
         const fetch = async () => {
             try {
                 //const { tracks, isLoading, error, isComparison } = useTracks('wip');
@@ -25,10 +24,6 @@ const Services = ({ isAdmin }) => {
         };
 
         fetch();
-
-        return () => {
-            console.log('Scoring:: unmount');
-        };
     }, []);
 
     return (

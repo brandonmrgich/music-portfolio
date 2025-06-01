@@ -21,7 +21,6 @@ const Scoring = ({ isAdmin }) => {
     };
 
     useEffect(() => {
-        console.log('Scoring::Tracks updated, mount');
         const fetch = async () => {
             try {
                 //const { tracks, isLoading, error, isComparison } = useTracks('wip');
@@ -36,10 +35,6 @@ const Scoring = ({ isAdmin }) => {
         };
 
         fetch();
-
-        return () => {
-            console.log('Scoring:: unmount');
-        };
     }, []);
 
     return (

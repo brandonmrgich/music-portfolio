@@ -9,40 +9,34 @@ import AnimatedLoadingText from '../utils/AnimatedLoadingText';
  * In Work page component.
  * @returns {React.Component} The In Work page component
  *
- * TODO: Review component lifecycle from
- * InWork -> useTracks -> AudioGrid -> ABCAudioPlayer -> AudioPlayer
- *
- * Use effects stacking causing re-mount behavior and double calls to the tracks fetch
- *
  */
 const InWork = ({ isAdmin }) => {
-    const [tracks, setTracks] = useState(null);
-    const [isLoading, setIsLoading] = useState(true);
+    //const [tracks, setTracks] = useState(null);
+    //const [isLoading, setIsLoading] = useState(true);
 
     // TODO: Tracks cannot be fetched here, needs to be added to the context
-    // const { tracks, isLoading, error, isComparison } = useTracks('wip');
+    const { tracks, isLoading, error, isComparison } = useTracks('wip');
 
-    useEffect(() => {
-        console.log('InWork::Tracks updated, mount');
+    //useEffect(() => {
+    //    console.log('InWork::Tracks updated, mount');
 
-        const fetch = async () => {
-            try {
-                // TODO: REMOVE: forcing local tracks for debug
-                const localTracks = await AudioLoader.getLocalTracks('wip');
+    //    const fetch = async () => {
+    //        try {
+    //            // TODO: REMOVE: forcing local tracks for debug
 
-                setTracks(localTracks);
-                setIsLoading(false);
-            } catch (e) {
-                console.error(e);
-            }
-        };
+    //            setTracks(localTracks);
+    //            setIsLoading(false);
+    //        } catch (e) {
+    //            console.error(e);
+    //        }
+    //    };
 
-        fetch();
+    //    fetch();
 
-        return () => {
-            console.log('InWork::Tracks updated, unmount');
-        };
-    }, []);
+    //    return () => {
+    //        console.log('InWork::Tracks updated, unmount');
+    //    };
+    //}, []);
 
     const renderAudioGrid = () => {
         if (isLoading) {
