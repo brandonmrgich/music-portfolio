@@ -2,7 +2,18 @@ import React, { useState, useEffect } from 'react';
 import ABCAudioPlayer from './ABCAudioPlayer';
 import { Heart } from 'lucide-react';
 
+/**
+ * AudioPlayer - Wrapper for ABCAudioPlayer that adds like functionality.
+ * Likes are stored in localStorage and are not synced with global audio state.
+ * @param {object} props
+ * @param {string|number} props.id - Track ID
+ * @param {string} props.src - Audio source URL
+ * @param {string} props.title - Track title
+ * @param {string} props.artist - Track artist
+ * @param {object} props.links - Track links (artist, song)
+ */
 const AudioPlayer = ({ id, src, title, artist, links }) => {
+    // Local like state, unrelated to audio playback
     const [likes, setLikes] = useState(0);
     const [hasLiked, setHasLiked] = useState(false);
 
@@ -12,6 +23,9 @@ const AudioPlayer = ({ id, src, title, artist, links }) => {
         setLikes(likedTracks[title] ? 1 : 0);
     }, [title]);
 
+    /**
+     * Toggle like state for this track and persist to localStorage.
+     */
     const handleLike = () => {
         const likedTracks = JSON.parse(localStorage.getItem('likedTracks') || '{}');
         const newLikedState = !hasLiked;
@@ -21,6 +35,10 @@ const AudioPlayer = ({ id, src, title, artist, links }) => {
         setLikes(newLikedState ? likes + 1 : likes - 1);
     };
 
+    /**
+     * Render the like button and count.
+     * @returns {JSX.Element}
+     */
     const renderAdditionalControls = () => (
         <button
             onClick={handleLike}
@@ -42,6 +60,7 @@ const AudioPlayer = ({ id, src, title, artist, links }) => {
             title={title}
             artist={artist}
             links={links}
+            meta={{ title, artist, links }}
             renderAdditionalControls={renderAdditionalControls}
         />
     );

@@ -1,17 +1,23 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import AudioGrid, { renderAudioGrid } from './AudioPlayer/AudioGrid';
-import { useTracks } from '../hooks/UseTracks';
+import { useAudio } from '../contexts/AudioContext';
 
 /**
- * Scoring page component.
- * @returns {React.Component} The Scoring page component
+ * Scoring - Page for displaying scoring tracks (film, videogame, etc).
+ * Uses AudioContext for track data and error/loading state.
+ * @param {object} props
+ * @param {boolean} props.isAdmin - If true, show admin features (unused here)
+ * @returns {JSX.Element}
  */
 const Scoring = ({ isAdmin }) => {
-    const { tracks, isLoading, error, isComparison } = useTracks('scoring');
+    const { tracks, tracksLoading, tracksError } = useAudio();
+    const isComparison = false;
+    const error = tracksError;
+    const isLoading = tracksLoading;
 
     useEffect(() => {
         if (error) console.error(error);
-    }, [tracks]);
+    }, [error]);
 
     return (
         <div className="scoring p-4 sm:p-6 max-w-4xl mx-auto space-y-12">
@@ -24,7 +30,7 @@ const Scoring = ({ isAdmin }) => {
                     Festivals, etc
                 </p>
             </section>
-            {renderAudioGrid(tracks, isComparison, isLoading)}
+            {renderAudioGrid(tracks.scoring, isComparison, isLoading)}
         </div>
     );
 };

@@ -11,18 +11,27 @@ const {
 
 require('dotenv').config();
 
+/**
+ * Tracks API Routes
+ * Handles CRUD operations for audio tracks (WIP, REEL, SCORING).
+ * @module routes/tracksRoutes
+ */
 const router = express.Router();
 
 // Multer setup for handling file uploads (in memory)
 const storage = multer.memoryStorage();
 const upload = multer({ storage });
 
-// Define the routes and link them to controller functions
-router.get('/', getTracks); // Get all tracks
-router.get('/:type', getTracksByType); // Get tracks by type
-router.post('/', upload.array('file', 2), uploadTrack); // Upload a track
-router.delete('/:id', deleteTrackById); // Delete track by ID
-router.put('/:id', updateTrackById); // Update track by ID
+// GET /tracks - Get all tracks
+router.get('/', getTracks);
+// GET /tracks/:type - Get tracks by type
+router.get('/:type', getTracksByType);
+// POST /tracks - Upload a track (max 2 files for REEL)
+router.post('/', upload.array('file', 2), uploadTrack);
+// DELETE /tracks/:id - Delete track by ID
+router.delete('/:id', deleteTrackById);
+// PUT /tracks/:id - Update track by ID
+router.put('/:id', updateTrackById);
 
 // Routes for manifest-related operations
 //router.post('/manifest', upload.single('file'), syncManifest);

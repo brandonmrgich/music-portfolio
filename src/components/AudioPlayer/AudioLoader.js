@@ -3,24 +3,35 @@ import { fileExists } from '../../utils/FileExists';
 
 const publicPath = process.env.PUBLIC_URL;
 
+/**
+ * AudioLoader - Utility class for loading local and API audio tracks.
+ * Used for validating and formatting track data.
+ */
 class AudioLoader {
     constructor() {
         this.defaultTrackData = defaultTracks;
     }
 
+    /**
+     * Track types mapped to default track data.
+     */
     static trackTypes = {
         wip: defaultTracks.WIP,
         scoring: defaultTracks.SCORING,
         reel: defaultTracks.REEL,
     };
 
+    /**
+     * Get local tracks for a given type, validating file existence.
+     * @param {string} trackType
+     * @returns {Promise<Array>}
+     */
     static async getLocalTracks(trackType = 'wip') {
         const tracks = this.trackTypes[trackType.toLowerCase()];
         const validTracks = [];
 
         for (const track of tracks) {
             const basePath = `audio/${trackType}/`;
-
             const srcExists = track.src && (await fileExists(`${basePath}${track.src}`));
             const beforeExists = track.before && (await fileExists(`${basePath}${track.before}`));
             const afterExists = track.after && (await fileExists(`${basePath}${track.after}`));
@@ -47,25 +58,34 @@ class AudioLoader {
         return validTracks;
     }
 
-    //static async getAPITracks(trackType = 'wip') {
-    //    try {
-    //        const response = await fetch(`/api/audio/${trackType}`);
-    //        if (!response.ok) {
-    //            throw new Error('Failed to fetch audio files from API');
-    //        }
-    //        return await response.json();
-    //    } catch (error) {
-    //        console.error('Error fetching API tracks:', error);
-    //        return [];
-    //    }
-    //}
+    /**
+     * (Commented out) Example for fetching tracks from an API endpoint.
+     * @param {string} trackType
+     * @returns {Promise<Array>}
+     */
+    // static async getAPITracks(trackType = 'wip') {
+    //     try {
+    //         const response = await fetch(`/api/audio/${trackType}`);
+    //         if (!response.ok) {
+    //             throw new Error('Failed to fetch audio files from API');
+    //         }
+    //         return await response.json();
+    //     } catch (error) {
+    //         console.error('Error fetching API tracks:', error);
+    //         return [];
+    //     }
+    // }
 
+    /**
+     * Get all tracks for a given type from both local and API sources.
+     * @param {string} trackType
+     * @returns {Promise<Array>}
+     */
     static async getAllTracks(trackType = 'wip') {
         const [localTracks, apiTracks] = await Promise.all([
             this.getLocalTracks(trackType),
             this.getAPITracks(trackType),
         ]);
-
         return [...localTracks, ...apiTracks];
     }
 }

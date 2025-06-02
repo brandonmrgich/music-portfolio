@@ -6,6 +6,10 @@ const { sanitizeTrackType, sanitizeQuotes } = require('../utils/santizeTrackType
 
 const BUCKET_NAME = process.env.AWS_BUCKET_NAME;
 
+/**
+ * Load the manifest JSON from disk.
+ * @returns {object} Manifest data
+ */
 const loadManifest = () => {
     if (fs.existsSync(manifestPath)) {
         return JSON.parse(fs.readFileSync(manifestPath, 'utf8'));
@@ -13,10 +17,19 @@ const loadManifest = () => {
     return { WIP: [], REEL: [], SCORING: [] };
 };
 
+/**
+ * Save the manifest JSON to disk.
+ * @param {object} data - Manifest data
+ */
 const saveManifest = (data) => {
     fs.writeFileSync(manifestPath, JSON.stringify(data, null, 2));
 };
 
+/**
+ * Backup the manifest to S3, using a temp file and then overwriting the main manifest.
+ * @param {object} s3 - AWS S3 instance
+ * @param {object} manifest - Manifest data
+ */
 const backupManifestToS3 = async (s3, manifest) => {
     const manifestBackupKey = 'state/manifest.json';
     const tempBackupKey = `state/manifest_temp_${uuidv4()}.json`;
@@ -77,6 +90,12 @@ const backupManifestToS3 = async (s3, manifest) => {
     }
 };
 
+/**
+ * Generate a signed S3 URL for a given key.
+ * @param {string} key
+ * @param {object} s3 - AWS S3 instance
+ * @returns {string} Signed URL
+ */
 const getSignedUrl = (key, s3) => {
     const params = {
         Bucket: BUCKET_NAME,
@@ -86,7 +105,11 @@ const getSignedUrl = (key, s3) => {
     return s3.getSignedUrl('getObject', params);
 };
 
-// **GET /tracks** - Retrieve all tracks
+/**
+ * GET /tracks - Retrieve all tracks (all types)
+ * @route GET /tracks
+ * @returns {Array} List of all tracks with signed URLs
+ */
 const getTracks = async (req, res) => {
     const manifest = loadManifest();
     const s3 = req.s3;
@@ -125,7 +148,12 @@ const getTracks = async (req, res) => {
     res.json(signedTracks);
 };
 
-// **GET /tracks/:type** - Retrieve tracks by type (WIP or REEL)
+/**
+ * GET /tracks/:type - Retrieve tracks by type (WIP, REEL, SCORING)
+ * @route GET /tracks/:type
+ * @param {string} type - Track type
+ * @returns {Array} List of tracks for the given type with signed URLs
+ */
 const getTracksByType = async (req, res) => {
     console.log('[API] Tracks request made');
     const { type } = req.params;
@@ -155,6 +183,16 @@ const getTracksByType = async (req, res) => {
     res.json(signedTracks);
 };
 
+/**
+ * POST /tracks - Upload a new track (WIP, REEL, or SCORING)
+ * @route POST /tracks
+ * @body {string} type - Track type
+ * @body {string} title - Track title
+ * @body {string} artist - Track artist
+ * @body {object} links - Track links
+ * @body {File[]} files - Uploaded audio files
+ * @returns {object} Uploaded track info
+ */
 const uploadTrack = async (req, res) => {
     const { type, title, artist, links } = req.body;
     const sanitizedType = sanitizeTrackType(type);
@@ -228,7 +266,12 @@ const uploadTrack = async (req, res) => {
     }
 };
 
-// **DELETE /tracks/:id** - Delete a track
+/**
+ * DELETE /tracks/:id - Delete a track by ID
+ * @route DELETE /tracks/:id
+ * @param {string} id - Track ID
+ * @returns {object} Deletion result
+ */
 const deleteTrackById = async (req, res) => {
     const { id } = req.params;
     const s3 = req.s3;
@@ -275,7 +318,13 @@ const deleteTrackById = async (req, res) => {
     }
 };
 
-// **PUT /tracks/:id** - Update track metadata (title, artist, links)
+/**
+ * PUT /tracks/:id - Update a track's metadata by ID
+ * @route PUT /tracks/:id
+ * @param {string} id - Track ID
+ * @body {object} updates - Updated metadata
+ * @returns {object} Updated track info
+ */
 const updateTrackById = async (req, res) => {
     const { id } = req.params;
     const { title, artist, links } = req.body;

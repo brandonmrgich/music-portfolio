@@ -1,25 +1,30 @@
 import AudioGrid, { renderAudioGrid } from './AudioPlayer/AudioGrid';
-import { useEffect, useState } from 'react';
-import { useTracks } from '../hooks/UseTracks';
+import { useAudio } from '../contexts/AudioContext';
+import { useEffect } from 'react';
 
 /**
- * In Work page component.
- * @returns {React.Component} The In Work page component
- *
+ * InWork - Page for displaying work-in-progress tracks.
+ * Uses AudioContext for track data and error/loading state.
+ * @param {object} props
+ * @param {boolean} props.isAdmin - If true, show admin features (unused here)
+ * @returns {JSX.Element}
  */
 const InWork = ({ isAdmin }) => {
-    const { tracks, isLoading, error, isComparison } = useTracks('wip');
+    const { tracks, tracksLoading, tracksError } = useAudio();
+    const isComparison = false;
+    const error = tracksError;
+    const isLoading = tracksLoading;
 
     useEffect(() => {
         if (error) console.error(error);
-    }, [tracks]);
+    }, [error]);
 
     return (
         <div className="in-work p-4 sm:p-6 max-w-4xl mx-auto space-y-12">
             <p className="text-lg text-gray-700 mb-4 text-center">
                 Here are some songs and demos I'm currently working on:
             </p>
-            {renderAudioGrid(tracks, isComparison, isLoading)}
+            {renderAudioGrid(tracks.wip, isComparison, isLoading)}
         </div>
     );
 };

@@ -2,8 +2,17 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Play, Pause, Volume, Volume1, Volume2, VolumeX } from 'lucide-react';
 import { useAudio } from '../../contexts/AudioContext';
 
-// TODO: Add optional image, default is current theme, else if image, set as player card background
-// with opacity lowered.
+/**
+ * ABCAudioPlayer - A flexible audio player card for a single track.
+ * Handles play/pause, seek, and volume, and syncs with global audio context.
+ * @param {object} props
+ * @param {string|number} props.id - Track ID
+ * @param {string} props.src - Audio source URL
+ * @param {string} props.title - Track title
+ * @param {string} props.artist - Track artist
+ * @param {object} props.links - Track links (artist, song)
+ * @param {function} [props.renderAdditionalControls] - Optional render prop for extra controls
+ */
 const ABCAudioPlayer = ({ id, src, title, artist, links, renderAdditionalControls }) => {
     const {
         error,
@@ -28,12 +37,21 @@ const ABCAudioPlayer = ({ id, src, title, artist, links, renderAdditionalControl
     const closeVolume = () => setVolumeOpen(false);
     const volumeRef = useRef(null);
 
+    /**
+     * Format seconds as mm:ss
+     * @param {number} time
+     * @returns {string}
+     */
     const formatTime = (time) => {
         const minutes = Math.floor(time / 60);
         const seconds = Math.floor(time % 60);
         return `${minutes}:${seconds.toString().padStart(2, '0')}`;
     };
 
+    /**
+     * Render the correct volume icon for the current volume.
+     * @returns {JSX.Element}
+     */
     const renderVolumeIcon = () => {
         if (volume <= 0) {
             return <VolumeX />;
@@ -46,13 +64,13 @@ const ABCAudioPlayer = ({ id, src, title, artist, links, renderAdditionalControl
         }
     };
 
-    // State management for text fade w/ volume slider
+    // Mask style for text fade effect with volume slider
     const [maskStyle, setMaskStyle] = useState({
         WebkitMaskImage: 'linear-gradient(to right, rgba(0, 0, 0, 1) 20%, rgba(0, 0, 0, 0))',
         maskImage: 'linear-gradient(to right, rgba(0, 0, 0, 1) 20%, rgba(0, 0, 0, 0))',
     });
 
-    // useEffect to update mask style when volumeOpen changes
+    // Update mask style when volumeOpen changes
     useEffect(() => {
         if (volumeOpen) {
             setMaskStyle({
@@ -69,32 +87,38 @@ const ABCAudioPlayer = ({ id, src, title, artist, links, renderAdditionalControl
         }
     }, [volumeOpen]);
 
+    // Close volume slider when clicking outside
     useEffect(() => {
         const handleClickOutside = (event) => {
             if (volumeRef.current && !volumeRef.current.contains(event.target)) {
                 closeVolume();
             }
         };
-
         if (volumeOpen) {
             document.addEventListener('mousedown', handleClickOutside);
         }
-
         return () => {
             document.removeEventListener('mousedown', handleClickOutside);
         };
     }, [volumeOpen]);
 
+    // Only initialize audio if not already present (idempotent)
     useEffect(() => {
-        console.log('init audio');
-        initializeAudio(id, src, volume);
+        initializeAudio(id, src);
+    }, [id, src, initializeAudio]);
 
-        return () => {
-            //pause(id); // Uncomment to stop the audio when user leaves the page
-        };
-    }, [src]);
+    if (error) console.log(error);
 
-    error && console.log(error);
+    /**
+     * Handle play/pause button click.
+     */
+    const handlePlayPause = () => {
+        if (isPlaying) {
+            pause(id);
+        } else {
+            play(id, src, { title, artist, links });
+        }
+    };
 
     return (
         <div className="sm:p-4 md:p-4 p-1 max-h-30 sm:max-h-100 md:max-h-100 rounded-lg border border-comfy-dark bg-comfy-accent2 bg-opacity-5 shadow-lg transition-all duration-300 ease-in-out transform md:hover:scale-110 lg:hover:scale-110 disabled:opacity-50 audio-player max-w-sm sm:max-w-sm md:max-w-xs lg:max-w-lg flex flex-col w-full ">
@@ -155,7 +179,7 @@ const ABCAudioPlayer = ({ id, src, title, artist, links, renderAdditionalControl
 
             <section className="playerControls flex items-center col-auto">
                 <button
-                    onClick={() => (isPlaying ? pause(id) : play(id, src))}
+                    onClick={handlePlayPause}
                     className="py-1.5 w-full bg-comfy-accent2 bg-opacity-50 text-comfy-dark
                     rounded-md hover:bg-opacity-70 transition-all duration-300 ease-in-out transform
                     hover:scale-95 disabled:opacity-50"

@@ -1,14 +1,24 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import AudioUpload from '../admin/AudioUpload';
 import AudioGrid, { renderAudioGrid } from './AudioPlayer/AudioGrid';
-import { useTracks } from '../hooks/UseTracks';
+import { useAudio } from '../contexts/AudioContext';
 
+/**
+ * Services - Page for displaying 'reel' (comparison) tracks and service info.
+ * Uses AudioContext for track data and error/loading state.
+ * @param {object} props
+ * @param {boolean} props.isAdmin - If true, show admin features (commented out)
+ * @returns {JSX.Element}
+ */
 const Services = ({ isAdmin }) => {
-    const { tracks, isLoading, error, isComparison } = useTracks('reel');
+    const { tracks, tracksLoading, tracksError } = useAudio();
+    const isComparison = true;
+    const error = tracksError;
+    const isLoading = tracksLoading;
 
     useEffect(() => {
         if (error) console.error(error);
-    }, [tracks]);
+    }, [error]);
 
     return (
         <div className="services p-4 sm:p-6 max-w-4xl mx-auto space-y-12">
@@ -35,13 +45,15 @@ const Services = ({ isAdmin }) => {
                 </h2>
             </section>
 
-            {renderAudioGrid(tracks, isComparison, isLoading)}
+            {renderAudioGrid(tracks.reel, isComparison, isLoading)}
 
-            {/*{isAdmin && (
+            {/*
+            {isAdmin && (
                 <section className="admin space-y-4 justify-self-center">
                     <AudioUpload />
                 </section>
-            )} */}
+            )}
+            */}
         </div>
     );
 };

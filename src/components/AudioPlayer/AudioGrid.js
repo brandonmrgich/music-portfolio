@@ -1,8 +1,16 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import AudioPlayer from './AudioPlayer';
 import AudioComparisonPlayer from './AudioComparisonPlayer';
 import AnimatedLoadingText from '../../utils/AnimatedLoadingText';
 
+/**
+ * AudioGrid - Displays a grid of audio player cards (standard or comparison).
+ * @param {object} props
+ * @param {Array} props.tracks - List of track objects
+ * @param {boolean} props.isComparison - If true, use AudioComparisonPlayer
+ * @param {boolean} props.isLoading - If true, show loading animation
+ * @returns {JSX.Element}
+ */
 const AudioGrid = ({ tracks, isComparison, isLoading }) => {
     if (isLoading) {
         return (
@@ -47,6 +55,13 @@ const AudioGrid = ({ tracks, isComparison, isLoading }) => {
     );
 };
 
+/**
+ * renderAudioGrid - Helper to render AudioGrid or loading/empty state.
+ * @param {Array} tracks
+ * @param {boolean} isComparison
+ * @param {boolean} isLoading
+ * @returns {JSX.Element}
+ */
 const renderAudioGrid = (tracks, isComparison, isLoading) => {
     if (isLoading) {
         return (

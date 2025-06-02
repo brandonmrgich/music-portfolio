@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { HashRouter as Router, Route, Routes, Link } from 'react-router-dom';
 import Footer from './components/Footer';
+import GlobalAudioBar from './components/AudioPlayer/GlobalAudioBar';
 import About from './components/About';
 import InWork from './components/InWork';
 import Services from './components/Services';
@@ -13,11 +14,16 @@ import ContactForm from './components/Contact/ContactForm';
 import Logo from './pictures/asailboat.png';
 import { SunMoon, Sun } from 'lucide-react';
 
+/**
+ * App - Main application shell.
+ * Handles global theming, navigation, and page routing.
+ * Renders the global audio bar and footer.
+ * @returns {JSX.Element}
+ */
 const App = () => {
     const isDevelopment = process.env.REACT_APP_ENV === 'development';
     const [isAdmin, setIsAdmin] = useState(isDevelopment);
-
-    const { darkMode, toggleDarkMode } = useTheme(); // Use dark mode from context
+    const { darkMode, toggleDarkMode } = useTheme();
 
     useEffect(() => {
         const token = localStorage.getItem('token');
@@ -44,12 +50,10 @@ const App = () => {
 
                 <nav className="relative z-10 p-4 border border-comfy-medium text-xl">
                     <div className="flex justify-between items-center max-w-full overflow-hidden">
-                        {}
                         <section className="ml-1 sm:ml-3 flex flex-row justify-between items-center">
                             <a href="https://linktr.ee/brandonamrgich" className="hidden sm:block">
                                 <img src={Logo} height="36" width="36" alt="Brandon Mrgich" />
                             </a>
-
                             <button
                                 onClick={toggleDarkMode}
                                 className="mx-1 sm:mx-3 scale-70 sm:scale-100 text-sm sm:text-base"
@@ -57,7 +61,6 @@ const App = () => {
                                 {darkMode ? <Sun /> : <SunMoon />}
                             </button>
                         </section>
-
                         <ul className="flex space-x-4">
                             <li>
                                 <Link
@@ -111,6 +114,8 @@ const App = () => {
                     </Routes>
                 </main>
 
+                {/* Global audio bar for current playing track */}
+                <GlobalAudioBar />
                 <Footer />
                 <div>
                     <ContactForm />

@@ -1,5 +1,10 @@
 const { getS3Instance } = require('../utils/S3Helper');
 
+/**
+ * GET /heartbeat/aws - Check AWS S3 connectivity and list buckets.
+ * @route GET /heartbeat/aws
+ * @returns {object} S3 bucket list or error
+ */
 const getS3Heartbeat = (req, res) => {
     const s3 = req.s3; // getS3Instance();
 
@@ -18,6 +23,11 @@ const getS3Heartbeat = (req, res) => {
     });
 };
 
+/**
+ * GET /heartbeat - Simple server health check.
+ * @route GET /heartbeat
+ * @returns {object} Server status and timestamp
+ */
 const getHeartbeat = async (req, res) => {
     res.status(200).json({
         status: 'OK',

@@ -7,6 +7,11 @@ import './index.css';
 
 import AppProvider from './contexts/AppProvider';
 
+/**
+ * Entry point for the React application.
+ * Wraps the App in AppProvider for global context (theme, audio, etc).
+ * Renders the app to the root DOM node.
+ */
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
     <AppProvider>
