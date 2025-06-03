@@ -42,13 +42,13 @@ const AudioPlayer = ({ id, src, title, artist, links }) => {
     const renderAdditionalControls = () => (
         <button
             onClick={handleLike}
-            className="relative bg-none bg-opacity-80 text-comfy-dark transition-all duration-300 ease-in-out transform hover:scale-110 disabled:opacity-50 hover:cursor-pointer px-2 py-0"
+            className="relative bg-none bg-opacity-80 text-text-light dark:text-text-dark transition-all duration-300 ease-in-out transform hover:scale-110 disabled:opacity-50 hover:cursor-pointer px-2 py-0"
         >
             <div className="relative justify-between items-start">
                 <Heart
-                    className={`w-5 h-5 text-comfy-accent1 hover:text-red-500 transition-color duration-500 ${hasLiked ? 'fill-current text-red-500' : 'fill-none'}`}
+                    className={`w-5 h-5 text-accent-light dark:text-accent-dark hover:text-red-500 transition-color duration-500 ${hasLiked ? 'fill-current text-red-500' : 'fill-none'}`}
                 />
-                <span className="text-sm text-comfy-dark">{likes}</span>
+                <span className="text-sm text-text-light dark:text-text-dark">{likes}</span>
             </div>
         </button>
     );
@@ -61,7 +61,7 @@ const AudioPlayer = ({ id, src, title, artist, links }) => {
             artist={artist}
             links={links}
             meta={{ title, artist, links }}
-            renderAdditionalControls={renderAdditionalControls}
+            // renderAdditionalControls={renderAdditionalControls}
         />
     );
 };

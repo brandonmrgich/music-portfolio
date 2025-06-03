@@ -101,8 +101,8 @@ const SocialMediaLink = ({ href, icon: Icon, colorClass, label }) => {
     return (
         <li className="group flex flex-col items-center p-2 rounded-full bg-opacity-0 hover:bg-opacity-10 opacity-85 font-thin transition">
             <a className="flex flex-col items-center space-y-1 transition-colors" href={href}>
-                <Icon className={`text-3xl max-h-6 ${colorClass} group-hover:text-comfy-dark`} />
-                <span className="text-comfy-accent2 group-hover:text-comfy-tertiary transition-colors">
+                <Icon className={`text-3xl max-h-6 ${colorClass} group-hover:text-text-light dark:group-hover:text-text-dark`} />
+                <span className="text-text-light dark:text-text-dark group-hover:text-accent-light dark:group-hover:text-accent-dark transition-colors">
                     {label}
                 </span>
             </a>

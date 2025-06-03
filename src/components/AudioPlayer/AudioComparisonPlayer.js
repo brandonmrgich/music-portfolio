@@ -33,16 +33,16 @@ const AudioComparisonPlayer = ({ id, before, after, title, artist, links }) => {
     const renderAdditionalControls = () => (
         <button
             onClick={handleToggle}
-            className="text-sm relative bg-none bg-opacity-90 text-comfy-dark px-4 py-2 transition-all duration-300 ease-in-out transform hover:scale-95 disabled:opacity-50 hover:cursor-pointer"
+            className="text-sm relative bg-none bg-opacity-90 text-text-light dark:text-text-dark px-4 py-2 transition-all duration-300 ease-in-out transform hover:scale-95 disabled:opacity-50 hover:cursor-pointer"
         >
             {isBeforeAudio ? (
                 <div className="flex flex-grow row-auto">
-                    <FaToggleOff className="text-red-500" />
+                    <FaToggleOff className="text-accent-light dark:text-accent-dark" />
                     <span>A</span>
                 </div>
             ) : (
                 <div>
-                    <FaToggleOn className="text-green-500" />
+                    <FaToggleOn className="text-accent-light dark:text-accent-dark" />
                     <span>B</span>
                 </div>
             )}
