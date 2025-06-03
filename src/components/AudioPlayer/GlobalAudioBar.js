@@ -100,18 +100,20 @@ const GlobalAudioBar = () => {
             >
                 <button
                     onClick={() => (isPlaying ? pause(id) : play(id, src, { title, artist, links }))}
-                    className="p-0.5 rounded-full bg-comfy-accent2 hover:bg-comfy-accent2/80 dark:bg-comfydark-accent2 dark:hover:bg-comfydark-accent2/80 text-white shadow transition-colors duration-150 focus:outline-none h-7 w-7 flex items-center justify-center sm:h-6 sm:w-6"
+                    className="p-0.5 rounded-full bg-button-light dark:bg-button-dark hover:bg-button-light/80 dark:hover:bg-button-dark/80 text-buttonText-light dark:text-buttonText-dark shadow transition-colors duration-150 focus:outline-none h-7 w-7 flex items-center justify-center sm:h-6 sm:w-6"
                     aria-label={isPlaying ? 'Pause' : 'Play'}
                     style={{ minWidth: 0, minHeight: 0 }}
                 >
-                    {isPlaying ? <Pause size={16} /> : <Play size={16} />}
+                    {isPlaying ? <Pause size={16} className="text-playicon-light dark:text-playicon-dark" /> : <Play size={16} className="text-playicon-light dark:text-playicon-dark" />}
                 </button>
-                <span className="truncate font-semibold text-comfy-accent1 dark:text-comfydark-accent1 text-xs max-w-[7rem] leading-tight" title={title}>
-                    {title}
-                </span>
-                <span className="truncate text-comfy-accent1 dark:text-comfydark-tertiary text-xs max-w-[6rem] leading-tight opacity-80" title={artist}>
-                    {artist}
-                </span>
+                <div className="flex flex-row flex-1 min-w-0 items-center gap-1">
+                    <span className="truncate font-semibold text-playercardText-light dark:text-playercardText-dark text-[11px] sm:text-xs md:text-sm max-w-[6rem] sm:max-w-[10rem] leading-tight" title={title}>
+                        {title}
+                    </span>
+                    <span className="truncate text-playercardText-light dark:text-playercardText-dark text-[10px] sm:text-xs md:text-sm max-w-[5rem] sm:max-w-[8rem] leading-tight opacity-80" title={artist}>
+                        {artist}
+                    </span>
+                </div>
                 <button
                     onClick={() => setMinimized(false)}
                     className="ml-auto p-0.5 rounded-full bg-transparent hover:bg-white/30 dark:hover:bg-comfydark-dark/30 transition-colors h-7 w-7 flex items-center justify-center sm:h-6 sm:w-6"
@@ -138,19 +140,19 @@ const GlobalAudioBar = () => {
             {/* Track Info */}
             <div className="flex flex-col flex-grow min-w-0 relative z-10">
                 <div className="flex items-center gap-1 min-w-0 sm:gap-2">
-                    <span className="truncate font-semibold text-comfy-accent1 dark:text-comfydark-accent1 text-sm max-w-[8rem] sm:text-base sm:max-w-xs">
+                    <span className="truncate font-semibold text-playercardText-light dark:text-playercardText-dark text-sm max-w-[8rem] sm:text-base sm:max-w-xs">
                         <a href={links?.song || '#'} target="_blank" rel="noopener noreferrer">
                             {title}
                         </a>
                     </span>
-                    <span className="truncate text-comfy-accent1 dark:text-comfydark-tertiary text-xs opacity-80 max-w-[7rem] sm:text-sm sm:max-w-xs">
+                    <span className="truncate text-playercardText-light dark:text-playercardText-dark text-xs opacity-80 max-w-[7rem] sm:text-sm sm:max-w-xs">
                         <a href={links?.artist || '#'} target="_blank" rel="noopener noreferrer">
                             {artist}
                         </a>
                     </span>
                 </div>
                 <div className="flex items-center gap-1 w-full sm:gap-2">
-                    <span className="text-comfy-accent1 dark:text-comfydark-accent2 text-xs font-mono">
+                    <span className="text-accent-light dark:text-accent-dark text-xs font-mono">
                         {formatTime(currentTime)}
                     </span>
                     <input
@@ -159,10 +161,10 @@ const GlobalAudioBar = () => {
                         max={duration}
                         value={currentTime}
                         onChange={(e) => seek(id, Number(e.target.value))}
-                        className="flex-grow accent-comfy-accent2 dark:accent-comfydark-accent2 opacity-70 hover:opacity-100 transition-opacity duration-150 mx-1 h-2 rounded-lg bg-primary-light2/40 dark:bg-comfydark-medium/40 sm:mx-2"
+                        className="flex-grow accent-accent-light dark:accent-accent-dark opacity-80 dark:opacity-100 hover:cursor-pointer mx-1 h-2 rounded-lg bg-primary-light2/40 dark:bg-comfydark-medium/40 sm:mx-2"
                         aria-label="Seek audio"
                     />
-                    <span className="text-comfy-accent1 dark:text-comfydark-accent2 text-xs font-mono">
+                    <span className="text-accent-light dark:text-accent-dark text-xs font-mono">
                         {formatTime(duration)}
                     </span>
                 </div>
@@ -170,10 +172,10 @@ const GlobalAudioBar = () => {
             {/* Play/Pause Button */}
             <button
                 onClick={() => (isPlaying ? pause(id) : play(id, src, { title, artist, links }))}
-                className="mx-1 p-2 rounded-full bg-comfy-accent2 hover:bg-comfy-accent2/80 dark:bg-comfydark-accent2 dark:hover:bg-comfydark-accent2/80 text-white shadow-lg transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-primary-light1/60 dark:focus:ring-comfydark-accent2/60 relative z-10 h-9 w-9 flex items-center justify-center sm:mx-2 sm:p-3 sm:h-auto sm:w-auto"
+                className="mx-1 p-2 rounded-full bg-button-light dark:bg-button-dark hover:bg-button-light/80 dark:hover:bg-button-dark/80 text-buttonText-light dark:text-buttonText-dark shadow-lg transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-primary-light1/60 dark:focus:ring-comfydark-accent2/60 relative z-10 h-9 w-9 flex items-center justify-center sm:mx-2 sm:p-3 sm:h-auto sm:w-auto"
                 aria-label={isPlaying ? 'Pause' : 'Play'}
             >
-                {isPlaying ? <Pause size={22} /> : <Play size={22} />}
+                {isPlaying ? <Pause size={22} className="text-playicon-light dark:text-playicon-dark" /> : <Play size={22} className="text-playicon-light dark:text-playicon-dark" />}
             </button>
             {/* Volume Control (hide on xs, show on sm+) */}
             <div className="hidden sm:flex items-center gap-2 min-w-[100px] relative z-10">
@@ -184,11 +186,11 @@ const GlobalAudioBar = () => {
                     step="0.01"
                     value={volume}
                     onChange={(e) => setVolume(id, parseFloat(e.target.value))}
-                    className="w-20 accent-comfy-accent2 dark:accent-comfydark-accent2 opacity-70 hover:opacity-100 transition-opacity duration-150 h-2 rounded-lg bg-primary-light2/40 dark:bg-comfydark-medium/40"
+                    className="w-20 accent-accent-light dark:accent-accent-dark opacity-80 dark:opacity-100 hover:cursor-pointer h-2 rounded-lg bg-primary-light2/40 dark:bg-comfydark-medium/40"
                     aria-label="Set volume"
                 />
                 <span className="text-comfy-accent1 dark:text-comfydark-accent2">
-                    {renderVolumeIcon()}
+                    {renderVolumeIcon() && React.cloneElement(renderVolumeIcon(), { className: 'text-playicon-light dark:text-playicon-dark' })}
                 </span>
             </div>
             {/* Minimize Button */}

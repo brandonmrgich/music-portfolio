@@ -20,12 +20,12 @@ const About = ({ isAdmin }) => {
 
     return (
         <div className="about p-4 sm:p-6 max-w-4xl mx-auto space-y-12">
-            <h1 className="text-4xl font-bold text-center mb-4 ">Brandon Mrgich</h1>
+            <h1 className="text-4xl font-bold text-center mb-4 text-text-light dark:text-text-dark">Brandon Mrgich</h1>
             <div className="flex flex-col items-center md:flex-row md:items-start mb-8 flex-wrap">
                 <div className="mb-4 md:mb-0 md:mr-8 flex justify-center">
                     <a href="https://linktr.ee/brandonamrgich">
                         <img
-                            className="border border-secondary-light aspect-square shadow-lg rounded-full "
+                            className="border border-border-light dark:border-border-dark aspect-square shadow-lg rounded-full "
                             src={profilePicture}
                             alt="Profile"
                             width="256"
@@ -56,19 +56,19 @@ const About = ({ isAdmin }) => {
             </div>
 
             <section className="text-center mb-8">
-                <p className="text-lg text-secondary-dark mb-4">
+                <p className="text-lg text-text-light dark:text-text-dark mb-4">
                     Brandon is a multi-instrumentalist based out of Florida, with a lifelong passion
                     for music. From a young age, his fascination with sound has driven him to
                     explore and create. On March 1st 2024, along with
                     <a
-                        className="text-accent-DEFAULT hover:text-accent-dark font-light"
+                        className="text-accent-light dark:text-accent-dark hover:text-accent-dark font-light"
                         href={contentLinks.artistBlueshades.link}
                     >
                         <span> {contentLinks.artistBlueshades.text}, </span>
                     </a>
                     they released the collaborative project
                     <a
-                        className="text-accent-DEFAULT hover:text-accent-dark font-light"
+                        className="text-accent-light dark:text-accent-dark hover:text-accent-dark font-light"
                         href={contentLinks.albumGota.link}
                     >
                         <span> {contentLinks.albumGota.text}. </span>

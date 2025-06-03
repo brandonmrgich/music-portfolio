@@ -34,3 +34,10 @@ a {
     position: relative;
     z-index: 10; /* Ensure links are above everything else */
 }
+
+:root {
+  /* --main-bg-image: url('/public/asailboat.png');  */
+}
+.dark {
+  --main-bg-image: url('/public/background1.jpg'); 
+}

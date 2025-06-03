@@ -35,20 +35,11 @@ const App = () => {
     return (
         <Router>
             <div
-                className={`w-full min-h-screen flex flex-col ${
-                    darkMode
-                        ? 'text-comfydark-light bg-cover bg-center bg-fixed'
-                        : 'text-comfy-dark bg-gradient-to-b from-comfy-light to-comfy-medium'
-                }`}
-                style={{
-                    ...(darkMode && {
-                        backgroundImage: "url('/background1.jpg')",
-                    }),
-                }}
+                className="w-full min-h-screen flex flex-col text-text-light dark:text-text-dark bg-surface-light dark:bg-surface-dark bg-cover bg-center"
+                style={{ backgroundImage: 'var(--main-bg-image)' }}
             >
-                {darkMode && <div className="absolute inset-0 bg-overlay blur-lg"></div>}
 
-                <nav className="relative z-10 p-4 border border-comfy-medium text-xl">
+                <nav className="relative z-10 p-4 border border-border-light dark:border-border-dark text-xl bg-surface-light dark:bg-surface-dark">
                     <div className="flex justify-between items-center max-w-full overflow-hidden">
                         <section className="ml-1 sm:ml-3 flex flex-row justify-between items-center">
                             <a href="https://linktr.ee/brandonamrgich" className="hidden sm:block">
@@ -56,7 +47,7 @@ const App = () => {
                             </a>
                             <button
                                 onClick={toggleDarkMode}
-                                className="mx-1 sm:mx-3 scale-70 sm:scale-100 text-sm sm:text-base"
+                                className="mx-1 sm:mx-3 scale-70 sm:scale-100 text-sm sm:text-base text-text-light dark:text-text-dark"
                             >
                                 {darkMode ? <Sun /> : <SunMoon />}
                             </button>
@@ -65,7 +56,7 @@ const App = () => {
                             <li>
                                 <Link
                                     to="/"
-                                    className="text-comfy-dark hover:text-comfy-accent1 focus:text-comfy-accent2 transition-color"
+                                    className="text-text-light dark:text-text-dark hover:text-accent-light dark:hover:text-accent-dark focus:text-accent-light dark:focus:text-accent-dark transition-color"
                                 >
                                     About
                                 </Link>
@@ -73,7 +64,7 @@ const App = () => {
                             <li>
                                 <Link
                                     to="/in-work"
-                                    className="text-comfy-dark hover:text-comfy-accent1 focus:text-comfy-accent2 transition-color"
+                                    className="text-text-light dark:text-text-dark hover:text-accent-light dark:hover:text-accent-dark focus:text-accent-light dark:focus:text-accent-dark transition-color"
                                 >
                                     <span className="hidden sm:inline md:inline">
                                         Work In Progress
@@ -84,7 +75,7 @@ const App = () => {
                             <li>
                                 <Link
                                     to="/services"
-                                    className="text-comfy-dark hover:text-comfy-accent1 focus:text-comfy-accent2 transition-color"
+                                    className="text-text-light dark:text-text-dark hover:text-accent-light dark:hover:text-accent-dark focus:text-accent-light dark:focus:text-accent-dark transition-color"
                                 >
                                     Services
                                 </Link>
@@ -92,7 +83,7 @@ const App = () => {
                             <li>
                                 <Link
                                     to="/scoring"
-                                    className="text-comfy-dark hover:text-comfy-accent1 focus:text-comfy-accent2 transition-color"
+                                    className="text-text-light dark:text-text-dark hover:text-accent-light dark:hover:text-accent-dark focus:text-accent-light dark:focus:text-accent-dark transition-color"
                                 >
                                     Scoring
                                 </Link>

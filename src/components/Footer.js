@@ -21,13 +21,13 @@ const Footer = () => {
                 <div className="flex justify-center mb-2">
                     <a
                         href="https://github.com/brandonmrgich/music-portfolio"
-                        className="text-gray-400 text-sm font-light flex items-center space-x-1 hover:text-comfy-accent2 transition-colors duration-300"
+                        className="text-text-light dark:text-text-dark text-sm font-light flex items-center space-x-1 hover:text-accent-light dark:hover:text-accent-dark transition-colors duration-300"
                     >
                         <FaGithub className="w-4 h-4" />
                         <span>GitHub</span>
                     </a>
                 </div>
-                <p className="flex justify-center arr text-xs font-extralight mb-6 text-gray-400">
+                <p className="flex justify-center arr text-xs font-extralight mb-6 text-text-light dark:text-text-dark opacity-70">
                     &copy; 1999-2025 Brandon Mrgich. All rights reserved.
                 </p>
             </section>

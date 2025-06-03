@@ -32,20 +32,20 @@ const ContactForm = () => {
         <div>
             {/* Envelope icon button always visible */}
             <button
-                className="fixed bottom-4 right-4 z-50 bg-comfy-light p-2 rounded-full shadow-lg"
+                className="fixed bottom-4 right-4 z-50 bg-surface-light dark:bg-surface-dark p-2 rounded-full shadow-lg border border-border-light dark:border-border-dark"
                 onClick={openForm}
                 aria-label="Open Contact Form"
             >
-                <FaEnvelope size={24} className="text-comfy-dark" />
+                <FaEnvelope size={24} className="text-text-light dark:text-text-dark" />
             </button>
 
             {isFormOpen && (
                 <div
                     ref={formRef}
-                    className="fixed bottom-16 right-4 z-50 w-96 bg-comfy-light bg-opacity-75 border border-comfy-dark p-6 rounded-lg shadow-lg space-y-4"
+                    className="fixed bottom-16 right-4 z-50 w-96 bg-surface-light dark:bg-surface-dark bg-opacity-90 border border-border-light dark:border-border-dark p-6 rounded-lg shadow-lg space-y-4"
                 >
                     <button
-                        className="absolute top-2 right-2 text-comfy-dark focus:outline-none"
+                        className="absolute top-2 right-2 text-text-light dark:text-text-dark focus:outline-none"
                         onClick={closeForm}
                     >
                         <FaTimes size={18} />
@@ -55,7 +55,7 @@ const ContactForm = () => {
                             <input
                                 type="text"
                                 placeholder="Your Name"
-                                className="w-full p-4 border rounded bg-comfy-light bg-opacity-25 border-comfy-dark text-comfy-dark placeholder-comfy-dark focus:outline-none focus:ring-2 focus:ring-comfy-dark"
+                                className="w-full p-4 border rounded bg-surface-light dark:bg-surface-dark bg-opacity-60 border-border-light dark:border-border-dark text-text-light dark:text-text-dark placeholder-text-light dark:placeholder-text-dark focus:outline-none focus:ring-2 focus:ring-accent-light dark:focus:ring-accent-dark"
                                 required
                                 value={formName}
                                 onChange={(e) => setFormName(e.target.value)}
@@ -65,7 +65,7 @@ const ContactForm = () => {
                             <input
                                 type="email"
                                 placeholder="Your Email"
-                                className="w-full p-4 border rounded bg-comfy-light bg-opacity-25 border-comfy-dark text-comfy-dark placeholder-comfy-dark focus:outline-none focus:ring-2 focus:ring-comfy-dark"
+                                className="w-full p-4 border rounded bg-surface-light dark:bg-surface-dark bg-opacity-60 border-border-light dark:border-border-dark text-text-light dark:text-text-dark placeholder-text-light dark:placeholder-text-dark focus:outline-none focus:ring-2 focus:ring-accent-light dark:focus:ring-accent-dark"
                                 required
                                 value={formEmail}
                                 onChange={(e) => setFormEmail(e.target.value)}
@@ -74,7 +74,7 @@ const ContactForm = () => {
                         <div className="space-y-2">
                             <textarea
                                 placeholder="Your Message"
-                                className="w-full p-4 border rounded bg-comfy-light bg-opacity-25 border-comfy-dark text-comfy-dark placeholder-comfy-dark resize-none focus:outline-none focus:ring-2 focus:ring-comfy-dark"
+                                className="w-full p-4 border rounded bg-surface-light dark:bg-surface-dark bg-opacity-60 border-border-light dark:border-border-dark text-text-light dark:text-text-dark placeholder-text-light dark:placeholder-text-dark resize-none focus:outline-none focus:ring-2 focus:ring-accent-light dark:focus:ring-accent-dark"
                                 required
                                 value={formMessage}
                                 onChange={(e) => setFormMessage(e.target.value)}
@@ -83,7 +83,7 @@ const ContactForm = () => {
                         <div className="space-y-2">
                             <button
                                 type="submit"
-                                className="w-full bg-comfy-light bg-opacity-50 text-comfy-dark px-4 py-2 rounded-lg hover:bg-gray-600 transition-colors"
+                                className="w-full bg-button-light dark:bg-button-dark text-buttonText-light dark:text-buttonText-dark px-4 py-2 rounded-lg hover:bg-accent-light dark:hover:bg-accent-dark transition-colors"
                                 onClick={sendMessage}
                             >
                                 Send
