@@ -11,7 +11,22 @@ import {
     FaBandcamp,
     FaSoundcloud,
 } from "react-icons/fa";
-import AudiusIcon from "../assets/images/audius-icon.jpeg";
+import AudiusIcon from "./icons/AudiusIcon";
+
+// Trademark brand colors for each platform
+const BRAND_COLORS = {
+    Google: '#4285F4',
+    Spotify: '#1DB954',
+    'Youtube Channel': '#FF0000', // YouTube Channel (red)
+    'YouTube Music': '#FF0000',      // YouTube Music (white)
+    Apple: '#000000',
+    Instagram: '#E4405F',
+    Tiktok: '#010101',
+    Amazon: '#FF9900',
+    Bandcamp: '#629AA9',
+    SoundCloud: '#FF5500',
+    Audius: '#CC47FF', // Audius purple
+};
 
 const Links = {
     Social: {
@@ -64,16 +79,7 @@ const Links = {
         },
         audius: {
             href: "https://audius.co/brandonmrgich",
-            icon: () => (
-                <img
-                    className="text-4xl"
-                    src={AudiusIcon}
-                    height="32"
-                    width="32"
-                    alt="Audius"
-                    style={{ paddingTop: "3px" }}
-                />
-            ),
+            icon: AudiusIcon,
             label: "Audius",
         },
         soundcloud: {
@@ -84,14 +90,38 @@ const Links = {
     },
 };
 
+// Pastel red for hover
+const HOVER_COLOR = '#F7B2AD';
+
 const SocialMediaLink = ({ href, icon: Icon, label }) => {
+    // Get the brand color for the icon
+    const brandColor = BRAND_COLORS[label] || BRAND_COLORS[label.replace(/ .*/,"")] || '#fff';
     return (
         <li className="group flex flex-col items-center p-2 rounded-full bg-opacity-0 hover:bg-opacity-10 font-thin transition">
-            <a className="flex flex-col items-center space-y-1 transition-colors" href={href} target="_blank" rel="noopener noreferrer">
-                <Icon className="text-3xl max-h-6 text-playercardText-dark group-hover:text-accent-dark transition-colors duration-200" />
-                <span className="text-playercardText-dark group-hover:text-accent-dark transition-colors duration-200 text-xs font-medium tracking-wide">
+            <a
+                className="flex flex-col items-center space-y-1 transition-colors"
+                href={href}
+                target="_blank"
+                rel="noopener noreferrer"
+            >
+                <Icon
+                    className="text-3xl max-h-6 transition-colors duration-200"
+                    style={{
+                        color: brandColor,
+                    }}
+                />
+                <span
+                    className="transition-colors duration-200 text-xs font-medium tracking-wide"
+                    style={{ color: '#fff' }}
+                >
                     {label}
                 </span>
+                <style>{`
+                  .group:hover .text-3xl,
+                  .group:hover .transition-colors {
+                    color: ${HOVER_COLOR} !important;
+                  }
+                `}</style>
             </a>
         </li>
     );

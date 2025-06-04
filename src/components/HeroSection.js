@@ -3,7 +3,7 @@ import beachImg from '../assets/images/profile-beach.jpeg';
 
 const heroData = {
   heading: "Brandon Mrgich",
-  tagline: "Producer, Mixer, Composer | Modern Music Portfolio",
+  tagline: "From Indie Songs to Cinematic Scores\nMulti-Instrumentalist • Producer • Sound Designer • Software Engineer",
   background: beachImg,
 };
 
@@ -73,7 +73,7 @@ const HeroSection = ({ onHeroExit, scrollLocked }) => {
           <h1 className="text-4xl md:text-6xl font-extrabold mb-4 text-accent-dark drop-shadow-lg relative" style={{ zIndex: 2 }}>
             {heroData.heading}
           </h1>
-          <p className="text-xl md:text-2xl text-comfy-accent1 mb-6 max-w-2xl mx-auto relative" style={{ zIndex: 2 }}>
+          <p className="text-xl md:text-2xl text-comfy-accent1 mb-6 max-w-2xl mx-auto relative whitespace-pre-line" style={{ zIndex: 2 }}>
             {heroData.tagline}
           </p>
         </div>

@@ -3,9 +3,9 @@ import ContentLinks from '../utils/ContentLinks';
 
 const navLinks = [
   { label: 'Home', section: 'hero' },
+  { label: 'Scoring', section: 'scoring' },
   { label: 'In Work', section: 'inwork' },
   { label: 'Services', section: 'services' },
-  { label: 'Scoring', section: 'scoring' },
   { label: 'About', section: 'about' },
 ];
 

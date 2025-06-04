@@ -1,38 +1,36 @@
 import React from 'react';
 
-const wavePaths = [
-  // Variant 1
-  "M0,40 C360,120 1080,-40 1440,60 L1440,100 L0,100 Z",
-  // Variant 2 (slightly different wave)
-  "M0,60 C480,0 960,120 1440,40 L1440,100 L0,100 Z"
-];
+const SectionDivider = ({ className = '', style = {}, variant = 0 }) => {
+  // Subtler, low-opacity gradient for center-strong blur (variant 0)
+  const centerGradient =
+    'linear-gradient(to bottom, transparent 0%, rgba(35,35,35,0.04) 8%, rgba(35,35,35,0.12) 18%, rgba(35,35,35,0.25) 40%, rgba(35,35,35,0.25) 60%, rgba(35,35,35,0.12) 82%, rgba(35,35,35,0.04) 92%, transparent 100%)';
+  // Stronger, extended top-strong blur for variant 1
+  const topGradient =
+    'linear-gradient(to bottom, rgba(35,35,35,0.25) 0%, rgba(35,35,35,0.12) 30%, transparent 100%)';
 
-const SectionDivider = ({ className = '', flip = false, variant = 0 }) => (
-  <div
-    className={`w-full overflow-hidden leading-none ${className}`}
-    style={{ lineHeight: 0, transform: flip ? 'scaleY(-1)' : undefined }}
-  >
-    <svg
-      viewBox="0 0 1440 100"
-      fill="none"
-      xmlns="http://www.w3.org/2000/svg"
-      className="w-full h-16 md:h-24"
-      preserveAspectRatio="none"
-    >
-      <defs>
-        <linearGradient id="waveGradient" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stopColor="rgba(44,44,54,0.5)" />
-          <stop offset="80%" stopColor="rgba(44,44,54,0.3)" />
-          <stop offset="100%" stopColor="rgba(44,44,54,0)" />
-        </linearGradient>
-      </defs>
-      <path
-        d={wavePaths[variant % wavePaths.length]}
-        fill="url(#waveGradient)"
-        style={{ filter: 'blur(2px)' }}
+  return (
+    <div className={`relative w-full h-16 my-0 ${className}`} style={style}>
+      {/* Glassy base line with more pronounced shadow */}
+      <div
+        className="absolute inset-0 w-full h-full"
+        style={{
+          background: 'rgba(35, 35, 35, 0.18)',
+          backdropFilter: 'blur(6px)',
+          WebkitBackdropFilter: 'blur(6px)',
+          boxShadow: '0 8px 32px 0 rgba(35,35,35,0.28), 0 -8px 32px 0 rgba(35,35,35,0.28)',
+          pointerEvents: 'none',
+        }}
       />
-    </svg>
-  </div>
-);
+      {/* Subtle gradient overlay for fade/blur effect */}
+      <div
+        className="absolute inset-0 w-full h-full pointer-events-none"
+        style={{
+          background: variant === 0 ? centerGradient : topGradient,
+          filter: variant === 0 ? 'blur(0.5px)' : undefined,
+        }}
+      />
+    </div>
+  );
+};
 
 export default SectionDivider; 

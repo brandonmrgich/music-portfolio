@@ -10,6 +10,7 @@ import GlobalAudioBar from './components/AudioPlayer/GlobalAudioBar';
 import Footer from './components/Footer';
 import backgroundImg from './assets/images/background1.jpg';
 import SectionDivider from './components/SectionDivider';
+import beachImg from './assets/images/profile-beach.jpeg';
 
 /**
  * App - Main application shell.
@@ -43,7 +44,7 @@ const App = () => {
         if (!scrollLocked) return;
         setScrollLocked(false);
         setTimeout(() => {
-            inWorkRef.current?.scrollIntoView({ behavior: 'smooth' });
+            scoringRef.current?.scrollIntoView({ behavior: 'smooth' });
         }, 10);
     }, [scrollLocked]);
 
@@ -60,13 +61,13 @@ const App = () => {
             />
             <main className="flex flex-col flex-grow relative z-10">
                 <section ref={heroRef} id="hero"><HeroSection onHeroExit={unlockAndScroll} scrollLocked={scrollLocked} /></section>
+                <SectionDivider variant={1} />
+                <section ref={scoringRef} id="scoring"><ScoringSection /></section>
                 <SectionDivider variant={0} />
                 <section ref={inWorkRef} id="inwork" className="scroll-mt-24"><InWorkSection /></section>
-                <SectionDivider variant={1} flip />
+                <SectionDivider variant={0} />
                 <section ref={servicesRef} id="services"><ServicesSection /></section>
                 <SectionDivider variant={0} />
-                <section ref={scoringRef} id="scoring"><ScoringSection /></section>
-                <SectionDivider variant={1} flip />
                 <section ref={aboutRef} id="about"><AboutSection /></section>
             </main>
             <GlobalAudioBar />
