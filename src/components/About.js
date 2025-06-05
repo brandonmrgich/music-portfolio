@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import defaultPfp from '../pictures/profile-default.jpg';
+import defaultPfp from '../assets/images/profile-default.jpg';
 import getRandomProfilePicture from '../utils/getRandomProfilePicture';
 import { SocialMediaLink, Links } from './SocialMediaLink';
 import ContentLinks from '../utils/ContentLinks';

@@ -1,10 +1,10 @@
 import React from 'react';
-import defaultPfp from '../pictures/profile-default.jpg';
+import defaultPfp from '../assets/images/profile-default.jpg';
 
 // Get a random pfp
 export function getRandomProfilePicture() {
     const images = require.context(
-        '../pictures',
+        '../assets/images',
         false,
         /^\.\/profile-.*\.(png|jpe?g|svg|gif|bmp|webp|aif)$/
     );

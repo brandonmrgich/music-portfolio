@@ -1,0 +1,337 @@
+import React, { useState, useEffect, useRef } from 'react';
+import { Play, Pause, Volume, Volume1, Volume2, VolumeX } from 'lucide-react';
+import { useAudio } from '../../contexts/AudioContext';
+
+/**
+ * BaseAudioPlayer - A flexible audio player card for a single track.
+ * Handles play/pause, seek, and volume, and syncs with global audio context.
+ * @param {object} props
+ * @param {string|number} props.id - Track ID
+ * @param {string} props.src - Audio source URL
+ * @param {string} props.title - Track title
+ * @param {string} props.artist - Track artist
+ * @param {object} props.links - Track links (artist, song)
+ * @param {function} [props.renderAdditionalControls] - Optional render prop for extra controls
+ * @param {boolean} [props.compact] - If true, render a minimal UI
+ * @param {string} [props.className] - Additional className for styling
+ */
+const BaseAudioPlayer = ({ id, src, title, artist, links = {}, renderAdditionalControls, compact = false, className = '' }) => {
+    const {
+        error,
+        play,
+        pause,
+        seek,
+        setVolume,
+        playingStates,
+        currentTimes,
+        durations,
+        volumes,
+        initializeAudio,
+    } = useAudio();
+
+    const isPlaying = playingStates[id];
+    const currentTime = currentTimes[id] || 0;
+    const duration = durations[id] || 0;
+    const volume = volumes[id] !== undefined ? volumes[id] : 0.5;
+    const [volumeOpen, setVolumeOpen] = useState(false);
+
+    const openVolume = () => setVolumeOpen(true);
+    const closeVolume = () => setVolumeOpen(false);
+    const volumeRef = useRef(null);
+
+    const formatTime = (time) => {
+        const minutes = Math.floor(time / 60);
+        const seconds = Math.floor(time % 60);
+        return `${minutes}:${seconds.toString().padStart(2, '0')}`;
+    };
+
+    // Animated, interactive volume icon
+    const iconRef = useRef(null);
+    const getVolumeColor = () => {
+        // Light gray at 0, accent at 1
+        const accent = '247,178,173'; // rgb for accent-dark
+        const gray = '203,191,175'; // rgb for border-light
+        const t = volume; // 0 to 1
+        // Interpolate between gray and accent
+        const r = Math.round((1 - t) * 203 + t * 247);
+        const g = Math.round((1 - t) * 191 + t * 178);
+        const b = Math.round((1 - t) * 175 + t * 173);
+        return `rgb(${r},${g},${b})`;
+    };
+    const getIcon = () => {
+        const iconProps = {
+            size: 28,
+            style: {
+                color: getVolumeColor(),
+                filter: 'drop-shadow(0 1px 2px rgba(0,0,0,0.12))',
+                transform: `scale(${0.95 + 0.15 * volume})`,
+                transition: 'color 0.2s, transform 0.2s',
+            },
+        };
+        if (volume <= 0 || muted) {
+            return <VolumeX {...iconProps} />;
+        } else if (volume > 0 && volume <= 0.33) {
+            return <Volume {...iconProps} />;
+        } else if (volume > 0.33 && volume <= 0.66) {
+            return <Volume1 {...iconProps} />;
+        } else {
+            return <Volume2 {...iconProps} />;
+        }
+    };
+
+    // Drag/scroll logic
+    const [dragging, setDragging] = useState(false);
+    const [muted, setMuted] = useState(false);
+    const dragStartY = useRef(null);
+    const dragStartVolume = useRef(null);
+    const dragStartX = useRef(null);
+
+    const handleIconClick = (e) => {
+        setMuted((m) => {
+            if (m) {
+                setVolume(id, volume > 0 ? volume : 0.5);
+                return false;
+            } else {
+                setVolume(id, 0);
+                return true;
+            }
+        });
+    };
+    const handleMouseDown = (e) => {
+        setDragging(true);
+        dragStartY.current = e.clientY;
+        dragStartVolume.current = volume;
+        dragStartX.current = e.clientX;
+        document.body.style.userSelect = 'none';
+    };
+    useEffect(() => {
+        if (!dragging) return;
+        const handleMouseMove = (e) => {
+            const dy = dragStartY.current - e.clientY;
+            const dx = e.clientX - dragStartX.current;
+            // Up or right increases, down or left decreases
+            let newVolume = dragStartVolume.current + (dy + dx) / 100;
+            newVolume = Math.min(1, Math.max(0, newVolume));
+            setMuted(false);
+            setVolume(id, newVolume);
+        };
+        const handleMouseUp = () => {
+            setDragging(false);
+            document.body.style.userSelect = '';
+        };
+        window.addEventListener('mousemove', handleMouseMove);
+        window.addEventListener('mouseup', handleMouseUp);
+        return () => {
+            window.removeEventListener('mousemove', handleMouseMove);
+            window.removeEventListener('mouseup', handleMouseUp);
+        };
+    }, [dragging, id, setVolume]);
+
+    // Touch drag for mobile
+    const handleTouchStart = (e) => {
+        setDragging(true);
+        dragStartY.current = e.touches[0].clientY;
+        dragStartX.current = e.touches[0].clientX;
+        dragStartVolume.current = volume;
+    };
+    useEffect(() => {
+        if (!dragging) return;
+        const handleTouchMove = (e) => {
+            const dy = dragStartY.current - e.touches[0].clientY;
+            const dx = e.touches[0].clientX - dragStartX.current;
+            let newVolume = dragStartVolume.current + (dy + dx) / 100;
+            newVolume = Math.min(1, Math.max(0, newVolume));
+            setMuted(false);
+            setVolume(id, newVolume);
+        };
+        const handleTouchEnd = () => setDragging(false);
+        window.addEventListener('touchmove', handleTouchMove);
+        window.addEventListener('touchend', handleTouchEnd);
+        return () => {
+            window.removeEventListener('touchmove', handleTouchMove);
+            window.removeEventListener('touchend', handleTouchEnd);
+        };
+    }, [dragging, id, setVolume]);
+
+    const [maskStyle, setMaskStyle] = useState({
+        WebkitMaskImage: 'linear-gradient(to right, rgba(0, 0, 0, 1) 20%, rgba(0, 0, 0, 0))',
+        maskImage: 'linear-gradient(to right, rgba(0, 0, 0, 1) 20%, rgba(0, 0, 0, 0))',
+    });
+
+    useEffect(() => {
+        if (volumeOpen) {
+            setMaskStyle({
+                WebkitMaskImage:
+                    'linear-gradient(to right, rgba(0, 0, 0, 1) 60%, rgba(0, 0, 0, .3))',
+                maskImage: 'linear-gradient(to right, rgba(0, 0, 0, 1) 60%, rgba(0, 0, 0, .3))',
+            });
+        } else {
+            setMaskStyle({
+                WebkitMaskImage:
+                    'linear-gradient(to right, rgba(0, 0, 0, 1) 40%, rgba(0, 0, 0, .6))',
+                maskImage: 'linear-gradient(to right, rgba(0, 0, 0, 1) 40%, rgba(0, 0, 0, .6))',
+            });
+        }
+    }, [volumeOpen]);
+
+    useEffect(() => {
+        const handleClickOutside = (event) => {
+            if (volumeRef.current && !volumeRef.current.contains(event.target)) {
+                closeVolume();
+            }
+        };
+        if (volumeOpen) {
+            document.addEventListener('mousedown', handleClickOutside);
+        }
+        return () => {
+            document.removeEventListener('mousedown', handleClickOutside);
+        };
+    }, [volumeOpen]);
+
+    useEffect(() => {
+        initializeAudio(id, src);
+    }, [id, src, initializeAudio]);
+
+    if (error) console.log(error);
+
+    const handlePlayPause = () => {
+        if (isPlaying) {
+            pause(id);
+        } else {
+            play(id, src, { title, artist, links });
+        }
+    };
+
+    // Keyboard left/right support
+    const handleKeyDown = (e) => {
+        if (e.key === 'ArrowLeft' || e.key === 'ArrowDown') {
+            setMuted(false);
+            setVolume(id, Math.max(0, volume - 0.05));
+            e.preventDefault();
+        } else if (e.key === 'ArrowRight' || e.key === 'ArrowUp') {
+            setMuted(false);
+            setVolume(id, Math.min(1, volume + 0.05));
+            e.preventDefault();
+        }
+    };
+
+    if (compact) {
+        // Minimal UI for compressed grid
+        return (
+            <div className={`flex flex-col bg-card-dark border border-border-dark rounded-lg shadow-md p-3 min-w-0 w-full max-w-xs mx-auto ${className}`}>
+                <div className="flex items-center justify-between mb-1">
+                    <button
+                        onClick={handlePlayPause}
+                        className="p-2 rounded-full bg-button-dark text-buttonText-dark hover:bg-accent-dark transition-colors"
+                        aria-label={isPlaying ? 'Pause' : 'Play'}
+                    >
+                        {isPlaying ? <Pause size={18} /> : <Play size={18} />}
+                    </button>
+                    <div className="flex flex-col flex-1 min-w-0 ml-2">
+                        <span className="truncate text-sm font-semibold text-playercardText-dark">{title}</span>
+                        <span className="truncate text-xs text-playercardText-dark opacity-80">{artist}</span>
+                    </div>
+                    <span className="text-xs text-accent-dark ml-2 min-w-[40px] text-right">{formatTime(currentTime)}</span>
+                </div>
+                <input
+                    type="range"
+                    min="0"
+                    max={duration}
+                    value={currentTime}
+                    onChange={(e) => seek(id, Number(e.target.value))}
+                    className="w-full accent-accent-dark h-1 rounded bg-primary-dark2/30 mt-1"
+                    aria-label="Seek audio"
+                />
+            </div>
+        );
+    }
+
+    // Full-featured player
+    return (
+        <div className={`sm:p-4 md:p-4 p-1 max-h-30 sm:max-h-100 md:max-h-100 rounded-xl border border-border-dark shadow-xl transition-all duration-300 ease-in-out transform md:hover:scale-105 lg:hover:scale-105 disabled:opacity-50 audio-player max-w-sm sm:max-w-sm md:max-w-xs lg:max-w-lg flex flex-col w-full ${className}`}
+            style={{
+                background: 'rgba(44,44,54,0.55)',
+                backdropFilter: 'blur(18px)',
+                WebkitBackdropFilter: 'blur(18px)',
+            }}
+        >
+            <div className="flex flex-col gap-1">
+                <div className="flex items-center gap-2">
+                    <h3
+                        className="flex-grow truncate break-words overflow-hidden whitespace-nowrap text-lg font-semibold text-playercardText-dark hover:text-accent-dark transition-all duration-900"
+                        style={maskStyle}
+                    >
+                        <a
+                            href={links.song || '#'}
+                            className="block text-playercardText-dark hover:text-accent-dark transition-all duration-400"
+                        >
+                            {title}
+                        </a>
+                    </h3>
+                    <button
+                        ref={iconRef}
+                        className={`transition-transform focus:outline-none ${dragging ? 'scale-110' : ''}`}
+                        aria-label="Volume"
+                        onClick={handleIconClick}
+                        onMouseDown={handleMouseDown}
+                        onTouchStart={handleTouchStart}
+                        onKeyDown={handleKeyDown}
+                        tabIndex={0}
+                        style={{ cursor: 'pointer', outline: 'none', background: 'none', border: 'none', padding: 0 }}
+                    >
+                        {getIcon()}
+                    </button>
+                </div>
+                <h4 className="truncate md:max-w-30 lg:max-w-sm text-md font-light text-playercardText-dark hover:text-accent-dark transition-all duration-700">
+                    <a
+                        href={links.artist || '#'}
+                        className="max-w-xs opacity-80 text-playercardText-dark hover:text-accent-dark transition-all duration-300"
+                    >
+                        {artist}
+                    </a>
+                </h4>
+                {/* No visible slider, all volume control is via the icon */}
+            </div>
+
+            <div className="mb-2 mt-2 flex items-center text-sm italic">
+                <span className="text-accent-dark">{formatTime(currentTime)}</span>
+                <div className="flex-grow mx-4 flex items-center justify-center">
+                    <input
+                        type="range"
+                        min="0"
+                        max={duration}
+                        value={currentTime}
+                        onChange={(e) => seek(id, e.target.value)}
+                        className="w-full accent-accent-dark opacity-100 hover:cursor-pointer"
+                    />
+                </div>
+                <span className="text-accent-dark">{formatTime(duration)}</span>
+            </div>
+
+            <section className="playerControls flex items-center col-auto">
+                <button
+                    onClick={handlePlayPause}
+                    className="py-1.5 w-full bg-button-dark text-buttonText-dark rounded-md hover:bg-accent-dark transition-all duration-300 ease-in-out transform hover:scale-95 disabled:opacity-50"
+                >
+                    <div className="relative w-5 h-5 mx-auto">
+                        <Play
+                            className={`absolute top-0 left-0 w-5 h-5 transform transition-all duration-300 ease-in-out text-playicon-dark ${
+                                isPlaying ? 'opacity-0 scale-75' : 'opacity-100 scale-100'
+                            }`}
+                        />
+                        <Pause
+                            className={`absolute top-0 left-0 w-5 h-5 transform transition-all duration-300 ease-in-out text-playicon-dark ${
+                                isPlaying ? 'opacity-100 scale-100' : 'opacity-0 scale-75'
+                            }`}
+                        />
+                    </div>
+                </button>
+                <div className="mt-1">{renderAdditionalControls && <span className="text-playercardText-dark">{renderAdditionalControls()}</span>}</div>
+            </section>
+
+            {error && <span className="sm text-red-500 mt-2">{error}</span>}
+        </div>
+    );
+};
+
+export default BaseAudioPlayer; 

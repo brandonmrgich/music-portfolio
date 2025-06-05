@@ -1,6 +1,7 @@
 import React, { useRef, useState, useEffect } from 'react';
-import { Play, Pause, Volume, Volume1, Volume2, VolumeX, ChevronUp, ChevronDown } from 'lucide-react';
+import { ChevronUp, ChevronDown, Pause, Play, Volume, Volume1, Volume2, VolumeX } from 'lucide-react';
 import { useAudio } from '../../contexts/AudioContext';
+import BaseAudioPlayer from './BaseAudioPlayer';
 
 /**
  * GlobalAudioBar - Modern, glassy, pastel look with dark mode and mobile support.
@@ -12,21 +13,38 @@ import { useAudio } from '../../contexts/AudioContext';
 const GlobalAudioBar = () => {
     const {
         currentTrack,
+        play,
+        pause,
         playingStates,
+        seek,
+        setVolume,
         currentTimes,
         durations,
         volumes,
-        play,
-        pause,
-        seek,
-        setVolume,
     } = useAudio();
     const [minimized, setMinimized] = useState(false);
     const [mobileHidden, setMobileHidden] = useState(false);
     const lastScrollY = useRef(0);
     const ticking = useRef(false);
     const barRef = useRef(null);
-
+    // --- Expanded bar hooks (must always be called) ---
+    const [muted, setMuted] = useState(false);
+    const [previousVolume, setPreviousVolume] = useState(0.5);
+    const volumeRef = useRef(null);
+    // When expanded, minimize the bar if clicking outside the bar
+    useEffect(() => {
+        if (minimized) return;
+        const handleClickOutside = (event) => {
+            if (barRef.current && !barRef.current.contains(event.target)) {
+                setMinimized(true);
+            }
+        };
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => {
+            document.removeEventListener('mousedown', handleClickOutside);
+        };
+    }, [minimized]);
+    // --- End expanded bar hooks ---
     // Scroll-aware show/hide for mobile
     useEffect(() => {
         const SCROLL_THRESHOLD = 40; // px before toggling
@@ -50,33 +68,27 @@ const GlobalAudioBar = () => {
         window.addEventListener('scroll', handleScroll, { passive: true });
         return () => window.removeEventListener('scroll', handleScroll);
     }, []);
-
     // If no track, don't show bar or tab
     if (!currentTrack) return null;
-
     const { id, title, artist, links, src } = currentTrack;
     const isPlaying = playingStates[id];
     const currentTime = currentTimes[id] || 0;
     const duration = durations[id] || 0;
     const volume = volumes[id] !== undefined ? volumes[id] : 0.5;
-
-    /**
-     * Format seconds as mm:ss
-     * @param {number} time
-     * @returns {string}
-     */
+    const handlePlayPause = () => {
+        if (isPlaying) {
+            pause(id);
+        } else {
+            play(id, src, { title, artist, links });
+        }
+    };
     const formatTime = (time) => {
         const minutes = Math.floor(time / 60);
         const seconds = Math.floor(time % 60);
         return `${minutes}:${seconds.toString().padStart(2, '0')}`;
     };
-
-    /**
-     * Render the correct volume icon for the current volume.
-     * @returns {JSX.Element}
-     */
     const renderVolumeIcon = () => {
-        if (volume <= 0) {
+        if (volume <= 0 || muted) {
             return <VolumeX />;
         } else if (volume > 0 && volume <= 0.33) {
             return <Volume />;
@@ -86,121 +98,140 @@ const GlobalAudioBar = () => {
             return <Volume2 />;
         }
     };
-
-    // Minimized bar (responsive)
+    const handleMuteClick = () => {
+        if (!muted && volume > 0) {
+            setPreviousVolume(volume);
+            setVolume(id, 0);
+            setMuted(true);
+        } else {
+            setVolume(id, previousVolume > 0 ? previousVolume : 0.5);
+            setMuted(false);
+        }
+    };
     if (minimized) {
+        // Redesigned minimized bar: [play/pause] Song artist [chevron] (no seek bar, compact layout, centered background)
         return (
             <div
-                className={`fixed bottom-2 left-1/2 -translate-x-1/2 w-[90vw] max-w-lg z-50 rounded-xl shadow-md border border-primary-light1/40 dark:border-comfydark-dark/40 bg-white/40 dark:bg-comfydark-dark/40 backdrop-blur-md flex items-center px-2 py-0 gap-1 min-h-[24px] h-[28px] sm:px-3 sm:py-1 sm:gap-2 sm:min-h-[32px] sm:h-[32px] transition-transform duration-200 ${mobileHidden ? 'translate-y-20 pointer-events-none' : ''}`}
+                className={`fixed bottom-2 left-1/2 -translate-x-1/2 z-50 rounded-xl shadow-lg border border-border-dark bg-card-dark/80 backdrop-blur-lg inline-flex items-center px-3 py-1 gap-2 sm:gap-3 max-w-full transition-transform duration-200 ${mobileHidden ? 'translate-y-20 pointer-events-none' : ''}`}
                 style={{
-                    boxShadow: '0 2px 8px 0 rgba(31, 38, 135, 0.10)',
-                    backdropFilter: 'blur(8px)',
-                    WebkitBackdropFilter: 'blur(8px)',
+                    boxShadow: '0 2px 16px 0 rgba(31, 38, 135, 0.18)',
+                    backdropFilter: 'blur(10px)',
+                    WebkitBackdropFilter: 'blur(10px)',
                 }}
             >
+                {/* Play/Pause */}
                 <button
-                    onClick={() => (isPlaying ? pause(id) : play(id, src, { title, artist, links }))}
-                    className="p-0.5 rounded-full bg-button-light dark:bg-button-dark hover:bg-button-light/80 dark:hover:bg-button-dark/80 text-buttonText-light dark:text-buttonText-dark shadow transition-colors duration-150 focus:outline-none h-7 w-7 flex items-center justify-center sm:h-6 sm:w-6"
+                    onClick={handlePlayPause}
+                    className="p-1.5 rounded-full bg-button-dark text-buttonText-dark hover:bg-accent-dark transition-colors flex-shrink-0"
                     aria-label={isPlaying ? 'Pause' : 'Play'}
-                    style={{ minWidth: 0, minHeight: 0 }}
                 >
-                    {isPlaying ? <Pause size={16} className="text-playicon-light dark:text-playicon-dark" /> : <Play size={16} className="text-playicon-light dark:text-playicon-dark" />}
+                    {isPlaying ? <Pause size={18} /> : <Play size={18} />}
                 </button>
-                <div className="flex flex-row flex-1 min-w-0 items-center gap-1">
-                    <span className="truncate font-semibold text-playercardText-light dark:text-playercardText-dark text-[11px] sm:text-xs md:text-sm max-w-[6rem] sm:max-w-[10rem] leading-tight" title={title}>
-                        {title}
-                    </span>
-                    <span className="truncate text-playercardText-light dark:text-playercardText-dark text-[10px] sm:text-xs md:text-sm max-w-[5rem] sm:max-w-[8rem] leading-tight opacity-80" title={artist}>
-                        {artist}
-                    </span>
-                </div>
+                {/* Song Title */}
+                <span className="truncate font-semibold text-playercardText-dark text-sm sm:text-base max-w-[28vw] sm:max-w-[16vw] ml-1">
+                    {links?.song ? (
+                        <a href={links.song} target="_blank" rel="noopener noreferrer" className="hover:text-accent-dark">{title}</a>
+                    ) : title}
+                </span>
+                {/* Artist */}
+                <span className="truncate text-playercardText-dark text-xs sm:text-sm opacity-80 max-w-[18vw] sm:max-w-[10vw] ml-1">
+                    {links?.artist ? (
+                        <a href={links.artist} target="_blank" rel="noopener noreferrer" className="hover:text-accent-dark">{artist}</a>
+                    ) : artist}
+                </span>
+                {/* Chevron (expand) */}
                 <button
                     onClick={() => setMinimized(false)}
-                    className="ml-auto p-0.5 rounded-full bg-transparent hover:bg-white/30 dark:hover:bg-comfydark-dark/30 transition-colors h-7 w-7 flex items-center justify-center sm:h-6 sm:w-6"
+                    className="ml-2 p-1 rounded-full bg-transparent hover:bg-accent-dark/20 transition-colors h-8 w-8 flex items-center justify-center flex-shrink-0 drop-shadow hover:scale-110"
                     aria-label="Expand audio player"
                     style={{ minWidth: 0, minHeight: 0 }}
                 >
-                    <ChevronUp size={14} />
+                    <ChevronUp size={24} className="text-accent-dark drop-shadow" />
                 </button>
             </div>
         );
     }
-
-    // Full bar (responsive)
+    // Expanded glassy bar with custom controls (no BaseAudioPlayer)
     return (
         <div
             ref={barRef}
-            className={`fixed bottom-4 left-1/2 -translate-x-1/2 w-[98vw] max-w-3xl z-50 rounded-2xl shadow-2xl border border-primary-light1/40 dark:border-comfydark-dark/40 backdrop-blur-lg flex items-center px-3 py-2 gap-2 bg-white/30 dark:bg-comfydark-dark/30 transition-colors duration-300 sm:px-6 sm:py-3 sm:gap-4 ${mobileHidden ? 'translate-y-28 pointer-events-none' : ''}`}
+            className={`fixed bottom-4 left-1/2 -translate-x-1/2 w-[98vw] max-w-xl z-50 rounded-2xl shadow-2xl border border-primary-light1/40 dark:border-comfydark-dark/40 backdrop-blur-lg flex items-center px-3 py-2 bg-white/30 dark:bg-comfydark-dark/30 transition-colors duration-300 sm:px-6 sm:py-3 ${mobileHidden ? 'translate-y-28 pointer-events-none' : ''}`}
             style={{
                 boxShadow: '0 8px 32px 0 rgba(31, 38, 135, 0.15)',
                 backdropFilter: 'blur(12px)',
                 WebkitBackdropFilter: 'blur(12px)',
             }}
         >
-            {/* Track Info */}
-            <div className="flex flex-col flex-grow min-w-0 relative z-10">
-                <div className="flex items-center gap-1 min-w-0 sm:gap-2">
-                    <span className="truncate font-semibold text-playercardText-light dark:text-playercardText-dark text-sm max-w-[8rem] sm:text-base sm:max-w-xs">
-                        <a href={links?.song || '#'} target="_blank" rel="noopener noreferrer">
-                            {title}
-                        </a>
+            {/* Left controls: Play, Song+Artist */}
+            <div className="flex items-center min-w-0 gap-2">
+                <button
+                    onClick={handlePlayPause}
+                    className="p-2 rounded-full bg-button-dark text-buttonText-dark hover:bg-accent-dark transition-colors flex-shrink-0"
+                    aria-label={isPlaying ? 'Pause' : 'Play'}
+                >
+                    {isPlaying ? <Pause size={24} /> : <Play size={24} />}
+                </button>
+                <div className="flex flex-col min-w-0 max-w-[28vw] sm:max-w-[18vw]">
+                    <span className="truncate text-lg font-semibold text-playercardText-dark">
+                        {links?.song ? (
+                            <a href={links.song} target="_blank" rel="noopener noreferrer" className="hover:text-accent-dark">{title}</a>
+                        ) : title}
                     </span>
-                    <span className="truncate text-playercardText-light dark:text-playercardText-dark text-xs opacity-80 max-w-[7rem] sm:text-sm sm:max-w-xs">
-                        <a href={links?.artist || '#'} target="_blank" rel="noopener noreferrer">
-                            {artist}
-                        </a>
-                    </span>
-                </div>
-                <div className="flex items-center gap-1 w-full sm:gap-2">
-                    <span className="text-accent-light dark:text-accent-dark text-xs font-mono">
-                        {formatTime(currentTime)}
-                    </span>
-                    <input
-                        type="range"
-                        min="0"
-                        max={duration}
-                        value={currentTime}
-                        onChange={(e) => seek(id, Number(e.target.value))}
-                        className="flex-grow accent-accent-light dark:accent-accent-dark opacity-80 dark:opacity-100 hover:cursor-pointer mx-1 h-2 rounded-lg bg-primary-light2/40 dark:bg-comfydark-medium/40 sm:mx-2"
-                        aria-label="Seek audio"
-                    />
-                    <span className="text-accent-light dark:text-accent-dark text-xs font-mono">
-                        {formatTime(duration)}
+                    <span className="truncate text-sm text-playercardText-dark opacity-80">
+                        {links?.artist ? (
+                            <a href={links.artist} target="_blank" rel="noopener noreferrer" className="hover:text-accent-dark">{artist}</a>
+                        ) : artist}
                     </span>
                 </div>
             </div>
-            {/* Play/Pause Button */}
-            <button
-                onClick={() => (isPlaying ? pause(id) : play(id, src, { title, artist, links }))}
-                className="mx-1 p-2 rounded-full bg-button-light dark:bg-button-dark hover:bg-button-light/80 dark:hover:bg-button-dark/80 text-buttonText-light dark:text-buttonText-dark shadow-lg transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-primary-light1/60 dark:focus:ring-comfydark-accent2/60 relative z-10 h-9 w-9 flex items-center justify-center sm:mx-2 sm:p-3 sm:h-auto sm:w-auto"
-                aria-label={isPlaying ? 'Pause' : 'Play'}
-            >
-                {isPlaying ? <Pause size={22} className="text-playicon-light dark:text-playicon-dark" /> : <Play size={22} className="text-playicon-light dark:text-playicon-dark" />}
-            </button>
-            {/* Volume Control (hide on xs, show on sm+) */}
-            <div className="hidden sm:flex items-center gap-2 min-w-[100px] relative z-10">
+            {/* Center: Seek Bar (centered, flex-1) */}
+            <div className="flex items-center flex-1 justify-center min-w-0 px-2">
+                <span className="text-xs text-accent-dark min-w-[32px] text-right">{formatTime(currentTime)}</span>
                 <input
                     type="range"
                     min="0"
-                    max="1"
-                    step="0.01"
-                    value={volume}
-                    onChange={(e) => setVolume(id, parseFloat(e.target.value))}
-                    className="w-20 accent-accent-light dark:accent-accent-dark opacity-80 dark:opacity-100 hover:cursor-pointer h-2 rounded-lg bg-primary-light2/40 dark:bg-comfydark-medium/40"
-                    aria-label="Set volume"
+                    max={duration}
+                    value={currentTime}
+                    onChange={(e) => seek(id, Number(e.target.value))}
+                    className="w-full max-w-[180px] accent-accent-dark h-1 rounded bg-primary-dark2/30 mx-2"
+                    aria-label="Seek audio"
                 />
-                <span className="text-comfy-accent1 dark:text-comfydark-accent2">
-                    {renderVolumeIcon() && React.cloneElement(renderVolumeIcon(), { className: 'text-playicon-light dark:text-playicon-dark' })}
-                </span>
+                <span className="text-xs text-accent-dark min-w-[32px] text-left">{formatTime(duration)}</span>
             </div>
-            {/* Minimize Button */}
-            <button
-                onClick={() => setMinimized(true)}
-                className="ml-1 p-2 rounded-full bg-transparent hover:bg-white/30 dark:hover:bg-comfydark-dark/30 transition-colors h-9 w-9 flex items-center justify-center sm:ml-2 sm:h-auto sm:w-auto"
-                aria-label="Minimize audio player"
-            >
-                <ChevronDown size={20} />
-            </button>
+            {/* Right controls: Volume, Chevron */}
+            <div className="flex items-center gap-1 flex-shrink-0">
+                <div className="relative flex items-center">
+                    <button onClick={handleMuteClick} className="ml-2 text-accent-dark drop-shadow hover:scale-110 transition-transform" aria-label="Mute/unmute">
+                        {React.cloneElement(renderVolumeIcon(), { size: 24, className: 'text-accent-dark drop-shadow' })}
+                    </button>
+                    <input
+                        ref={volumeRef}
+                        type="range"
+                        min="0"
+                        max="1"
+                        step="0.01"
+                        value={volume}
+                        onChange={e => {
+                            setVolume(id, parseFloat(e.target.value));
+                            if (parseFloat(e.target.value) === 0) {
+                                setMuted(true);
+                            } else {
+                                setMuted(false);
+                                setPreviousVolume(parseFloat(e.target.value));
+                            }
+                        }}
+                        className="w-24 h-2 accent-accent-dark bg-primary-dark2/30 rounded-lg cursor-pointer ml-2"
+                        aria-label="Volume"
+                    />
+                </div>
+                <button
+                    onClick={() => setMinimized(true)}
+                    className="p-2 rounded-full bg-transparent hover:bg-white/30 dark:hover:bg-comfydark-dark/30 transition-colors h-10 w-10 flex items-center justify-center drop-shadow hover:scale-110"
+                    aria-label="Minimize audio player"
+                >
+                    <ChevronDown size={24} className="text-accent-dark drop-shadow" />
+                </button>
+            </div>
         </div>
     );
 };
