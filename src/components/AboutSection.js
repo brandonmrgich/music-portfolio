@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import profileImg from '../assets/images/profile-beach.jpeg';
 import { SocialMediaLink, Links } from './SocialMediaLink';
-import profileImg from '../assets/images/profile-glasses.png';
 
 const aboutData = {
   name: 'Brandon Mrgich',
@@ -12,6 +12,7 @@ const aboutData = {
 const socialKeys = ['instagram', 'tiktok', 'youtube'];
 
 const AboutSection = () => (
+
   <div className="relative min-h-screen py-16 px-4 flex flex-col items-center overflow-hidden">
     <div className="relative z-10 flex flex-col items-center w-full max-w-3xl mx-auto">
       <h2 className="text-3xl font-bold mb-8 text-accent-dark text-center">About</h2>
@@ -19,7 +20,9 @@ const AboutSection = () => (
         {aboutData.bio}
       </p>
       {aboutData.imageUrl && (
-        <img src={aboutData.imageUrl} alt={aboutData.name} className="w-32 h-32 rounded-full mb-6 object-cover" />
+        <div className="w-40 h-40 rounded-full overflow-hidden mb-6">
+          <img src={aboutData.imageUrl} alt={aboutData.name} className="w-full h-full object-cover" />
+        </div>
       )}
       {/* Contact Call-to-Action */}
       <div className="mb-4 text-center">
