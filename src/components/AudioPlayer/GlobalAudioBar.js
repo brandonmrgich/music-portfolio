@@ -155,53 +155,32 @@ const GlobalAudioBar = () => {
     return (
         <div
             ref={barRef}
-            className={`fixed bottom-4 left-1/2 -translate-x-1/2 w-[98vw] max-w-xl z-50 rounded-2xl shadow-2xl border border-primary-light1/40 dark:border-comfydark-dark/40 backdrop-blur-lg flex items-center px-3 py-2 bg-white/30 dark:bg-comfydark-dark/30 transition-colors duration-300 sm:px-6 sm:py-3 ${mobileHidden ? 'translate-y-28 pointer-events-none' : ''}`}
+            className={`fixed bottom-4 left-1/2 -translate-x-1/2 w-[98vw] max-w-xl z-50 rounded-2xl shadow-2xl border border-primary-light1/40 dark:border-comfydark-dark/40 backdrop-blur-lg flex flex-col px-3 py-2 bg-white/30 dark:bg-comfydark-dark/30 transition-colors duration-300 sm:px-6 sm:py-3 ${mobileHidden ? 'translate-y-28 pointer-events-none' : ''}`}
             style={{
                 boxShadow: '0 8px 32px 0 rgba(31, 38, 135, 0.15)',
                 backdropFilter: 'blur(12px)',
                 WebkitBackdropFilter: 'blur(12px)',
             }}
         >
-            {/* Left controls: Play, Song+Artist */}
-            <div className="flex items-center min-w-0 gap-2">
-                <button
-                    onClick={handlePlayPause}
-                    className="p-2 rounded-full bg-button-dark text-buttonText-dark hover:bg-accent-dark transition-colors flex-shrink-0"
-                    aria-label={isPlaying ? 'Pause' : 'Play'}
-                >
-                    {isPlaying ? <Pause size={24} /> : <Play size={24} />}
-                </button>
-                <div className="flex flex-col min-w-0 max-w-[28vw] sm:max-w-[18vw]">
-                    <span className="truncate text-lg font-semibold text-playercardText-dark">
+            {/* Top row: Song + Artist, Volume */}
+            <div className="flex flex-row items-center w-full gap-2 mb-1">
+                {/* Song Title + Artist (left) */}
+                <div className="flex-1 min-w-0 flex items-center gap-2 overflow-hidden">
+                    <span className="text-lg font-semibold text-playercardText-dark whitespace-nowrap truncate">
                         {links?.song ? (
                             <a href={links.song} target="_blank" rel="noopener noreferrer" className="hover:text-accent-dark">{title}</a>
                         ) : title}
                     </span>
-                    <span className="truncate text-sm text-playercardText-dark opacity-80">
+                    <span className="text-playercardText-dark opacity-60 mx-1">&middot;</span>
+                    <span className="text-sm text-playercardText-dark opacity-80 whitespace-nowrap truncate">
                         {links?.artist ? (
                             <a href={links.artist} target="_blank" rel="noopener noreferrer" className="hover:text-accent-dark">{artist}</a>
                         ) : artist}
                     </span>
                 </div>
-            </div>
-            {/* Center: Seek Bar (centered, flex-1) */}
-            <div className="flex items-center flex-1 justify-center min-w-0 px-2">
-                <span className="text-xs text-accent-dark min-w-[32px] text-right">{formatTime(currentTime)}</span>
-                <input
-                    type="range"
-                    min="0"
-                    max={duration}
-                    value={currentTime}
-                    onChange={(e) => seek(id, Number(e.target.value))}
-                    className="w-full max-w-[180px] accent-accent-dark h-1 rounded bg-primary-dark2/30 mx-2"
-                    aria-label="Seek audio"
-                />
-                <span className="text-xs text-accent-dark min-w-[32px] text-left">{formatTime(duration)}</span>
-            </div>
-            {/* Right controls: Volume, Chevron */}
-            <div className="flex items-center gap-1 flex-shrink-0">
-                <div className="relative flex items-center">
-                    <button onClick={handleMuteClick} className="ml-2 text-accent-dark drop-shadow hover:scale-110 transition-transform" aria-label="Mute/unmute">
+                {/* Volume controls (right) */}
+                <div className="flex items-center flex-shrink-0 ml-2">
+                    <button onClick={handleMuteClick} className="text-accent-dark drop-shadow hover:scale-110 transition-transform" aria-label="Mute/unmute">
                         {React.cloneElement(renderVolumeIcon(), { size: 24, className: 'text-accent-dark drop-shadow' })}
                     </button>
                     <input
@@ -223,14 +202,28 @@ const GlobalAudioBar = () => {
                         className="w-24 h-2 accent-accent-dark bg-primary-dark2/30 rounded-lg cursor-pointer ml-2"
                         aria-label="Volume"
                     />
+                    <button
+                        onClick={() => setMinimized(true)}
+                        className="p-2 rounded-full bg-transparent hover:bg-white/30 dark:hover:bg-comfydark-dark/30 transition-colors h-10 w-10 flex items-center justify-center drop-shadow hover:scale-110 ml-2"
+                        aria-label="Minimize audio player"
+                    >
+                        <ChevronDown size={24} className="text-accent-dark drop-shadow" />
+                    </button>
                 </div>
-                <button
-                    onClick={() => setMinimized(true)}
-                    className="p-2 rounded-full bg-transparent hover:bg-white/30 dark:hover:bg-comfydark-dark/30 transition-colors h-10 w-10 flex items-center justify-center drop-shadow hover:scale-110"
-                    aria-label="Minimize audio player"
-                >
-                    <ChevronDown size={24} className="text-accent-dark drop-shadow" />
-                </button>
+            </div>
+            {/* Bottom row: Seek Bar */}
+            <div className="flex items-center w-full px-2">
+                <span className="text-xs text-accent-dark min-w-[32px] text-right">{formatTime(currentTime)}</span>
+                <input
+                    type="range"
+                    min="0"
+                    max={duration}
+                    value={currentTime}
+                    onChange={(e) => seek(id, Number(e.target.value))}
+                    className="w-full min-w-[90px] sm:min-w-[140px] max-w-[400px] accent-accent-dark h-1 rounded bg-primary-dark2/30 mx-2"
+                    aria-label="Seek audio"
+                />
+                <span className="text-xs text-accent-dark min-w-[32px] text-left">{formatTime(duration)}</span>
             </div>
         </div>
     );

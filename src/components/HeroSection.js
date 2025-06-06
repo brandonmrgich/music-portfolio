@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from 'react';
-import beachImg from '../assets/images/profile-beach.jpeg';
+import beachImg from '../assets/images/profile-coat.png';
 
 const heroData = {
   heading: "Brandon Mrgich",
