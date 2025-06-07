@@ -79,7 +79,8 @@ const HeroSection = ({ onHeroExit, scrollLocked }) => {
         </div>
       </div>
       <div className="absolute bottom-8 w-full flex justify-center pointer-events-none">
-        <span className="text-accent-dark text-lg animate-bounce opacity-80 select-none text-center">Scroll or click to enter</span>
+        <span className="text-accent-dark text-lg animate-bounce opacity-80 select-none text-center block sm:hidden">Swipe or tap to enter</span>
+        <span className="text-accent-dark text-lg animate-bounce opacity-80 select-none text-center hidden sm:block">Scroll or click to enter</span>
       </div>
     </div>
   );
