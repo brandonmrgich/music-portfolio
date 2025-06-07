@@ -1,22 +1,18 @@
 {
   "files": {
-    "main.css": "/static/css/main.6a87af76.css",
-    "main.js": "/static/js/main.2406ac1f.js",
+    "main.css": "/static/css/main.8c0bcf96.css",
+    "main.js": "/static/js/main.4bac502d.js",
     "static/js/453.0094daa3.chunk.js": "/static/js/453.0094daa3.chunk.js",
     "static/media/profile-coat.png": "/static/media/profile-coat.4582259a80dbb2e8a226.png",
-    "static/media/asailboat.png": "/static/media/asailboat.879372da421005ace17b.png",
-    "static/media/profile-glasses.png": "/static/media/profile-glasses.b8f8455806f0a14dbd3e.png",
-    "static/media/profile-art-1.jpg": "/static/media/profile-art-1.b6525fd465c07f347cf8.jpg",
+    "static/media/background1.jpg": "/static/media/background1.44d13137653861ee8277.jpg",
     "static/media/profile-beach.jpeg": "/static/media/profile-beach.4473eac4ebd3ceab33e8.jpeg",
-    "static/media/audius-icon.jpeg": "/static/media/audius-icon.3af227222a59677eea7c.jpeg",
-    "static/media/profile-default.jpg": "/static/media/profile-default.ff3533004c286ab6805b.jpg",
     "index.html": "/index.html",
-    "main.6a87af76.css.map": "/static/css/main.6a87af76.css.map",
-    "main.2406ac1f.js.map": "/static/js/main.2406ac1f.js.map",
+    "main.8c0bcf96.css.map": "/static/css/main.8c0bcf96.css.map",
+    "main.4bac502d.js.map": "/static/js/main.4bac502d.js.map",
     "453.0094daa3.chunk.js.map": "/static/js/453.0094daa3.chunk.js.map"
   },
   "entrypoints": [
-    "static/css/main.6a87af76.css",
-    "static/js/main.2406ac1f.js"
+    "static/css/main.8c0bcf96.css",
+    "static/js/main.4bac502d.js"
   ]
 }
