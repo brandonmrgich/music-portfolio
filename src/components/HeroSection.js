@@ -30,13 +30,36 @@ const HeroSection = ({ onHeroExit, scrollLocked }) => {
         onHeroExit && onHeroExit();
       }
     };
+    let touchStartY = null;
+    const SWIPE_THRESHOLD = 40;
+    const handleTouchStart = (e) => {
+      if (e.touches && e.touches.length === 1) {
+        touchStartY = e.touches[0].clientY;
+      }
+    };
+    const handleTouchEnd = (e) => {
+      if (touchStartY === null) return;
+      let endY = null;
+      if (e.changedTouches && e.changedTouches.length === 1) {
+        endY = e.changedTouches[0].clientY;
+      }
+      if (endY !== null && Math.abs(endY - touchStartY) > SWIPE_THRESHOLD && !hasTriggered.current) {
+        hasTriggered.current = true;
+        onHeroExit && onHeroExit();
+      }
+      touchStartY = null;
+    };
     window.addEventListener('scroll', handleScroll, { passive: true });
     window.addEventListener('wheel', handleWheel, { passive: true });
     window.addEventListener('keydown', handleKeyDown);
+    window.addEventListener('touchstart', handleTouchStart, { passive: true });
+    window.addEventListener('touchend', handleTouchEnd, { passive: true });
     return () => {
       window.removeEventListener('scroll', handleScroll);
       window.removeEventListener('wheel', handleWheel);
       window.removeEventListener('keydown', handleKeyDown);
+      window.removeEventListener('touchstart', handleTouchStart);
+      window.removeEventListener('touchend', handleTouchEnd);
     };
   }, [onHeroExit, scrollLocked]);
 
