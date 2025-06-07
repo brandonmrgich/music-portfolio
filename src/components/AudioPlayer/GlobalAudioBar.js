@@ -1,5 +1,14 @@
 import React, { useRef, useState, useEffect } from 'react';
-import { ChevronUp, ChevronDown, Pause, Play, Volume, Volume1, Volume2, VolumeX } from 'lucide-react';
+import {
+    ChevronUp,
+    ChevronDown,
+    Pause,
+    Play,
+    Volume,
+    Volume1,
+    Volume2,
+    VolumeX,
+} from 'lucide-react';
 import { useAudio } from '../../contexts/AudioContext';
 import BaseAudioPlayer from './BaseAudioPlayer';
 
@@ -24,6 +33,7 @@ const GlobalAudioBar = () => {
     } = useAudio();
     const [minimized, setMinimized] = useState(false);
     const [mobileHidden, setMobileHidden] = useState(false);
+    const [isMobile, setIsMobile] = useState(false);
     const lastScrollY = useRef(0);
     const ticking = useRef(false);
     const barRef = useRef(null);
@@ -68,6 +78,31 @@ const GlobalAudioBar = () => {
         window.addEventListener('scroll', handleScroll, { passive: true });
         return () => window.removeEventListener('scroll', handleScroll);
     }, []);
+    // Detect mobile viewport
+    useEffect(() => {
+        const checkMobile = () => setIsMobile(window.innerWidth < 640);
+        checkMobile();
+        window.addEventListener('resize', checkMobile);
+        return () => window.removeEventListener('resize', checkMobile);
+    }, []);
+    // Keyboard volume control for mobile
+    useEffect(() => {
+        if (!isMobile) return;
+        const handleKeyDown = (e) => {
+            if (!currentTrack) return;
+            if (e.key === 'ArrowUp' || e.key === 'ArrowRight') {
+                setMuted(false);
+                setVolume(currentTrack.id, Math.min(1, (volumes[currentTrack.id] !== undefined ? volumes[currentTrack.id] : 0.5) + 0.05));
+                e.preventDefault();
+            } else if (e.key === 'ArrowDown' || e.key === 'ArrowLeft') {
+                setMuted(false);
+                setVolume(currentTrack.id, Math.max(0, (volumes[currentTrack.id] !== undefined ? volumes[currentTrack.id] : 0.5) - 0.05));
+                e.preventDefault();
+            }
+        };
+        window.addEventListener('keydown', handleKeyDown);
+        return () => window.removeEventListener('keydown', handleKeyDown);
+    }, [isMobile, currentTrack, setVolume, setMuted, volumes]);
     // If no track, don't show bar or tab
     if (!currentTrack) return null;
     const { id, title, artist, links, src } = currentTrack;
@@ -128,16 +163,34 @@ const GlobalAudioBar = () => {
                     {isPlaying ? <Pause size={18} /> : <Play size={18} />}
                 </button>
                 {/* Song Title */}
-                <span className="truncate font-semibold text-playercardText-dark text-sm sm:text-base max-w-[28vw] sm:max-w-[16vw] ml-1">
+                <span className="break-words whitespace-normal font-semibold text-playercardText-dark text-sm sm:text-base max-w-[40vw] sm:max-w-[20vw] ml-1">
                     {links?.song ? (
-                        <a href={links.song} target="_blank" rel="noopener noreferrer" className="hover:text-accent-dark">{title}</a>
-                    ) : title}
+                        <a
+                            href={links.song}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="hover:text-accent-dark"
+                        >
+                            {title}
+                        </a>
+                    ) : (
+                        title
+                    )}
                 </span>
                 {/* Artist */}
-                <span className="truncate text-playercardText-dark text-xs sm:text-sm opacity-80 max-w-[18vw] sm:max-w-[10vw] ml-1">
+                <span className="break-words whitespace-normal text-playercardText-dark text-xs sm:text-sm opacity-80 max-w-[28vw] sm:max-w-[12vw] ml-1">
                     {links?.artist ? (
-                        <a href={links.artist} target="_blank" rel="noopener noreferrer" className="hover:text-accent-dark">{artist}</a>
-                    ) : artist}
+                        <a
+                            href={links.artist}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="hover:text-accent-dark"
+                        >
+                            {artist}
+                        </a>
+                    ) : (
+                        artist
+                    )}
                 </span>
                 {/* Chevron (expand) */}
                 <button
@@ -162,58 +215,97 @@ const GlobalAudioBar = () => {
                 WebkitBackdropFilter: 'blur(12px)',
             }}
         >
-            {/* Top row: Song + Artist, Volume */}
+            {/* Top row: Song + Artist, Volume or Play/Pause (right) */}
             <div className="flex flex-row items-center w-full gap-2 mb-1">
-                {/* Song Title + Artist (left) */}
-                <div className="flex-1 min-w-0 flex items-center gap-2 overflow-hidden">
-                    <span className="text-lg font-semibold text-playercardText-dark whitespace-nowrap truncate">
+                {/* Song Title + Artist (left, or shifted right on mobile) */}
+                <div className={`flex-1 min-w-0 flex items-center gap-2 overflow-hidden ${isMobile ? 'justify-end' : ''}`}> 
+                    <span className="text-lg font-bold text-playercardText-dark break-words whitespace-normal">
                         {links?.song ? (
-                            <a href={links.song} target="_blank" rel="noopener noreferrer" className="hover:text-accent-dark">{title}</a>
-                        ) : title}
+                            <a
+                                href={links.song}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="hover:text-accent-dark"
+                            >
+                                {title}
+                            </a>
+                        ) : (
+                            title
+                        )}
                     </span>
                     <span className="text-playercardText-dark opacity-60 mx-1">&middot;</span>
-                    <span className="text-sm text-playercardText-dark opacity-80 whitespace-nowrap truncate">
+                    <span className="text-sm font-semibold text-playercardText-dark opacity-80 break-words whitespace-normal">
                         {links?.artist ? (
-                            <a href={links.artist} target="_blank" rel="noopener noreferrer" className="hover:text-accent-dark">{artist}</a>
-                        ) : artist}
+                            <a
+                                href={links.artist}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="hover:text-accent-dark"
+                            >
+                                {artist}
+                            </a>
+                        ) : (
+                            artist
+                        )}
                     </span>
                 </div>
-                {/* Volume controls (right) */}
-                <div className="flex items-center flex-shrink-0 ml-2">
-                    <button onClick={handleMuteClick} className="text-accent-dark drop-shadow hover:scale-110 transition-transform" aria-label="Mute/unmute">
-                        {React.cloneElement(renderVolumeIcon(), { size: 24, className: 'text-accent-dark drop-shadow' })}
-                    </button>
-                    <input
-                        ref={volumeRef}
-                        type="range"
-                        min="0"
-                        max="1"
-                        step="0.01"
-                        value={volume}
-                        onChange={e => {
-                            setVolume(id, parseFloat(e.target.value));
-                            if (parseFloat(e.target.value) === 0) {
-                                setMuted(true);
-                            } else {
-                                setMuted(false);
-                                setPreviousVolume(parseFloat(e.target.value));
-                            }
-                        }}
-                        className="w-24 h-2 accent-accent-dark bg-primary-dark2/30 rounded-lg cursor-pointer ml-2"
-                        aria-label="Volume"
-                    />
+                {/* Volume controls (right) - hide on mobile, show play/pause on mobile */}
+                {!isMobile && (
+                    <div className="flex items-center flex-shrink-0 ml-2">
+                        <button
+                            onClick={handleMuteClick}
+                            className="text-accent-dark drop-shadow hover:scale-110 transition-transform"
+                            aria-label="Mute/unmute"
+                        >
+                            {React.cloneElement(renderVolumeIcon(), {
+                                size: 24,
+                                className: 'text-accent-dark drop-shadow',
+                            })}
+                        </button>
+                        <input
+                            ref={volumeRef}
+                            type="range"
+                            min="0"
+                            max="1"
+                            step="0.01"
+                            value={volume}
+                            onChange={(e) => {
+                                setVolume(id, parseFloat(e.target.value));
+                                if (parseFloat(e.target.value) === 0) {
+                                    setMuted(true);
+                                } else {
+                                    setMuted(false);
+                                    setPreviousVolume(parseFloat(e.target.value));
+                                }
+                            }}
+                            className="w-24 h-2 accent-accent-dark bg-primary-dark2/30 rounded-lg cursor-pointer ml-2"
+                            aria-label="Volume"
+                        />
+                    </div>
+                )}
+                {isMobile && (
                     <button
-                        onClick={() => setMinimized(true)}
-                        className="p-2 rounded-full bg-transparent hover:bg-white/30 dark:hover:bg-comfydark-dark/30 transition-colors h-10 w-10 flex items-center justify-center drop-shadow hover:scale-110 ml-2"
-                        aria-label="Minimize audio player"
+                        onClick={handlePlayPause}
+                        className="ml-2 p-1.5 rounded-full bg-button-dark text-buttonText-dark hover:bg-accent-dark transition-colors flex-shrink-0 shadow-sm"
+                        aria-label={isPlaying ? 'Pause' : 'Play'}
+                        style={{ minWidth: 0, minHeight: 0 }}
                     >
-                        <ChevronDown size={24} className="text-accent-dark drop-shadow" />
+                        {isPlaying ? <Pause size={20} /> : <Play size={20} />}
                     </button>
-                </div>
+                )}
+                <button
+                    onClick={() => setMinimized(true)}
+                    className="p-2 rounded-full bg-transparent hover:bg-white/30 dark:hover:bg-comfydark-dark/30 transition-colors h-10 w-10 flex items-center justify-center drop-shadow hover:scale-110 ml-2"
+                    aria-label="Minimize audio player"
+                >
+                    <ChevronDown size={24} className="text-accent-dark drop-shadow" />
+                </button>
             </div>
             {/* Bottom row: Seek Bar */}
             <div className="flex items-center w-full px-2">
-                <span className="text-xs text-accent-dark min-w-[32px] text-right">{formatTime(currentTime)}</span>
+                <span className="text-xs text-accent-dark min-w-[32px] text-right">
+                    {formatTime(currentTime)}
+                </span>
                 <input
                     type="range"
                     min="0"
@@ -223,10 +315,13 @@ const GlobalAudioBar = () => {
                     className="w-full min-w-[90px] sm:min-w-[140px] max-w-[400px] accent-accent-dark h-1 rounded bg-primary-dark2/30 mx-2"
                     aria-label="Seek audio"
                 />
-                <span className="text-xs text-accent-dark min-w-[32px] text-left">{formatTime(duration)}</span>
+                <span className="text-xs text-accent-dark min-w-[32px] text-left">
+                    {formatTime(duration)}
+                </span>
             </div>
         </div>
     );
 };
 
-export default GlobalAudioBar; 
+export default GlobalAudioBar;
+
