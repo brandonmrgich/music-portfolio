@@ -34,6 +34,9 @@ DRY_RUN=false
 #SSH_FLAGS="-v"
 SSH_FLAGS=""
 
+# Colima/Docker status
+COLIMA_STARTED=false
+
 if [[ "$1" == "--dry-run" ]]; then
     DRY_RUN=true
     echo "Dry-run mode activated. No changes will be made."
@@ -47,10 +50,46 @@ log_action() {
     fi
 }
 
+# --- Docker/Colima startup logic ---
+check_docker_or_colima() {
+    if docker info > /dev/null 2>&1; then
+        log_action "Docker is running."
+        return 0
+    fi
+    # If on macOS, try Colima
+    if [[ "$(uname)" == "Darwin" ]]; then
+        if command -v colima > /dev/null 2>&1; then
+            log_action "Docker is not running. Attempting to start Colima..."
+            colima start
+            sleep 3
+            if docker info > /dev/null 2>&1; then
+                log_action "Colima started and Docker CLI is now available."
+                COLIMA_STARTED=true
+                return 0
+            else
+                echo "[ERR] Failed to start Colima. Aborting."
+                exit 1
+            fi
+        else
+            echo "[ERR] Docker is not running and Colima is not installed. Please start Docker Desktop or install Colima."
+            exit 1
+        fi
+    else
+        echo "[ERR] Docker is not running. Please start Docker."
+        exit 1
+    fi
+}
+
+check_docker_or_colima
+
+# Build Docker image (multi-arch if needed)
 log_action "Building Docker image locally..."
 if [ "$DRY_RUN" = false ]; then
-    #docker build -t $DOCKER_IMAGE_NAME $LOCAL_BACKEND_DIR
-    docker build --platform ${DOCKER_BUILD_PLATFORMS} -t $DOCKER_IMAGE_NAME ${LOCAL_BACKEND_DIR}
+    if [[ "$DOCKER_BUILD_PLATFORMS" == *,* ]]; then
+        docker buildx build --platform ${DOCKER_BUILD_PLATFORMS} -t $DOCKER_IMAGE_NAME --load ${LOCAL_BACKEND_DIR}
+    else
+        docker build --platform ${DOCKER_BUILD_PLATFORMS} -t $DOCKER_IMAGE_NAME ${LOCAL_BACKEND_DIR}
+    fi
 else
     echo "[DRY-RUN] Docker image would be built: $DOCKER_IMAGE_NAME"
 fi
@@ -62,12 +101,31 @@ else
     echo "[DRY-RUN] Docker image would be saved to $LOCAL_TAR_PATH"
 fi
 
+if [ "$DRY_RUN" = false ] && [ ! -f "$LOCAL_TAR_PATH" ]; then
+    echo "[ERROR] Tarball not found: $LOCAL_TAR_PATH"
+    # Stop Colima if we started it
+    if [ "$COLIMA_STARTED" = true ]; then
+        colima stop
+    fi
+    exit 1
+fi
+
 log_action "Copying tarball to AWS..."
 if [ "$DRY_RUN" = false ]; then
-    #scp $LOCAL_TAR_PATH $SERVER:$BACKEND_DIR
     rsync -avz -c --progress $LOCAL_TAR_PATH $SERVER:$BACKEND_DIR
 else
     echo "[DRY-RUN] Tarball would be copied to $SERVER:$BACKEND_DIR"
+fi
+
+log_action "Copying .env file to AWS..."
+if [ "$DRY_RUN" = false ]; then
+    if [ -f "$LOCAL_BACKEND_DIR/.env" ]; then
+        rsync -avz -c --progress "$LOCAL_BACKEND_DIR/.env" "$SERVER:$BACKEND_DIR/.env"
+    else
+        echo "[WARN] .env file not found in $LOCAL_BACKEND_DIR. Skipping .env copy."
+    fi
+else
+    echo "[DRY-RUN] .env file would be copied to $SERVER:$BACKEND_DIR/.env"
 fi
 
 log_action "Deploying Docker container on ${SERVER}..."
@@ -78,7 +136,6 @@ ssh ${SSH_FLAGS} $SERVER env "${REMOTE_ENV[@]}" 'bash -s' <<'EOF' #EOF requires 
     echo "[INFO] User:   $(whoami)"
 
     PLATFORM=$(uname -m)
-    
     # Check platform and set platform-specific Docker run options
     if [[ "$PLATFORM" == "x86_64" ]]; then
         PLATFORM_ARG="linux/amd64"
@@ -101,7 +158,6 @@ ssh ${SSH_FLAGS} $SERVER env "${REMOTE_ENV[@]}" 'bash -s' <<'EOF' #EOF requires 
     mkdir -p ${BACKEND_DIR}
 
     res=`which docker`
-    
     if [ -z "${res}" ]; then
         sudo apt install -y docker 
     fi
@@ -115,7 +171,6 @@ ssh ${SSH_FLAGS} $SERVER env "${REMOTE_ENV[@]}" 'bash -s' <<'EOF' #EOF requires 
             exit 1
         fi
     fi
-
 
     echo "[DEPLOY] Loading Docker image..."
     docker load -i $BACKEND_DIR/$TAR_NAME
@@ -136,7 +191,7 @@ ssh ${SSH_FLAGS} $SERVER env "${REMOTE_ENV[@]}" 'bash -s' <<'EOF' #EOF requires 
     fi
 
     echo "[DEPLOY] Running new container..."
-    docker run --platform ${PLATFORM_ARG} -d --restart unless-stopped --name $DOCKER_CONTAINER_NAME -p 5000:5000 -e NODE_ENV=production $DOCKER_IMAGE_NAME
+    docker run --platform ${PLATFORM_ARG} -d --restart unless-stopped --name $DOCKER_CONTAINER_NAME -p 5000:5000 --env-file $BACKEND_DIR/.env $DOCKER_IMAGE_NAME
 
     echo "[DEPLOY] Deployment complete, cleaning up."
 EOF
@@ -144,10 +199,16 @@ EOF
 REMOTE_INSTALL_STATUS=$?
 
 log_action "Cleaning up local tarball..."
-if [ "$DRY_RUN" = false ]; then
-    rm $LOCAL_TAR_PATH
+if [ "$DRY_RUN" = false ] && [ -f "$LOCAL_TAR_PATH" ]; then
+    rm "$LOCAL_TAR_PATH"
 else
     echo "[DRY-RUN] Local tarball would be removed: $LOCAL_TAR_PATH"
+fi
+
+# Stop Colima if we started it
+if [ "$COLIMA_STARTED" = true ]; then
+    log_action "Stopping Colima..."
+    colima stop
 fi
 
 # Final status
