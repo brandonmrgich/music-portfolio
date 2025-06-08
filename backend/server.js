@@ -16,6 +16,9 @@ const emailRoutes = require('./routes/emailRoutes');
 const hbRoutes = require('./routes/heartbeatRoutes');
 const tracksRoutes = require('./routes/tracksRoutes');
 
+const { startManifestCacheAutoRefresh } = require('./controllers/manifestController');
+const { getS3Instance } = require('./utils/S3Helper');
+
 const app = express();
 const port = 5000; // 80 & 443 reverse proxied via nginx on prod
 
@@ -30,6 +33,9 @@ app.use(s3Middleware); // Attach S3 client to all requests
 app.use('/email', emailRoutes);
 app.use('/heartbeat', hbRoutes);
 app.use('/tracks', tracksRoutes);
+
+// Start the manifest cache auto-refresh on server startup
+startManifestCacheAutoRefresh({ s3: getS3Instance() });
 
 // Start the server
 app.listen(port, () => {

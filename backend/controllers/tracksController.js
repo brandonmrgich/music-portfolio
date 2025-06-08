@@ -3,6 +3,7 @@ const manifestPath = path.resolve(__dirname, '../data/manifest.json');
 const { v4: uuidv4 } = require('uuid');
 const fs = require('fs');
 const { sanitizeTrackType, sanitizeQuotes } = require('../utils/santizeTrackType');
+const { syncManifest, getCachedManifest } = require('./manifestController.js');
 
 const BUCKET_NAME = process.env.AWS_BUCKET_NAME;
 
@@ -111,7 +112,8 @@ const getSignedUrl = (key, s3) => {
  * @returns {Array} List of all tracks with signed URLs
  */
 const getTracks = async (req, res) => {
-    const manifest = loadManifest();
+    // Manifest is now served from in-memory cache
+    const manifest = getCachedManifest();
     const s3 = req.s3;
 
     // Iterate through all tracks and generate signed URLs
@@ -155,10 +157,11 @@ const getTracks = async (req, res) => {
  * @returns {Array} List of tracks for the given type with signed URLs
  */
 const getTracksByType = async (req, res) => {
+    // Manifest is now served from in-memory cache
+    const manifest = getCachedManifest();
     console.log('[API] Tracks request made');
     const { type } = req.params;
     let trackType = sanitizeTrackType(type);
-    const manifest = loadManifest();
     const s3 = req.s3;
 
     if (!manifest[trackType]) {

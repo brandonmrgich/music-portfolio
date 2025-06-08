@@ -1,15 +1,21 @@
 const fs = require('fs');
 const path = require('path');
 const _ = require('lodash');
+const dotenv = require('dotenv');
+dotenv.config();
 
 // Path to where the manifest is stored locally
 const localManifestPath = path.join(__dirname, '..', 'data', 'manifest.json');
-const SERVER_MANIFEST_PATH = 'data/manifest.json';
+const SERVER_MANIFEST_PATH = 'state/manifest.json';
 const DEFAULT_MANIFEST = { WIP: [], REEL: [], SCORING: [] };
 
+let manifestCache = DEFAULT_MANIFEST;
+let lastManifestFetch = 0;
+const REFRESH_INTERVAL = parseInt(process.env.MANIFEST_REFRESH_INTERVAL_MS, 10) || 30000;
+
 /**
- * Load the local manifest from disk.
- * @returns {object} Manifest data
+ * PRIVATE: Only for admin/debug or legacy migration. Not exported.
+ * Reads the manifest from disk (legacy, not used in new design).
  */
 function loadLocalManifest() {
     try {
@@ -23,8 +29,8 @@ function loadLocalManifest() {
 }
 
 /**
- * Save the manifest locally to disk.
- * @param {object} manifest - Manifest data
+ * PRIVATE: Only for admin/debug or legacy migration. Not exported.
+ * Writes the manifest to disk (legacy, not used in new design).
  */
 function saveLocalManifest(manifest) {
     try {
@@ -37,9 +43,7 @@ function saveLocalManifest(manifest) {
 }
 
 /**
- * Fetch the manifest from the server (S3).
- * @param {object} req - Express request (with s3 instance)
- * @returns {Promise<object|null>} Manifest data or null on error
+ * PRIVATE: Used internally for fetching manifest from S3. Not exported.
  */
 async function fetchManifestFromServer(req) {
     const s3 = req.s3;
@@ -62,9 +66,7 @@ async function fetchManifestFromServer(req) {
 }
 
 /**
- * GET /manifest - Get the manifest from the server (S3).
- * @route GET /manifest
- * @returns {object} Manifest data
+ * ADMIN/DEBUG ONLY: Not exported. Use only for direct S3 inspection.
  */
 async function getManifest(req, res) {
     const serverManifest = await fetchManifestFromServer(req);
@@ -76,30 +78,39 @@ async function getManifest(req, res) {
 }
 
 /**
- * POST /manifest/sync - Sync the local manifest with the server (S3).
- * @route POST /manifest/sync
- * @returns {object} Sync result
+ * LEGACY/ADMIN ONLY: Not exported. Use only for legacy migration or admin sync.
  */
 async function syncManifest(req, res) {
+    console.log('syncing');
     const localManifest = loadLocalManifest();
     const serverManifest = await fetchManifestFromServer(req);
     if (!serverManifest) {
         console.error('Failed to fetch manifest from server');
-        return res.status(500).json({ error: 'Unable to fetch manifest from server' });
+        if (res) {
+            return res.status(500).json({ error: 'Unable to fetch manifest from server' });
+        } else {
+            return { success: false, error: 'Unable to fetch manifest from server' };
+        }
     }
     if (!_.isEqual(serverManifest, localManifest)) {
         console.log('Manifests differ. Syncing local with server.');
         saveLocalManifest(serverManifest);
-        return res.status(200).json({ message: 'Manifest synced successfully' });
+        if (res) {
+            return res.status(200).json({ message: 'Manifest synced successfully' });
+        } else {
+            return { success: true, message: 'Manifest synced successfully' };
+        }
     }
     console.log('Manifests are already up-to-date.');
-    return res.status(200).json({ message: 'No changes needed' });
+    if (res) {
+        return res.status(200).json({ message: 'No changes needed' });
+    } else {
+        return { success: true, message: 'No changes needed' };
+    }
 }
 
 /**
- * POST /manifest/upload - Sync the manifest from an uploaded file.
- * @route POST /manifest/upload
- * @returns {object} Sync result
+ * DANGEROUS: Not exported. Use only for admin upload/migration.
  */
 async function uploadAndSyncManifest(req, res) {
     if (!req.file) {
@@ -122,9 +133,31 @@ async function uploadAndSyncManifest(req, res) {
     return res.status(200).json({ message: 'No changes to sync from upload' });
 }
 
+/**
+ * PRIVATE: Used internally for cache refresh. Not exported.
+ */
+async function fetchManifestFromS3AndUpdateCache(req) {
+    const serverManifest = await fetchManifestFromServer(req);
+    console.log('fetching manifest from s3', { serverManifest });
+    if (serverManifest) {
+        manifestCache = serverManifest;
+        lastManifestFetch = Date.now();
+        console.log('[ManifestCache] Manifest updated from S3.');
+    } else {
+        console.warn('[ManifestCache] Failed to update manifest from S3.');
+    }
+}
+
+function getCachedManifest() {
+    return manifestCache;
+}
+
+function startManifestCacheAutoRefresh(req) {
+    fetchManifestFromS3AndUpdateCache(req); // Initial fetch
+    setInterval(() => fetchManifestFromS3AndUpdateCache(req), REFRESH_INTERVAL);
+}
+
 module.exports = {
-    loadLocalManifest,
-    getManifest,
-    syncManifest,
-    uploadAndSyncManifest,
+    getCachedManifest,
+    startManifestCacheAutoRefresh,
 };
