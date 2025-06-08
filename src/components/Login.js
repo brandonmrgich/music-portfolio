@@ -1,24 +1,20 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
-// import { authenticateUser, generateToken } from "../utils/auth";
+import { useAdmin } from '../contexts/AdminContext';
 
-const Login = ({ setIsAdmin }) => {
+const Login = ({ onSuccess }) => {
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
-    const navigate = useNavigate();
+    const [error, setError] = useState("");
+    const { login } = useAdmin();
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        setError("");
         try {
-            //const user = await authenticateUser(username, password);
-            //const token = generateToken(user);
-
-            // TODO: create api call
-
-            // setIsAdmin(true);
-            navigate("/");
-        } catch (error) {
-            alert(error.message);
+            await login(username, password);
+            if (onSuccess) onSuccess();
+        } catch (err) {
+            setError("Invalid username or password");
         }
     };
 
@@ -44,6 +40,7 @@ const Login = ({ setIsAdmin }) => {
             >
                 Login
             </button>
+            {error && <div className="text-red-500 text-sm">{error}</div>}
         </form>
     );
 };

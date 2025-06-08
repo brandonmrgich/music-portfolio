@@ -1,4 +1,5 @@
 import { fetchData, postData, putData, deleteData } from './api';
+import axios from 'axios';
 
 // Fetch all tracks
 export const fetchTracks = async () => {
@@ -36,6 +37,23 @@ export const fetchTracksByType = async (type) => {
 
 // Add a new track
 export const addTrack = async (trackData) => {
+    // If FormData, use axios directly for multipart upload
+    if (trackData instanceof FormData) {
+        try {
+            const response = await axios.post('/tracks', trackData, {
+                baseURL: process.env.NODE_ENV === 'production'
+                    ? 'https://api.brandonmrgich.com'
+                    : 'http://localhost:5000',
+                withCredentials: true,
+                headers: { 'Content-Type': 'multipart/form-data' },
+            });
+            return response.data;
+        } catch (error) {
+            console.error('Error adding track:', error);
+            throw error;
+        }
+    }
+    // Otherwise, use JSON
     try {
         const response = await postData('/tracks', trackData);
         return response;

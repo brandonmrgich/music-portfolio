@@ -1,5 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import ContentLinks from '../utils/ContentLinks';
+import { useAdmin } from '../contexts/AdminContext';
+import Login from './Login';
 
 const navLinks = [
   { label: 'Home', section: 'hero' },
@@ -9,11 +11,12 @@ const navLinks = [
   { label: 'About', section: 'about' },
 ];
 
-const Navbar = ({ refs }) => {
+const Navbar = ({ refs, setShowLogin }) => {
   const [menuOpen, setMenuOpen] = useState(false);
   const [hidden, setHidden] = useState(false);
   const lastScrollY = useRef(0);
   const ticking = useRef(false);
+  const { isAdmin, logout } = useAdmin();
 
   useEffect(() => {
     const SCROLL_THRESHOLD = 20;
@@ -53,6 +56,11 @@ const Navbar = ({ refs }) => {
         <a href="https://linktr.ee/brandonamrgich" target="_blank" rel="noopener noreferrer" aria-label="Linktree">
           <img src="/asailboat.png" alt="Logo" className="h-9 w-9 rounded-full hover:scale-105 transition-transform duration-200" />
         </a>
+        {isAdmin ? (
+          <button onClick={logout} className="ml-4 px-3 py-1 rounded bg-accent-dark text-white">Logout</button>
+        ) : (
+          <button onClick={() => setShowLogin(true)} className="ml-4 px-3 py-1 rounded bg-accent-dark text-white">Admin Login</button>
+        )}
       </div>
       <div className="md:hidden">
         <button onClick={() => setMenuOpen(!menuOpen)} className="focus:outline-none">
