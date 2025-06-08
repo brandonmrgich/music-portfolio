@@ -357,7 +357,6 @@ const BaseAudioPlayer = ({ id, src, title, artist, links = {}, renderAdditionalC
                             {artist}
                         </a>
                     </h4>
-                    {/* No visible slider, all volume control is via the icon */}
                 </div>
 
                 <div className="mb-2 mt-2 flex items-center text-sm italic">
@@ -368,7 +367,7 @@ const BaseAudioPlayer = ({ id, src, title, artist, links = {}, renderAdditionalC
                             min="0"
                             max={duration}
                             value={currentTime}
-                            onChange={(e) => seek(id, e.target.value)}
+                            onChange={(e) => seek(id, Number(e.target.value))}
                             className="w-full accent-accent-dark opacity-100 hover:cursor-pointer"
                         />
                     </div>
