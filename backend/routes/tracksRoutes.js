@@ -8,6 +8,7 @@ const {
     getTracksByType,
     uploadTrack,
 } = require('../controllers/tracksController');
+const adminSession = require('../middleware/adminSession');
 
 require('dotenv').config();
 
@@ -27,7 +28,7 @@ router.get('/', getTracks);
 // GET /tracks/:type - Get tracks by type
 router.get('/:type', getTracksByType);
 // POST /tracks - Upload a track (max 2 files for REEL)
-router.post('/', upload.array('file', 2), uploadTrack);
+router.post('/', adminSession, upload.array('file', 2), uploadTrack);
 // DELETE /tracks/:id - Delete track by ID
 router.delete('/:id', deleteTrackById);
 // PUT /tracks/:id - Update track by ID

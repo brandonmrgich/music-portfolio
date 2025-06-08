@@ -62,5 +62,14 @@
     }
   ],
   "SCORING": [],
-  "REEL": []
+  "REEL": [
+    {
+      "id": "2d4897cd-6ce1-4429-83ad-45851adde54c",
+      "title": "Screens",
+      "artist": "Blueshades",
+      "links": {},
+      "before": "tracks/reel/2d4897cd-6ce1-4429-83ad-45851adde54c_screensmasteringDemo+Gain.mp3",
+      "after": "tracks/reel/2d4897cd-6ce1-4429-83ad-45851adde54c_version2_Mrgich_Master_ScreensV1.wav"
+    }
+  ]
 }
