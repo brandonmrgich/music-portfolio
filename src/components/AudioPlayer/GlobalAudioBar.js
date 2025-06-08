@@ -44,7 +44,6 @@ const GlobalAudioBar = () => {
             document.removeEventListener('mousedown', handleClickOutside);
         };
     }, [minimized]);
-    // --- End expanded bar hooks ---
     // Scroll-aware show/hide for mobile
     useEffect(() => {
         const SCROLL_THRESHOLD = 40; // px before toggling

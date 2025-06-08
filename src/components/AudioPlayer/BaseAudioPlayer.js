@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Play, Pause, Volume, Volume1, Volume2, VolumeX } from 'lucide-react';
+import { Play, Pause, Volume, Volume1, Volume2, VolumeX, X, Loader2 } from 'lucide-react';
 import { useAudio } from '../../contexts/AudioContext';
+import { useAdmin } from '../../contexts/AdminContext';
+import { deleteTrack } from '../../services/tracks';
 
 /**
  * BaseAudioPlayer - A flexible audio player card for a single track.
@@ -27,7 +29,12 @@ const BaseAudioPlayer = ({ id, src, title, artist, links = {}, renderAdditionalC
         durations,
         volumes,
         initializeAudio,
+        refreshTracks,
     } = useAudio();
+    const { isAdmin } = useAdmin();
+    const [deleting, setDeleting] = useState(false);
+    const [deleteStatus, setDeleteStatus] = useState('idle'); // idle | deleting | success | error
+    const [deleteMsg, setDeleteMsg] = useState('');
 
     const isPlaying = playingStates[id];
     const currentTime = currentTimes[id] || 0;
@@ -215,10 +222,48 @@ const BaseAudioPlayer = ({ id, src, title, artist, links = {}, renderAdditionalC
         }
     };
 
+    const handleDelete = async () => {
+        if (!window.confirm('Are you sure you want to delete this track?')) return;
+        setDeleteStatus('deleting');
+        setDeleteMsg('');
+        try {
+            await deleteTrack(id);
+            await refreshTracks();
+            setDeleteStatus('success');
+            setDeleteMsg('Track deleted successfully.');
+            setTimeout(() => setDeleteStatus('idle'), 1500);
+        } catch (err) {
+            setDeleteStatus('error');
+            setDeleteMsg('Failed to delete track.');
+            setTimeout(() => setDeleteStatus('idle'), 2000);
+        }
+    };
+
     if (compact) {
         // Minimal UI for compressed grid
         return (
-            <div className={`flex flex-col bg-card-dark border border-border-dark rounded-lg shadow-md p-3 min-w-0 w-full max-w-xs mx-auto ${className}`}>
+            <div className={`relative flex flex-col bg-card-dark border border-border-dark rounded-lg shadow-md p-3 min-w-0 w-full max-w-xs mx-auto ${className}`}>
+                {isAdmin && (
+                    <button
+                        className="absolute top-2 right-2 z-10 text-red-400 hover:text-red-600 bg-black/40 rounded-full p-1.5 transition-colors flex items-center justify-center"
+                        onClick={handleDelete}
+                        disabled={deleteStatus === 'deleting'}
+                        title="Delete track"
+                        aria-label="Delete track"
+                    >
+                        {deleteStatus === 'deleting' ? (
+                            <Loader2 className="animate-spin" size={16} />
+                        ) : (
+                            <X size={16} />
+                        )}
+                    </button>
+                )}
+                {isAdmin && deleteStatus !== 'idle' && (
+                    <div className={`absolute top-10 right-2 text-xs px-2 py-1 rounded ${deleteStatus === 'success' ? 'bg-green-700 text-white' : 'bg-red-700 text-white'}`}
+                        style={{ zIndex: 20 }}>
+                        {deleteMsg}
+                    </div>
+                )}
                 <div className="flex items-center justify-between mb-1">
                     <button
                         onClick={handlePlayPause}
@@ -248,88 +293,110 @@ const BaseAudioPlayer = ({ id, src, title, artist, links = {}, renderAdditionalC
 
     // Full-featured player
     return (
-        <div className={`sm:p-4 md:p-4 p-1 max-h-30 sm:max-h-100 md:max-h-100 rounded-xl border border-border-dark shadow-xl transition-all duration-300 ease-in-out transform md:hover:scale-105 lg:hover:scale-105 disabled:opacity-50 audio-player max-w-sm sm:max-w-sm md:max-w-xs lg:max-w-lg flex flex-col w-full ${className}`}
-            style={{
-                background: 'rgba(44,44,54,0.55)',
-                backdropFilter: 'blur(18px)',
-                WebkitBackdropFilter: 'blur(18px)',
-            }}
-        >
-            <div className="flex flex-col gap-1">
-                <div className="flex items-center gap-2">
-                    <h3
-                        className="flex-grow truncate break-words overflow-hidden whitespace-nowrap text-lg font-semibold text-playercardText-dark hover:text-accent-dark transition-all duration-900"
-                        style={maskStyle}
-                    >
-                        <a
-                            href={links.song || '#'}
-                            className="block text-playercardText-dark hover:text-accent-dark transition-all duration-400"
-                        >
-                            {title}
-                        </a>
-                    </h3>
-                    <button
-                        ref={iconRef}
-                        className={`transition-transform focus:outline-none ${dragging ? 'scale-110' : ''}`}
-                        aria-label="Volume"
-                        onClick={handleIconClick}
-                        onMouseDown={handleMouseDown}
-                        onTouchStart={handleTouchStart}
-                        onKeyDown={handleKeyDown}
-                        tabIndex={0}
-                        style={{ cursor: 'pointer', outline: 'none', background: 'none', border: 'none', padding: 0 }}
-                    >
-                        {getIcon()}
-                    </button>
-                </div>
-                <h4 className="truncate md:max-w-30 lg:max-w-sm text-md font-light text-playercardText-dark hover:text-accent-dark transition-all duration-700">
-                    <a
-                        href={links.artist || '#'}
-                        className="max-w-xs opacity-80 text-playercardText-dark hover:text-accent-dark transition-all duration-300"
-                    >
-                        {artist}
-                    </a>
-                </h4>
-                {/* No visible slider, all volume control is via the icon */}
-            </div>
-
-            <div className="mb-2 mt-2 flex items-center text-sm italic">
-                <span className="text-accent-dark">{formatTime(currentTime)}</span>
-                <div className="flex-grow mx-4 flex items-center justify-center">
-                    <input
-                        type="range"
-                        min="0"
-                        max={duration}
-                        value={currentTime}
-                        onChange={(e) => seek(id, e.target.value)}
-                        className="w-full accent-accent-dark opacity-100 hover:cursor-pointer"
-                    />
-                </div>
-                <span className="text-accent-dark">{formatTime(duration)}</span>
-            </div>
-
-            <section className="playerControls flex items-center col-auto">
+        <div className={`relative audio-player-card ${compact ? 'p-2' : 'p-4'} ${className}`}>
+            {isAdmin && (
                 <button
-                    onClick={handlePlayPause}
-                    className="py-1.5 w-full bg-button-dark text-buttonText-dark rounded-md hover:bg-accent-dark transition-all duration-300 ease-in-out transform hover:scale-95 disabled:opacity-50"
+                    className="absolute top-2 right-2 z-10 text-red-400 hover:text-red-600 bg-black/40 rounded-full p-1.5 transition-colors flex items-center justify-center"
+                    onClick={handleDelete}
+                    disabled={deleteStatus === 'deleting'}
+                    title="Delete track"
+                    aria-label="Delete track"
                 >
-                    <div className="relative w-5 h-5 mx-auto">
-                        <Play
-                            className={`absolute top-0 left-0 w-5 h-5 transform transition-all duration-300 ease-in-out text-playicon-dark ${
-                                isPlaying ? 'opacity-0 scale-75' : 'opacity-100 scale-100'
-                            }`}
-                        />
-                        <Pause
-                            className={`absolute top-0 left-0 w-5 h-5 transform transition-all duration-300 ease-in-out text-playicon-dark ${
-                                isPlaying ? 'opacity-100 scale-100' : 'opacity-0 scale-75'
-                            }`}
+                    {deleteStatus === 'deleting' ? (
+                        <Loader2 className="animate-spin" size={18} />
+                    ) : (
+                        <X size={18} />
+                    )}
+                </button>
+            )}
+            {isAdmin && deleteStatus !== 'idle' && (
+                <div className={`absolute top-10 right-2 text-xs px-2 py-1 rounded ${deleteStatus === 'success' ? 'bg-green-700 text-white' : 'bg-red-700 text-white'}`}
+                     style={{ zIndex: 20 }}>
+                    {deleteMsg}
+                </div>
+            )}
+            <div className={`sm:p-4 md:p-4 p-1 max-h-30 sm:max-h-100 md:max-h-100 rounded-xl border border-border-dark shadow-xl transition-all duration-300 ease-in-out transform md:hover:scale-105 lg:hover:scale-105 disabled:opacity-50 audio-player max-w-sm sm:max-w-sm md:max-w-xs lg:max-w-lg flex flex-col w-full`}
+                style={{
+                    background: 'rgba(44,44,54,0.55)',
+                    backdropFilter: 'blur(18px)',
+                    WebkitBackdropFilter: 'blur(18px)',
+                }}
+            >
+                <div className="flex flex-col gap-1">
+                    <div className="flex items-center gap-2">
+                        <h3
+                            className="flex-grow truncate break-words overflow-hidden whitespace-nowrap text-lg font-semibold text-playercardText-dark hover:text-accent-dark transition-all duration-900"
+                            style={maskStyle}
+                        >
+                            <a
+                                href={links.song || '#'}
+                                className="block text-playercardText-dark hover:text-accent-dark transition-all duration-400"
+                            >
+                                {title}
+                            </a>
+                        </h3>
+                        <button
+                            ref={iconRef}
+                            className={`transition-transform focus:outline-none ${dragging ? 'scale-110' : ''}`}
+                            aria-label="Volume"
+                            onClick={handleIconClick}
+                            onMouseDown={handleMouseDown}
+                            onTouchStart={handleTouchStart}
+                            onKeyDown={handleKeyDown}
+                            tabIndex={0}
+                            style={{ cursor: 'pointer', outline: 'none', background: 'none', border: 'none', padding: 0 }}
+                        >
+                            {getIcon()}
+                        </button>
+                    </div>
+                    <h4 className="truncate md:max-w-30 lg:max-w-sm text-md font-light text-playercardText-dark hover:text-accent-dark transition-all duration-700">
+                        <a
+                            href={links.artist || '#'}
+                            className="max-w-xs opacity-80 text-playercardText-dark hover:text-accent-dark transition-all duration-300"
+                        >
+                            {artist}
+                        </a>
+                    </h4>
+                </div>
+
+                <div className="mb-2 mt-2 flex items-center text-sm italic">
+                    <span className="text-accent-dark">{formatTime(currentTime)}</span>
+                    <div className="flex-grow mx-4 flex items-center justify-center">
+                        <input
+                            type="range"
+                            min="0"
+                            max={duration}
+                            value={currentTime}
+                            onChange={(e) => seek(id, Number(e.target.value))}
+                            className="w-full accent-accent-dark opacity-100 hover:cursor-pointer"
                         />
                     </div>
-                </button>
-                <div className="mt-1">{renderAdditionalControls && <span className="text-playercardText-dark">{renderAdditionalControls()}</span>}</div>
-            </section>
+                    <span className="text-accent-dark">{formatTime(duration)}</span>
+                </div>
 
-            {error && <span className="sm text-red-500 mt-2">{error}</span>}
+                <section className="playerControls flex items-center col-auto">
+                    <button
+                        onClick={handlePlayPause}
+                        className="py-1.5 w-full bg-button-dark text-buttonText-dark rounded-md hover:bg-accent-dark transition-all duration-300 ease-in-out transform hover:scale-95 disabled:opacity-50"
+                    >
+                        <div className="relative w-5 h-5 mx-auto">
+                            <Play
+                                className={`absolute top-0 left-0 w-5 h-5 transform transition-all duration-300 ease-in-out text-playicon-dark ${
+                                    isPlaying ? 'opacity-0 scale-75' : 'opacity-100 scale-100'
+                                }`}
+                            />
+                            <Pause
+                                className={`absolute top-0 left-0 w-5 h-5 transform transition-all duration-300 ease-in-out text-playicon-dark ${
+                                    isPlaying ? 'opacity-100 scale-100' : 'opacity-0 scale-75'
+                                }`}
+                            />
+                        </div>
+                    </button>
+                    <div className="mt-1">{renderAdditionalControls && <span className="text-playercardText-dark">{renderAdditionalControls()}</span>}</div>
+                </section>
+
+                {error && <span className="sm text-red-500 mt-2">{error}</span>}
+            </div>
         </div>
     );
 };

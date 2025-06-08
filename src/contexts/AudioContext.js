@@ -8,6 +8,9 @@ import { fetchTracksByType } from '../services/tracks';
  */
 const AudioContext = createContext();
 
+const TARGET_PEAK = 0.9;
+const DEFAULT_VOLUME = 0.5;
+
 /**
  * AudioProvider wraps the app and provides audio state and controls via context.
  * @param {object} props
@@ -21,193 +24,137 @@ export const AudioProvider = ({ children }) => {
     const [volumes, setVolumes] = useState({});
     const [currentSrcs, setCurrentSrcs] = useState({});
     const [currentTrack, setCurrentTrack] = useState(null); // Metadata for global bar
-    const audioRefs = useRef({});
-    const DEFAULT_VOLUME = 0.5;
-
     // --- Track data state ---
     const [tracks, setTracks] = useState({ wip: [], scoring: [], reel: [] });
     const [tracksLoading, setTracksLoading] = useState(false);
     const [tracksError, setTracksError] = useState(null);
 
-    /**
-     * Initialize an audio element for a given track id and src, if not already present.
-     * @param {string|number} id
-     * @param {string} src
-     */
-    const initializeAudio = (id, src) => {
+    // --- Audio refs ---
+    const audioRefs = useRef({}); // { id: { audio, normalization } }
+
+    // --- Web Audio API for normalization only ---
+    const getNormalizationFactor = async (src, targetPeak = TARGET_PEAK) => {
+        try {
+            const response = await fetch(src);
+            const arrayBuffer = await response.arrayBuffer();
+            const audioCtx = new window.AudioContext();
+            const audioBuffer = await audioCtx.decodeAudioData(arrayBuffer);
+            let peak = 0;
+            for (let i = 0; i < audioBuffer.numberOfChannels; i++) {
+                const channelData = audioBuffer.getChannelData(i);
+                for (let j = 0; j < channelData.length; j++) {
+                    peak = Math.max(peak, Math.abs(channelData[j]));
+                }
+            }
+            audioCtx.close();
+            return peak === 0 ? 1 : targetPeak / peak;
+        } catch (err) {
+            console.error('Error normalizing audio:', err);
+            return 1;
+        }
+    };
+
+    // --- Audio element management ---
+    const initializeAudio = async (id, src) => {
         if (audioRefs.current[id]) return;
-        setNewAudioSrc(id, src);
-        addAudioEventListeners(id);
-        audioRefs.current[id].initialized = true;
-    };
-
-    /**
-     * Create a new Audio element and set its volume.
-     * @param {string|number} id
-     * @param {string} src
-     * @param {number} [defaultVolume]
-     */
-    const setNewAudioSrc = (id, src, defaultVolume = DEFAULT_VOLUME) => {
-        audioRefs.current[id] = new Audio(src);
-        audioRefs.current[id].volume = volumes[id] !== undefined ? volumes[id] : defaultVolume;
-    };
-
-    /**
-     * Add event listeners to an audio element for metadata, time, and end events.
-     * @param {string|number} id
-     */
-    const addAudioEventListeners = (id) => {
-        const audio = audioRefs.current[id];
-        audio.addEventListener('loadedmetadata', () => handleLoadedMetadata(id));
-        audio.addEventListener('timeupdate', () => handleTimeUpdate(id));
-        audio.addEventListener('ended', () => handleEnded(id));
-    };
-
-    /**
-     * Handle loadedmetadata event for an audio element.
-     * @param {string|number} id
-     */
-    const handleLoadedMetadata = (id) => {
-        setDurations((prev) => ({ ...prev, [id]: audioRefs.current[id].duration }));
-    };
-
-    /**
-     * Handle timeupdate event for an audio element.
-     * @param {string|number} id
-     */
-    const handleTimeUpdate = (id) => {
-        setCurrentTimes((prev) => ({ ...prev, [id]: audioRefs.current[id].currentTime }));
-    };
-
-    /**
-     * Handle ended event for an audio element.
-     * @param {string|number} id
-     */
-    const handleEnded = (id) => {
-        setPlayingStates((prev) => ({ ...prev, [id]: false }));
-        setCurrentTimes((prev) => ({ ...prev, [id]: 0 }));
-    };
-
-    /**
-     * Clean up an audio element and its event listeners.
-     * @param {string|number} id
-     */
-    const cleanupAudio = (id) => {
-        const oldAudio = audioRefs.current[id];
-        if (oldAudio) {
-            oldAudio.pause();
-            oldAudio.currentTime = 0;
-            oldAudio.removeEventListener('loadedmetadata', handleLoadedMetadata);
-            oldAudio.removeEventListener('timeupdate', handleTimeUpdate);
-            oldAudio.removeEventListener('ended', handleEnded);
-            audioRefs.current[id] = null;
-        }
-    };
-
-    /**
-     * Play an audio element by id and src, updating global state and current track metadata.
-     * @param {string|number} id
-     * @param {string} src
-     * @param {object} [meta] - Track metadata (title, artist, links)
-     */
-    const play = (id, src, meta) => {
-        stopAllExcept(id);
-        if (audioRefs.current[id] == undefined) {
+        const normalization = await getNormalizationFactor(src);
+        const audio = new window.Audio(src);
+        audio.preload = 'auto';
+        audio.volume = (volumes[id] !== undefined ? volumes[id] : DEFAULT_VOLUME) * normalization;
+        audio.addEventListener('loadedmetadata', () => {
+            setDurations((prev) => ({ ...prev, [id]: audio.duration }));
+        });
+        audio.addEventListener('timeupdate', () => {
+            setCurrentTimes((prev) => ({ ...prev, [id]: audio.currentTime }));
+        });
+        audio.addEventListener('ended', () => {
             setPlayingStates((prev) => ({ ...prev, [id]: false }));
-            setCurrentSrcs(null);
-            setCurrentTrack(null);
-            return;
-        }
-        audioRefs.current[id]
-            .play()
-            .then(() => {
-                setPlayingStates((prev) => ({ ...prev, [id]: true }));
-                setCurrentSrcs((prev) => ({ ...prev, [id]: src }));
-                if (meta) setCurrentTrack({ id, src, ...meta });
-            })
-            .catch((err) => console.error(`Error playing ${id}:`, err));
+            setCurrentTimes((prev) => ({ ...prev, [id]: 0 }));
+        });
+        audioRefs.current[id] = { audio, normalization };
     };
 
-    /**
-     * Pause all audio except the given id.
-     * @param {string|number} id
-     */
+    // Pause and reset all audio except the one with the given id
     const stopAllExcept = (id) => {
         Object.keys(audioRefs.current).forEach((key) => {
-            if (key != id && audioRefs.current[key]) {
-                stop(key);
+            if (key !== String(id) && audioRefs.current[key]) {
+                audioRefs.current[key].audio.pause();
+                audioRefs.current[key].audio.currentTime = 0;
+                setPlayingStates((prev) => ({ ...prev, [key]: false }));
+                setCurrentTimes((prev) => ({ ...prev, [key]: 0 }));
             }
         });
     };
 
-    /**
-     * Stop and reset an audio element by id.
-     * @param {string|number} id
-     */
+    const play = async (id, src, meta) => {
+        stopAllExcept(id);
+        await initializeAudio(id, src);
+        const ref = audioRefs.current[id];
+        if (!ref) {
+            setPlayingStates((prev) => ({ ...prev, [id]: false }));
+            setCurrentSrcs((prev) => ({ ...prev, [id]: null }));
+            setCurrentTrack(null);
+            return;
+        }
+        ref.audio.currentTime = currentTimes[id] || 0;
+        ref.audio.play();
+        setPlayingStates((prev) => ({ ...prev, [id]: true }));
+        setCurrentSrcs((prev) => ({ ...prev, [id]: src }));
+        if (meta) setCurrentTrack({ id, src, ...meta });
+    };
+
+    const pause = (id) => {
+        const ref = audioRefs.current[id];
+        if (ref) {
+            ref.audio.pause();
+            setPlayingStates((prev) => ({ ...prev, [id]: false }));
+        }
+    };
+
     const stop = (id) => {
-        if (audioRefs.current[id]) {
-            audioRefs.current[id].pause();
-            audioRefs.current[id].currentTime = 0;
+        const ref = audioRefs.current[id];
+        if (ref) {
+            ref.audio.pause();
+            ref.audio.currentTime = 0;
             setPlayingStates((prev) => ({ ...prev, [id]: false }));
             setCurrentTimes((prev) => ({ ...prev, [id]: 0 }));
         }
     };
 
-    /**
-     * Pause an audio element by id.
-     * @param {string|number} id
-     */
-    const pause = (id) => {
-        audioRefs.current[id]?.pause();
-        setPlayingStates((prev) => ({ ...prev, [id]: false }));
-    };
-
-    /**
-     * Seek to a specific time in an audio element by id.
-     * @param {string|number} id
-     * @param {number} time
-     */
     const seek = (id, time) => {
-        if (audioRefs.current[id]) {
-            audioRefs.current[id].currentTime = time;
+        const ref = audioRefs.current[id];
+        if (ref) {
+            ref.audio.currentTime = time;
             setCurrentTimes((prev) => ({ ...prev, [id]: time }));
         }
     };
 
-    /**
-     * Set the volume for an audio element by id.
-     * @param {string|number} id
-     * @param {number} volume
-     */
     const setVolume = (id, volume) => {
-        if (audioRefs.current[id]) {
-            audioRefs.current[id].volume = volume;
-            setVolumes((prev) => ({ ...prev, [id]: volume }));
+        setVolumes((prev) => ({ ...prev, [id]: volume }));
+        const ref = audioRefs.current[id];
+        if (ref) {
+            ref.audio.volume = volume * ref.normalization;
         }
     };
 
-    /**
-     * Toggle between two audio sources for a given id, preserving volume and time.
-     * @param {string|number} id
-     * @param {string} beforeSrc
-     * @param {string} afterSrc
-     * @param {boolean} isBeforeAudio
-     */
-    const toggleSource = (id, beforeSrc, afterSrc, isBeforeAudio) => {
+    // Toggle between two sources (A/B)
+    const toggleSource = async (id, beforeSrc, afterSrc, isBeforeAudio) => {
         const newSrc = isBeforeAudio ? afterSrc : beforeSrc;
-        const oldAudio = audioRefs.current[id];
-        const oldVolume = oldAudio ? oldAudio.volume : DEFAULT_VOLUME;
-        const oldCurrentTime = oldAudio ? oldAudio.currentTime : 0;
-        cleanupAudio(id);
-        initializeAudio(id, newSrc);
+        const oldVolume = volumes[id] !== undefined ? volumes[id] : DEFAULT_VOLUME;
+        const oldCurrentTime = currentTimes[id] || 0;
+        // Remove old audio element
+        if (audioRefs.current[id]) {
+            audioRefs.current[id].audio.pause();
+            audioRefs.current[id].audio.src = '';
+            delete audioRefs.current[id];
+        }
+        await initializeAudio(id, newSrc);
         setVolume(id, oldVolume);
         seek(id, oldCurrentTime);
         play(id, newSrc);
     };
 
-    /**
-     * Fetch all track types and store in context.
-     */
+    // --- Track fetching ---
     const refreshTracks = async () => {
         setTracksLoading(true);
         setTracksError(null);
@@ -229,11 +176,7 @@ export const AudioProvider = ({ children }) => {
         refreshTracks();
     }, []);
 
-    /**
-     * Get a track by id from any type.
-     * @param {string|number} id
-     * @returns {object|null}
-     */
+    // --- Get track by id ---
     const getTrackById = (id) => {
         for (const type of Object.keys(tracks)) {
             const found = tracks[type]?.find((t) => String(t.id) === String(id));
@@ -245,23 +188,14 @@ export const AudioProvider = ({ children }) => {
     // On unmount, pause and reset all audio
     useEffect(() => {
         return () => {
-            Object.values(audioRefs.current).forEach((audio) => {
-                if (audio) {
-                    audio.pause();
-                    audio.currentTime = 0;
+            Object.values(audioRefs.current).forEach((ref) => {
+                if (ref && ref.audio) {
+                    ref.audio.pause();
+                    ref.audio.src = '';
                 }
             });
         };
     }, []);
-
-    /**
-     * Allow a component to re-bind to an existing audio instance (optional, for future use).
-     * @param {string|number} id
-     * @returns {HTMLAudioElement|null}
-     */
-    const bindAudioRef = (id) => {
-        return audioRefs.current[id] || null;
-    };
 
     /**
      * Context value: exposes all audio state, controls, and track data.
@@ -281,7 +215,6 @@ export const AudioProvider = ({ children }) => {
                 setVolume,
                 toggleSource,
                 initializeAudio,
-                bindAudioRef,
                 currentTrack,
                 tracks,
                 tracksLoading,
