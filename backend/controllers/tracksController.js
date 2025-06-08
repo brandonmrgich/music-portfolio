@@ -1,95 +1,35 @@
-const path = require('path');
-const manifestPath = path.resolve(__dirname, '../data/manifest.json');
 const { v4: uuidv4 } = require('uuid');
-const fs = require('fs');
 const { sanitizeTrackType, sanitizeQuotes } = require('../utils/santizeTrackType');
-const { syncManifest, getCachedManifest } = require('./manifestController.js');
+const {
+  syncManifest,
+  getCachedManifest,
+  fetchManifestFromS3AndUpdateCache,
+  loadManifest,
+  saveManifest,
+  backupManifestToS3,
+} = require('./manifestController.js');
 
 const BUCKET_NAME = process.env.AWS_BUCKET_NAME;
 
 /**
- * Load the manifest JSON from disk.
- * @returns {object} Manifest data
+ * Track Controller
+ * Handles CRUD operations for audio tracks (WIP, REEL, SCORING).
+ *
+ * Manifest operations (load, save, backup, cache refresh) are delegated to manifestController for single-responsibility and maintainability.
+ *
+ * Manifest-related functions imported from manifestController:
+ *   - loadManifest: Loads the manifest from disk (local source of truth)
+ *   - saveManifest: Saves the manifest to disk
+ *   - backupManifestToS3: Uploads the manifest to S3 (canonical source for production)
+ *   - fetchManifestFromS3AndUpdateCache: Refreshes the in-memory manifest cache from S3
+ *
+ * Usage pattern for any track change (add, update, delete):
+ *   1. loadManifest() to get the latest manifest
+ *   2. Modify manifest in-memory
+ *   3. saveManifest() to persist to disk
+ *   4. backupManifestToS3() to sync to S3
+ *   5. fetchManifestFromS3AndUpdateCache() to update in-memory cache
  */
-const loadManifest = () => {
-    if (fs.existsSync(manifestPath)) {
-        return JSON.parse(fs.readFileSync(manifestPath, 'utf8'));
-    }
-    return { WIP: [], REEL: [], SCORING: [] };
-};
-
-/**
- * Save the manifest JSON to disk.
- * @param {object} data - Manifest data
- */
-const saveManifest = (data) => {
-    fs.writeFileSync(manifestPath, JSON.stringify(data, null, 2));
-};
-
-/**
- * Backup the manifest to S3, using a temp file and then overwriting the main manifest.
- * @param {object} s3 - AWS S3 instance
- * @param {object} manifest - Manifest data
- */
-const backupManifestToS3 = async (s3, manifest) => {
-    const manifestBackupKey = 'state/manifest.json';
-    const tempBackupKey = `state/manifest_temp_${uuidv4()}.json`;
-
-    const MSGPRE = '[S3 Manifest Backup]';
-
-    try {
-        console.log(`${MSGPRE} Uploading temp manifest: ${tempBackupKey}...`);
-        // Step 1: Upload the temp file
-        await s3
-            .upload({
-                Bucket: BUCKET_NAME,
-                Key: tempBackupKey,
-                Body: JSON.stringify(manifest, null, 2),
-                ContentType: 'application/json',
-            })
-            .promise();
-        console.log(`${MSGPRE} Temp upload complete.`);
-
-        const data = await s3
-            .listObjectsV2({
-                Bucket: BUCKET_NAME,
-                Prefix: tempBackupKey,
-                MaxKeys: 1,
-            })
-            .promise();
-
-        const fileExists = data.Contents.length > 0;
-        //console.log('data: ', { data });
-
-        // If the temp file exists, proceed with renaming
-        if (fileExists) {
-            console.log(`${MSGPRE} Temp file confirmed, proceeding with overwrite...`);
-
-            // Step 3: Use `putObject` to overwrite the main manifest with the temp file's content
-            await s3
-                .putObject({
-                    Bucket: BUCKET_NAME,
-                    Key: manifestBackupKey,
-                    Body: JSON.stringify(manifest, null, 2), // Put the content of the new manifest here
-                    ContentType: 'application/json',
-                })
-                .promise();
-            console.log(`${MSGPRE} Manifest overwrite complete.`);
-
-            // Step 4: Delete the temp file
-            await s3
-                .deleteObject({
-                    Bucket: BUCKET_NAME,
-                    Key: tempBackupKey,
-                })
-                .promise();
-            console.log(`${MSGPRE} Temp file deleted.`);
-        }
-    } catch (error) {
-        console.error('Error during manifest backup:', error);
-        throw new Error('Manifest backup process failed');
-    }
-};
 
 /**
  * Generate a signed S3 URL for a given key.
@@ -188,6 +128,16 @@ const getTracksByType = async (req, res) => {
 
 /**
  * POST /tracks - Upload a new track (WIP, REEL, or SCORING)
+ *
+ * Steps:
+ *   1. Validate input and files
+ *   2. Upload audio files to S3
+ *   3. loadManifest() - get the latest manifest from disk
+ *   4. Add new track entry to manifest in-memory
+ *   5. saveManifest() - persist manifest to disk
+ *   6. backupManifestToS3() - upload manifest to S3
+ *   7. fetchManifestFromS3AndUpdateCache() - refresh in-memory cache
+ *
  * @route POST /tracks
  * @body {string} type - Track type
  * @body {string} title - Track title
@@ -218,6 +168,7 @@ const uploadTrack = async (req, res) => {
         return res.status(400).json({ error: 'WIP and SCORING require exactly one file' });
     }
 
+    // Step 3: Load manifest from disk
     const manifest = loadManifest();
     const id = uuidv4();
     const beforeFile = files[0];
@@ -259,8 +210,12 @@ const uploadTrack = async (req, res) => {
         };
 
         manifest[sanitizedType].push(track);
+        // Step 5: Save manifest to disk
         saveManifest(manifest);
+        // Step 6: Backup manifest to S3
         await backupManifestToS3(s3, manifest);
+        // Step 7: Refresh in-memory cache
+        await fetchManifestFromS3AndUpdateCache(req);
 
         res.json({ message: 'Track uploaded successfully', track });
     } catch (error) {
@@ -271,6 +226,14 @@ const uploadTrack = async (req, res) => {
 
 /**
  * DELETE /tracks/:id - Delete a track by ID
+ *
+ * Steps:
+ *   1. loadManifest() - get the latest manifest from disk
+ *   2. Find and remove the track entry
+ *   3. saveManifest() - persist manifest to disk
+ *   4. backupManifestToS3() - upload manifest to S3
+ *   5. fetchManifestFromS3AndUpdateCache() - refresh in-memory cache
+ *
  * @route DELETE /tracks/:id
  * @param {string} id - Track ID
  * @returns {object} Deletion result
@@ -278,6 +241,7 @@ const uploadTrack = async (req, res) => {
 const deleteTrackById = async (req, res) => {
     const { id } = req.params;
     const s3 = req.s3;
+    // Step 1: Load manifest from disk
     const manifest = loadManifest();
 
     let trackType = null;
@@ -311,8 +275,12 @@ const deleteTrackById = async (req, res) => {
         }
 
         manifest[trackType].splice(trackIndex, 1);
+        // Step 3: Save manifest to disk
         saveManifest(manifest);
+        // Step 4: Backup manifest to S3
         await backupManifestToS3(s3, manifest);
+        // Step 5: Refresh in-memory cache
+        await fetchManifestFromS3AndUpdateCache(req);
 
         res.json({ message: 'Track deleted successfully' });
     } catch (error) {
@@ -323,6 +291,14 @@ const deleteTrackById = async (req, res) => {
 
 /**
  * PUT /tracks/:id - Update a track's metadata by ID
+ *
+ * Steps:
+ *   1. loadManifest() - get the latest manifest from disk
+ *   2. Find and update the track entry
+ *   3. saveManifest() - persist manifest to disk
+ *   4. backupManifestToS3() - upload manifest to S3
+ *   5. fetchManifestFromS3AndUpdateCache() - refresh in-memory cache
+ *
  * @route PUT /tracks/:id
  * @param {string} id - Track ID
  * @body {object} updates - Updated metadata
@@ -332,6 +308,7 @@ const updateTrackById = async (req, res) => {
     const { id } = req.params;
     const { title, artist, links } = req.body;
     const s3 = req.s3;
+    // Step 1: Load manifest from disk
     const manifest = loadManifest();
 
     const sanitizedTitle = sanitizeQuotes(title);
@@ -366,8 +343,12 @@ const updateTrackById = async (req, res) => {
         return res.status(404).json({ error: 'Track not found' });
     }
 
+    // Step 3: Save manifest to disk
     saveManifest(manifest);
+    // Step 4: Backup manifest to S3
     await backupManifestToS3(s3, manifest);
+    // Step 5: Refresh in-memory cache
+    await fetchManifestFromS3AndUpdateCache(req);
     res.json({ message: 'Track updated successfully' });
 };
 
