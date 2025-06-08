@@ -52,42 +52,44 @@ const getSignedUrl = (key, s3) => {
  * @returns {Array} List of all tracks with signed URLs
  */
 const getTracks = async (req, res) => {
-    // Manifest is now served from in-memory cache
-    const manifest = getCachedManifest();
-    const s3 = req.s3;
-
-    // Iterate through all tracks and generate signed URLs
-    const signedTracks = await Promise.all(
-        Object.keys(manifest).map(async (type) => {
-            return {
-                type,
-                tracks: await Promise.all(
-                    manifest[type].map(async (track) => {
-                        // For REEL type, we need to generate signed URLs for both 'before' and 'after'
-                        if (track.before && track.after) {
-                            return {
-                                ...track,
-                                before: getSignedUrl(track.before, s3),
-                                after: getSignedUrl(track.after, s3),
-                            };
-                        }
-
-                        // For WIP and SCORING types, just the 'src' field
-                        if (track.src) {
-                            return {
-                                ...track,
-                                src: getSignedUrl(track.src, s3),
-                            };
-                        }
-
-                        return track; // In case the track doesn't have URLs
-                    })
-                ),
-            };
-        })
-    );
-
-    res.json(signedTracks);
+    console.log('[API] GET /tracks');
+    try {
+        // Manifest is now served from in-memory cache
+        const manifest = getCachedManifest();
+        const s3 = req.s3;
+        // Iterate through all tracks and generate signed URLs
+        const signedTracks = await Promise.all(
+            Object.keys(manifest).map(async (type) => {
+                return {
+                    type,
+                    tracks: await Promise.all(
+                        manifest[type].map(async (track) => {
+                            // For REEL type, we need to generate signed URLs for both 'before' and 'after'
+                            if (track.before && track.after) {
+                                return {
+                                    ...track,
+                                    before: getSignedUrl(track.before, s3),
+                                    after: getSignedUrl(track.after, s3),
+                                };
+                            }
+                            // For WIP and SCORING types, just the 'src' field
+                            if (track.src) {
+                                return {
+                                    ...track,
+                                    src: getSignedUrl(track.src, s3),
+                                };
+                            }
+                            return track; // In case the track doesn't have URLs
+                        })
+                    ),
+                };
+            })
+        );
+        res.json(signedTracks);
+    } catch (err) {
+        console.error('[API] Error in GET /tracks:', err);
+        res.status(500).json({ error: 'Internal server error' });
+    }
 };
 
 /**
@@ -97,33 +99,35 @@ const getTracks = async (req, res) => {
  * @returns {Array} List of tracks for the given type with signed URLs
  */
 const getTracksByType = async (req, res) => {
-    // Manifest is now served from in-memory cache
-    const manifest = getCachedManifest();
-    console.log('[API] Tracks request made');
-    const { type } = req.params;
-    let trackType = sanitizeTrackType(type);
-    const s3 = req.s3;
-
-    if (!manifest[trackType]) {
-        return res.status(400).json({ error: 'Invalid track type' });
-    }
-
-    // Generate signed URLs for tracks
-    const signedTracks = manifest[trackType].map((track) => {
-        if (trackType === 'REEL') {
+    console.log(`[API] GET /tracks/${req.params.type}`);
+    try {
+        // Manifest is now served from in-memory cache
+        const manifest = getCachedManifest();
+        const { type } = req.params;
+        let trackType = sanitizeTrackType(type);
+        const s3 = req.s3;
+        if (!manifest[trackType]) {
+            return res.status(400).json({ error: 'Invalid track type' });
+        }
+        // Generate signed URLs for tracks
+        const signedTracks = manifest[trackType].map((track) => {
+            if (trackType === 'REEL') {
+                return {
+                    ...track,
+                    before: track.before ? getSignedUrl(track.before, s3) : null,
+                    after: track.after ? getSignedUrl(track.after, s3) : null,
+                };
+            }
             return {
                 ...track,
-                before: track.before ? getSignedUrl(track.before, s3) : null,
-                after: track.after ? getSignedUrl(track.after, s3) : null,
+                src: track.src ? getSignedUrl(track.src, s3) : null,
             };
-        }
-        return {
-            ...track,
-            src: track.src ? getSignedUrl(track.src, s3) : null,
-        };
-    });
-
-    res.json(signedTracks);
+        });
+        res.json(signedTracks);
+    } catch (err) {
+        console.error(`[API] Error in GET /tracks/${req.params.type}:`, err);
+        res.status(500).json({ error: 'Internal server error' });
+    }
 };
 
 /**
@@ -147,37 +151,31 @@ const getTracksByType = async (req, res) => {
  * @returns {object} Uploaded track info
  */
 const uploadTrack = async (req, res) => {
-    const { type, title, artist, links } = req.body;
-    const sanitizedType = sanitizeTrackType(type);
-    const sanitizedTitle = sanitizeQuotes(title);
-    const sanitizedArtist = sanitizeQuotes(artist);
-    const sanitizedLinks = links ? JSON.parse(sanitizeQuotes(links)) : {};
-
-    const s3 = req.s3;
-    const files = req.files || [];
-
-    if (!sanitizedType || !sanitizedTitle || !sanitizedArtist || !sanitizedLinks) {
-        return res.status(400).json({ error: 'Missing required metadata' });
-    }
-
-    if (sanitizedType === 'REEL' && files.length !== 2) {
-        return res.status(400).json({ error: 'REEL requires exactly two files' });
-    }
-
-    if (sanitizedType !== 'REEL' && files.length !== 1) {
-        return res.status(400).json({ error: 'WIP and SCORING require exactly one file' });
-    }
-
-    // Step 3: Load manifest from disk
-    const manifest = loadManifest();
-    const id = uuidv4();
-    const beforeFile = files[0];
-    let afterFile = files.length > 1 ? files[1] : null;
-
-    const s3BeforeKey = `tracks/${sanitizedType.toLowerCase()}/${id}_${beforeFile.originalname}`;
-    let s3AfterKey = null;
-
+    console.log('[API] POST /tracks', req.body);
     try {
+        const { type, title, artist, links } = req.body;
+        const sanitizedType = sanitizeTrackType(type);
+        const sanitizedTitle = sanitizeQuotes(title);
+        const sanitizedArtist = sanitizeQuotes(artist);
+        const sanitizedLinks = links ? JSON.parse(sanitizeQuotes(links)) : {};
+        const s3 = req.s3;
+        const files = req.files || [];
+        if (!sanitizedType || !sanitizedTitle || !sanitizedArtist || !sanitizedLinks) {
+            return res.status(400).json({ error: 'Missing required metadata' });
+        }
+        if (sanitizedType === 'REEL' && files.length !== 2) {
+            return res.status(400).json({ error: 'REEL requires exactly two files' });
+        }
+        if (sanitizedType !== 'REEL' && files.length !== 1) {
+            return res.status(400).json({ error: 'WIP and SCORING require exactly one file' });
+        }
+        // Step 3: Load manifest from disk
+        const manifest = loadManifest();
+        const id = uuidv4();
+        const beforeFile = files[0];
+        let afterFile = files.length > 1 ? files[1] : null;
+        const s3BeforeKey = `tracks/${sanitizedType.toLowerCase()}/${id}_${beforeFile.originalname}`;
+        let s3AfterKey = null;
         await s3
             .upload({
                 Bucket: BUCKET_NAME,
@@ -186,7 +184,6 @@ const uploadTrack = async (req, res) => {
                 ContentType: beforeFile.mimetype,
             })
             .promise();
-
         if (sanitizedType === 'REEL' && afterFile) {
             s3AfterKey = `tracks/${sanitizedType.toLowerCase()}/${id}_version2_${afterFile.originalname}`;
             await s3
@@ -198,7 +195,6 @@ const uploadTrack = async (req, res) => {
                 })
                 .promise();
         }
-
         const track = {
             id,
             title: sanitizedTitle,
@@ -208,7 +204,6 @@ const uploadTrack = async (req, res) => {
                 ? { before: s3BeforeKey, after: s3AfterKey }
                 : { src: s3BeforeKey }),
         };
-
         manifest[sanitizedType].push(track);
         // Step 5: Save manifest to disk
         saveManifest(manifest);
@@ -216,11 +211,10 @@ const uploadTrack = async (req, res) => {
         await backupManifestToS3(s3, manifest);
         // Step 7: Refresh in-memory cache
         await fetchManifestFromS3AndUpdateCache(req);
-
         res.json({ message: 'Track uploaded successfully', track });
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ error: 'Failed to upload track' });
+    } catch (err) {
+        console.error('[API] Error in POST /tracks:', err);
+        res.status(500).json({ error: 'Internal server error' });
     }
 };
 
@@ -239,6 +233,7 @@ const uploadTrack = async (req, res) => {
  * @returns {object} Deletion result
  */
 const deleteTrackById = async (req, res) => {
+    console.log(`[API] DELETE /tracks/${req.params.id}`);
     const { id } = req.params;
     const s3 = req.s3;
     // Step 1: Load manifest from disk
@@ -283,9 +278,9 @@ const deleteTrackById = async (req, res) => {
         await fetchManifestFromS3AndUpdateCache(req);
 
         res.json({ message: 'Track deleted successfully' });
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ error: 'Failed to delete track' });
+    } catch (err) {
+        console.error(`[API] Error in DELETE /tracks/${req.params.id}:`, err);
+        res.status(500).json({ error: 'Internal server error' });
     }
 };
 
@@ -305,6 +300,7 @@ const deleteTrackById = async (req, res) => {
  * @returns {object} Updated track info
  */
 const updateTrackById = async (req, res) => {
+    console.log(`[API] PUT /tracks/${req.params.id}`);
     const { id } = req.params;
     const { title, artist, links } = req.body;
     const s3 = req.s3;

@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import { getAdminStatus, loginAdmin, logoutAdmin } from '../services/admin';
 
 const AdminContext = createContext();
 
@@ -8,8 +9,7 @@ export const AdminProvider = ({ children }) => {
 
   // Check admin status on mount
   useEffect(() => {
-    fetch('/admin/status', { credentials: 'include' })
-      .then(res => res.json())
+    getAdminStatus()
       .then(data => {
         setIsAdmin(!!data.isAdmin);
         setLoading(false);
@@ -18,21 +18,12 @@ export const AdminProvider = ({ children }) => {
   }, []);
 
   const login = async (username, password) => {
-    const res = await fetch('/admin/login', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      credentials: 'include',
-      body: JSON.stringify({ username, password })
-    });
-    if (!res.ok) throw new Error('Invalid credentials');
+    await loginAdmin(username, password);
     setIsAdmin(true);
   };
 
   const logout = async () => {
-    await fetch('/admin/logout', {
-      method: 'POST',
-      credentials: 'include',
-    });
+    await logoutAdmin();
     setIsAdmin(false);
   };
 

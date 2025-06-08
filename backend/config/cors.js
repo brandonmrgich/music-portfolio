@@ -1,8 +1,20 @@
-const isProduction = process.env.NODE_ENV === 'production';
+const allowedOrigins = [
+  'https://brandonmrgich.com',
+  'http://localhost:3000',
+];
 
 module.exports = {
-    origin: isProduction ? 'https://brandonmrgich.com' : 'http://localhost:3000', // Use localhost in dev
-    methods: 'GET,POST,PUT,DELETE', // Allow only these HTTP methods
-    //allowedHeaders: 'Content-Type', // Allow only specific headers
-    credentials: true, // Allow cookies, if necessary
+  origin: function(origin, callback) {
+    console.log(`[CORS] Request from origin: ${origin}`);
+    if (!origin || allowedOrigins.includes(origin)) {
+      console.log(`[CORS] Allowed: ${origin}`);
+      return callback(null, true);
+    } else {
+      console.log(`[CORS] Blocked: ${origin}`);
+      return callback(new Error('Not allowed by CORS'), false);
+    }
+  },
+  methods: 'GET,POST,PUT,DELETE,OPTIONS',
+  allowedHeaders: 'Content-Type,Authorization',
+  credentials: true,
 };
