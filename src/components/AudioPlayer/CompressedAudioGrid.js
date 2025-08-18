@@ -12,8 +12,11 @@ const CompressedAudioGrid = ({ tracks }) => {
           key={track.id}
           id={track.id}
           src={track.src}
+          before={track.before}
+          after={track.after}
           title={track.title}
           artist={track.artist}
+          links={track.links || {}}
         />
       ))}
     </div>

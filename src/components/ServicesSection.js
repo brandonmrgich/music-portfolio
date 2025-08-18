@@ -66,10 +66,7 @@ const ServicesSection = () => {
                 )}
                 {rest.length > 0 && (
                     <CompressedAudioGrid
-                        tracks={rest.map((t) => ({
-                            ...t,
-                            src: t.before || t.after,
-                        }))}
+                        tracks={rest}
                     />
                 )}
                 {showForm && isAdmin && (

@@ -14,7 +14,7 @@ import { useAudio } from '../../contexts/AudioContext';
  * @param {string} props.artist - Track artist
  * @param {object} props.links - Track links (artist, song)
  */
-const AudioComparisonPlayer = ({ id, before, after, title, artist, links }) => {
+const AudioComparisonPlayer = ({ id, before, after, title, artist, links, compact = false, className = '' }) => {
     const { toggleSource } = useAudio();
     const [isBeforeAudio, setIsBeforeAudio] = useState(true);
 
@@ -31,22 +31,24 @@ const AudioComparisonPlayer = ({ id, before, after, title, artist, links }) => {
      * @returns {JSX.Element}
      */
     const renderAdditionalControls = () => (
-        <button
-            onClick={handleToggle}
-            className="text-sm relative bg-none bg-opacity-90 text-playercardText-dark px-4 py-2 transition-all duration-300 ease-in-out transform hover:scale-95 disabled:opacity-50 hover:cursor-pointer"
-        >
-            {isBeforeAudio ? (
-                <div className="flex flex-grow row-auto">
-                    <FaToggleOff className="text-accent-dark" />
-                    <span>A</span>
-                </div>
-            ) : (
-                <div>
-                    <FaToggleOn className="text-accent-dark" />
-                    <span>B</span>
-                </div>
-            )}
-        </button>
+        <div className="inline-flex items-center bg-primary-dark2/40 rounded-md border border-border-dark overflow-hidden">
+            <button
+                onClick={() => { if (!isBeforeAudio) handleToggle(); }}
+                className={`px-2 py-1 text-xs transition-colors ${isBeforeAudio ? 'bg-accent-dark text-black' : 'text-playercardText-dark hover:bg-primary-dark2/60'}`}
+                aria-pressed={isBeforeAudio}
+                title="Original"
+            >
+                A
+            </button>
+            <button
+                onClick={() => { if (isBeforeAudio) handleToggle(); }}
+                className={`px-2 py-1 text-xs transition-colors ${!isBeforeAudio ? 'bg-accent-dark text-black' : 'text-playercardText-dark hover:bg-primary-dark2/60'}`}
+                aria-pressed={!isBeforeAudio}
+                title="Mastered"
+            >
+                B
+            </button>
+        </div>
     );
 
     return (
@@ -57,6 +59,8 @@ const AudioComparisonPlayer = ({ id, before, after, title, artist, links }) => {
             artist={artist}
             links={links}
             renderAdditionalControls={renderAdditionalControls}
+            compact={compact}
+            className={className}
         />
     );
 };

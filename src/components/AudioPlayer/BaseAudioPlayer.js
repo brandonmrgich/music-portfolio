@@ -274,9 +274,16 @@ const BaseAudioPlayer = ({ id, src, title, artist, links = {}, renderAdditionalC
                     >
                         {isPlaying ? <Pause size={18} /> : <Play size={18} />}
                     </button>
-                    <div className="flex flex-col flex-1 min-w-0 ml-2">
-                        <span className="truncate text-sm font-semibold text-playercardText-dark">{title}</span>
-                        <span className="truncate text-xs text-playercardText-dark opacity-80">{artist}</span>
+                    <div className="flex items-center flex-1 min-w-0 ml-2">
+                        <div className="flex flex-col flex-1 min-w-0">
+                            <span className="truncate text-sm font-semibold text-playercardText-dark">{title}</span>
+                            <span className="truncate text-xs text-playercardText-dark opacity-80">{artist}</span>
+                        </div>
+                        {renderAdditionalControls && (
+                            <span className="ml-2 text-playercardText-dark">
+                                {renderAdditionalControls()}
+                            </span>
+                        )}
                     </div>
                     <span className="text-xs text-accent-dark ml-2 min-w-[40px] text-right">{formatTime((!isPlaying && currentTime === 0 && duration > 0) ? duration : currentTime)}</span>
                 </div>
