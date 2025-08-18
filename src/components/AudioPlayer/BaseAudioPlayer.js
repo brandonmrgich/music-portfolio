@@ -160,26 +160,7 @@ const BaseAudioPlayer = ({ id, src, title, artist, links = {}, renderAdditionalC
         };
     }, [dragging, id, setVolume]);
 
-    const [maskStyle, setMaskStyle] = useState({
-        WebkitMaskImage: 'linear-gradient(to right, rgba(0, 0, 0, 1) 20%, rgba(0, 0, 0, 0))',
-        maskImage: 'linear-gradient(to right, rgba(0, 0, 0, 1) 20%, rgba(0, 0, 0, 0))',
-    });
-
-    useEffect(() => {
-        if (volumeOpen) {
-            setMaskStyle({
-                WebkitMaskImage:
-                    'linear-gradient(to right, rgba(0, 0, 0, 1) 60%, rgba(0, 0, 0, .3))',
-                maskImage: 'linear-gradient(to right, rgba(0, 0, 0, 1) 60%, rgba(0, 0, 0, .3))',
-            });
-        } else {
-            setMaskStyle({
-                WebkitMaskImage:
-                    'linear-gradient(to right, rgba(0, 0, 0, 1) 40%, rgba(0, 0, 0, .6))',
-                maskImage: 'linear-gradient(to right, rgba(0, 0, 0, 1) 40%, rgba(0, 0, 0, .6))',
-            });
-        }
-    }, [volumeOpen]);
+    // Removed hover-dependent text masking; prefer readable wrapping for mobile
 
     useEffect(() => {
         const handleClickOutside = (event) => {
@@ -276,8 +257,14 @@ const BaseAudioPlayer = ({ id, src, title, artist, links = {}, renderAdditionalC
                     </button>
                     <div className="flex items-center flex-1 min-w-0 ml-2">
                         <div className="flex flex-col flex-1 min-w-0">
-                            <span className="truncate text-sm font-semibold text-playercardText-dark">{title}</span>
-                            <span className="truncate text-xs text-playercardText-dark opacity-80">{artist}</span>
+                            <span
+                                className="text-sm font-semibold text-playercardText-dark overflow-hidden min-h-[40px]"
+                                title={title}
+                                style={{ display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }}
+                            >
+                                {title}
+                            </span>
+                            <span className="text-xs text-playercardText-dark opacity-80 truncate" title={artist}>{artist}</span>
                         </div>
                         {renderAdditionalControls && (
                             <span className="ml-2 text-playercardText-dark">
@@ -334,8 +321,9 @@ const BaseAudioPlayer = ({ id, src, title, artist, links = {}, renderAdditionalC
                 <div className="flex flex-col gap-1">
                     <div className="flex items-center gap-2">
                         <h3
-                            className="flex-grow truncate break-words overflow-hidden whitespace-nowrap text-lg font-semibold text-playercardText-dark hover:text-accent-dark transition-all duration-900"
-                            style={maskStyle}
+                            className="flex-grow text-lg font-semibold text-playercardText-dark hover:text-accent-dark overflow-hidden min-h-[48px]"
+                            title={title}
+                            style={{ display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }}
                         >
                             <a
                                 href={links.song || '#'}
@@ -358,7 +346,7 @@ const BaseAudioPlayer = ({ id, src, title, artist, links = {}, renderAdditionalC
                             {getIcon()}
                         </button>
                     </div>
-                    <h4 className="truncate md:max-w-30 lg:max-w-sm text-md font-light text-playercardText-dark hover:text-accent-dark transition-all duration-700">
+                    <h4 className="truncate text-md font-light text-playercardText-dark hover:text-accent-dark" title={artist}>
                         <a
                             href={links.artist || '#'}
                             className="max-w-xs opacity-80 text-playercardText-dark hover:text-accent-dark transition-all duration-300"

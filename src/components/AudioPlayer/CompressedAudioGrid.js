@@ -6,7 +6,7 @@ const CompressedAudioGrid = ({ tracks }) => {
     return <p className="text-center text-playercardText-dark">No tracks available.</p>;
   }
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 w-full max-w-4xl mx-auto mt-4">
+    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 sm:gap-4 w-full max-w-5xl mx-auto mt-4 px-2 sm:px-0">
       {tracks.map((track) => (
         <CompressedAudioPlayer
           key={track.id}
