@@ -9,7 +9,11 @@ import { fetchTracksByType } from '../services/tracks';
 const AudioContext = createContext();
 
 const TARGET_PEAK = 0.9;
-const ENABLE_NORMALIZATION = false; // Set true to analyze audio and normalize perceived loudness
+const TARGET_RMS = 0.2; // perceived loudness target (rough)
+const ENABLE_NORMALIZATION = true; // Analyze audio and normalize perceived loudness
+const NORMALIZATION_MAX_GAIN = 4.0; // avoid excessive boosts
+const NORMALIZATION_MIN_GAIN = 0.05; // avoid near-silence
+const VOLUME_RAMP_MS = 140; // smooth ramp to avoid jumps
 const DEFAULT_VOLUME = 0.5;
 
 /**
@@ -36,28 +40,78 @@ export const AudioProvider = ({ children }) => {
     const initGenerationRef = useRef({}); // { id: number }
     // The most recently intended src per id (absolute URL)
     const intendedSrcRef = useRef({}); // { id: string }
+    // Cache normalization by absolute src
+    const normalizationCacheRef = useRef({}); // { absoluteSrc: factor }
+    // Track any in-flight volume ramps so we can cancel/replace
+    const volumeRampHandlesRef = useRef({}); // { id: { cancel: () => void } }
 
     // --- Web Audio API for normalization only ---
-    const getNormalizationFactor = async (src, targetPeak = TARGET_PEAK) => {
+    const getNormalizationFactor = async (src, targetPeak = TARGET_PEAK, targetRms = TARGET_RMS) => {
         if (!ENABLE_NORMALIZATION) return 1;
         try {
+            if (normalizationCacheRef.current[src] !== undefined) {
+                return normalizationCacheRef.current[src];
+            }
             const response = await fetch(src);
             const arrayBuffer = await response.arrayBuffer();
             const audioCtx = new window.AudioContext();
             const audioBuffer = await audioCtx.decodeAudioData(arrayBuffer);
             let peak = 0;
+            let sumSquares = 0;
+            let totalSamples = 0;
             for (let i = 0; i < audioBuffer.numberOfChannels; i++) {
                 const channelData = audioBuffer.getChannelData(i);
                 for (let j = 0; j < channelData.length; j++) {
                     peak = Math.max(peak, Math.abs(channelData[j]));
+                    const s = channelData[j];
+                    sumSquares += s * s;
                 }
+                totalSamples += channelData.length;
             }
             audioCtx.close();
-            return peak === 0 ? 1 : targetPeak / peak;
+            const rms = totalSamples > 0 ? Math.sqrt(sumSquares / totalSamples) : 0;
+            const peakFactor = peak === 0 ? 1 : targetPeak / peak;
+            const rmsFactor = rms === 0 ? 1 : targetRms / rms;
+            let factor = Math.min(peakFactor, rmsFactor);
+            factor = Math.max(NORMALIZATION_MIN_GAIN, Math.min(NORMALIZATION_MAX_GAIN, factor));
+            normalizationCacheRef.current[src] = factor;
+            return factor;
         } catch (err) {
             console.error('Error normalizing audio:', err);
             return 1;
         }
+    };
+
+    // Smooth volume ramp to target over duration
+    const rampVolumeTo = (id, targetVolume, durationMs = VOLUME_RAMP_MS) => {
+        const ref = audioRefs.current[id];
+        if (!ref || !ref.audio) return;
+        const audio = ref.audio;
+        const startVolume = audio.volume;
+        const delta = targetVolume - startVolume;
+        if (Math.abs(delta) < 0.001) {
+            audio.volume = targetVolume;
+            return;
+        }
+        // Cancel any existing ramp
+        if (volumeRampHandlesRef.current[id] && volumeRampHandlesRef.current[id].cancel) {
+            volumeRampHandlesRef.current[id].cancel();
+        }
+        let rafId = null;
+        const startTime = performance.now();
+        const cancel = () => {
+            if (rafId !== null) cancelAnimationFrame(rafId);
+        };
+        volumeRampHandlesRef.current[id] = { cancel };
+        const step = () => {
+            const now = performance.now();
+            const t = Math.min(1, (now - startTime) / Math.max(1, durationMs));
+            audio.volume = startVolume + delta * t;
+            if (t < 1) {
+                rafId = requestAnimationFrame(step);
+            }
+        };
+        rafId = requestAnimationFrame(step);
     };
 
     // --- Audio element management ---
@@ -118,7 +172,7 @@ export const AudioProvider = ({ children }) => {
                         audioRefs.current[id].audio === audio
                     ) {
                         audioRefs.current[id].normalization = normalization;
-                        audio.volume = initialVolume * normalization;
+                        rampVolumeTo(id, initialVolume * normalization);
                     }
                 })
                 .catch((err) => {
@@ -266,7 +320,7 @@ export const AudioProvider = ({ children }) => {
                             audioRefs.current[id].audio === ref.audio
                         ) {
                             ref.normalization = normalization;
-                            ref.audio.volume = previousVolume * normalization;
+                            rampVolumeTo(id, previousVolume * normalization);
                         }
                     })
                     .catch((err) => console.error('Error normalizing audio:', err));
