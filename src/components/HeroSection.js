@@ -1,10 +1,12 @@
 import React, { useEffect, useRef } from 'react';
-import beachImg from '../assets/images/profile-coat.png';
+import coatImg from '../assets/images/profile-coat.png';
+import beachImg from '../assets/images/profile-beach.jpeg';
+import img from '../assets/images/profile-default.jpg';
 
 const heroData = {
   heading: "Brandon Mrgich",
   tagline: "From Indie Songs to Cinematic Scores\nMulti-Instrumentalist • Producer • Sound Designer • Software Engineer",
-  background: beachImg,
+  background: img,
 };
 
 const HeroSection = ({ onHeroExit, scrollLocked }) => {
@@ -98,6 +100,9 @@ const HeroSection = ({ onHeroExit, scrollLocked }) => {
           </h1>
           <p className="text-xl md:text-2xl text-comfy-accent1 mb-6 max-w-2xl mx-auto relative whitespace-pre-line" style={{ zIndex: 2 }}>
             {heroData.tagline}
+          </p>
+          <p className="text-sm text-comfy-accent1/80 mb-4 max-w-2xl mx-auto relative text-center italic" style={{ zIndex: 2 }}>
+            This site is an evolving portfolio of my music production work. Updates and improvements are ongoing. If your audio stops, simply refresh the page :)
           </p>
         </div>
       </div>
