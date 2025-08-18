@@ -1,20 +1,19 @@
 {
   "files": {
-    "main.css": "/static/css/main.d52543b7.css",
-    "main.js": "/static/js/main.cfd5b646.js",
+    "main.css": "/static/css/main.e73d19d5.css",
+    "main.js": "/static/js/main.5542ce4a.js",
     "static/js/453.0094daa3.chunk.js": "/static/js/453.0094daa3.chunk.js",
-    "static/media/Dwell.jpg": "/static/media/Dwell.a3a8eaed6b05308e2592.jpg",
     "static/media/profile-coat.png": "/static/media/profile-coat.4582259a80dbb2e8a226.png",
-    "static/media/20230505_204812.jpg": "/static/media/20230505_204812.449d3ba4a98209d0bdf8.jpg",
     "static/media/background1.jpg": "/static/media/background1.44d13137653861ee8277.jpg",
     "static/media/profile-beach.jpeg": "/static/media/profile-beach.4473eac4ebd3ceab33e8.jpeg",
+    "static/media/profile-default.jpg": "/static/media/profile-default.ff3533004c286ab6805b.jpg",
     "index.html": "/index.html",
-    "main.d52543b7.css.map": "/static/css/main.d52543b7.css.map",
-    "main.cfd5b646.js.map": "/static/js/main.cfd5b646.js.map",
+    "main.e73d19d5.css.map": "/static/css/main.e73d19d5.css.map",
+    "main.5542ce4a.js.map": "/static/js/main.5542ce4a.js.map",
     "453.0094daa3.chunk.js.map": "/static/js/453.0094daa3.chunk.js.map"
   },
   "entrypoints": [
-    "static/css/main.d52543b7.css",
-    "static/js/main.cfd5b646.js"
+    "static/css/main.e73d19d5.css",
+    "static/js/main.5542ce4a.js"
   ]
 }
