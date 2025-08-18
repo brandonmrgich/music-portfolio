@@ -1,36 +1,156 @@
 {
   "WIP": [
     {
-      "id": "242c5fd2-eb50-4a76-809f-fbc952cc2bfb",
+      "id": "64685f93-9fe3-4058-84eb-96cc9e9ac7f7",
       "title": "It's Alright",
-      "artist": "Brandon Mrgich",
-      "links": {
-        "artist": "https://brandonmrgich.com",
-        "song": "https://google.com"
-      },
-      "src": "tracks/wip/242c5fd2-eb50-4a76-809f-fbc952cc2bfb_ItsAlright.mp3"
+      "artist": "Laka Noch",
+      "links": {},
+      "src": "tracks/wip/64685f93-9fe3-4058-84eb-96cc9e9ac7f7_ItsAlright-V2.mp3"
     },
     {
-      "id": "fd0949ee-1562-4d59-9e82-3364ed6a3e02",
-      "title": "Waking Up",
-      "artist": "Brandon Mrgich",
-      "links": {
-        "artist": "https://brandonmrgich.com",
-        "song": "https://google.com"
-      },
-      "src": "tracks/wip/fd0949ee-1562-4d59-9e82-3364ed6a3e02_WakingUp.mp3"
+      "id": "b4947042-280c-4289-b303-0909804c8384",
+      "title": "To Be You (Chorus Section)",
+      "artist": "Laka Noch (ft. Brandon Mrgich)",
+      "links": {},
+      "src": "tracks/wip/b4947042-280c-4289-b303-0909804c8384_ToBeYouV2-ChorusSection-v2.mp3"
     },
     {
-      "id": "47f070a0-995b-428a-898b-8fc8ccbee545",
-      "title": "Losing Control",
-      "artist": "Brandon Mrgich",
-      "links": {
-        "artist": "https://brandonmrgich.com",
-        "song": "https://google.com"
-      },
-      "src": "tracks/wip/47f070a0-995b-428a-898b-8fc8ccbee545_Guitar-guitar-detuned (Losing Control).mp3"
+      "id": "05fea946-7440-487c-8540-302a246084df",
+      "title": "To Be You (Demo vocal stacks)",
+      "artist": "Laka Noch",
+      "links": {},
+      "src": "tracks/wip/05fea946-7440-487c-8540-302a246084df_ToBeYou(NewVocalChain).mp3"
+    },
+    {
+      "id": "e6eba0da-850e-4012-ab5f-a9be5de1ff3e",
+      "title": "Take me away",
+      "artist": "Laka Noch",
+      "links": {},
+      "src": "tracks/wip/e6eba0da-850e-4012-ab5f-a9be5de1ff3e_TakeMeAway.mp3"
+    },
+    {
+      "id": "886d599f-0cb9-49a7-ae34-4c4087f3a764",
+      "title": "New Catastrophe - voice memo",
+      "artist": "Laka Noch",
+      "links": {},
+      "src": "tracks/wip/886d599f-0cb9-49a7-ae34-4c4087f3a764_NewCatastrophe.mp3"
+    },
+    {
+      "id": "99991244-51b2-4fab-a534-31347cfe1510",
+      "title": "Favorite Place - Instrumental",
+      "artist": "Laka Noch",
+      "links": {},
+      "src": "tracks/wip/99991244-51b2-4fab-a534-31347cfe1510_Favorite PlaceV6-Instrumental.mp3"
+    },
+    {
+      "id": "6581ebf3-f40d-40c2-9b6a-ff5fc6541b4d",
+      "title": "Your place (Slowed+Reverbed)",
+      "artist": "Laka Noch",
+      "links": {},
+      "src": "tracks/wip/6581ebf3-f40d-40c2-9b6a-ff5fc6541b4d_Your place (Slowed+Reverbed).mp3"
+    },
+    {
+      "id": "0c0d1573-59ed-49d0-8ef5-73243450be74",
+      "title": "To Be You - voice memo",
+      "artist": "Laka Noch",
+      "links": {},
+      "src": "tracks/wip/0c0d1573-59ed-49d0-8ef5-73243450be74_ToBeYou-Acoustic-v7_master.wav"
     }
   ],
-  "SCORING": [],
-  "REEL": []
+  "SCORING": [
+    {
+      "id": "3c6a29bc-0d1f-48c9-ac0b-ff470c6ca9b8",
+      "title": "idea01-ambient",
+      "artist": "Brandon Mrgich",
+      "links": {},
+      "src": "tracks/scoring/3c6a29bc-0d1f-48c9-ac0b-ff470c6ca9b8_idea01-ambient.mp3"
+    },
+    {
+      "id": "6dd7d013-fadb-46f7-b9a0-339e56b07390",
+      "title": "idea04-You're so far away it hurts (ft. Laka Noch)",
+      "artist": "Brandon Mrgich",
+      "links": {},
+      "src": "tracks/scoring/6dd7d013-fadb-46f7-b9a0-339e56b07390_youresofarawayithurts(idea04)V2.mp3"
+    },
+    {
+      "id": "fb4c7619-5bff-49e0-a024-ee03a6d7ed7a",
+      "title": "idea03-voices",
+      "artist": "Brandon Mrgich",
+      "links": {},
+      "src": "tracks/scoring/fb4c7619-5bff-49e0-a024-ee03a6d7ed7a_VoicesV4.mp3"
+    },
+    {
+      "id": "c92c321c-0ab4-4955-8af0-46edb5b5a5a3",
+      "title": "idea05-i don't wanna go",
+      "artist": "Brandon Mrgich",
+      "links": {},
+      "src": "tracks/scoring/c92c321c-0ab4-4955-8af0-46edb5b5a5a3_IDontWannaGoV2.mp3"
+    },
+    {
+      "id": "78efcdf8-a488-488c-90f6-2440c35c0e4e",
+      "title": "idea07-Recursion",
+      "artist": "Brandon Mrgich",
+      "links": {},
+      "src": "tracks/scoring/78efcdf8-a488-488c-90f6-2440c35c0e4e_RecursionV2.mp3"
+    },
+    {
+      "id": "7ef0ebf2-c35f-41db-b01c-a6b1bb21ad96",
+      "title": "Sway - Post Rock Version (ft. Another Language)",
+      "artist": "Brandon Mrgich",
+      "links": {},
+      "src": "tracks/scoring/7ef0ebf2-c35f-41db-b01c-a6b1bb21ad96_Sway - Post Rock Version (feat. Another Language).mp3"
+    },
+    {
+      "id": "ecbed72f-b3cd-4a4a-9509-71145d9367c6",
+      "title": "idea02-Sway",
+      "artist": "Brandon Mrgich",
+      "links": {},
+      "src": "tracks/scoring/ecbed72f-b3cd-4a4a-9509-71145d9367c6_Sway-(tapepiano-arp2).mp3"
+    },
+    {
+      "id": "34cf0bd0-4b94-4111-820f-2d104c3758c7",
+      "title": "idea08-deep ambient",
+      "artist": "Brandon Mrgich",
+      "links": {},
+      "src": "tracks/scoring/34cf0bd0-4b94-4111-820f-2d104c3758c7_Midnight.mp3"
+    },
+    {
+      "id": "f29de436-fcc8-42bf-ae7a-4419e9b51c78",
+      "title": "Where have you been? (ft. r.b. wells)",
+      "artist": "Brandon Mrgich",
+      "links": {},
+      "src": "tracks/scoring/f29de436-fcc8-42bf-ae7a-4419e9b51c78_Wherehaveyoubeen?_V2.mp3"
+    },
+    {
+      "id": "a8c848f4-0102-41f7-ba16-7723eb28ac4b",
+      "title": "idea09-derealization",
+      "artist": "Brandon Mrgich",
+      "links": {},
+      "src": "tracks/scoring/a8c848f4-0102-41f7-ba16-7723eb28ac4b_Derealization.mp3"
+    },
+    {
+      "id": "3f302177-caff-4e72-95e5-f60224d43619",
+      "title": "idea00-envelope",
+      "artist": "Brandon Mrgich",
+      "links": {},
+      "src": "tracks/scoring/3f302177-caff-4e72-95e5-f60224d43619_idea00-envelope.mp3"
+    },
+    {
+      "id": "57ce8dd6-0ae2-4ff9-879a-71b36ac0ad69",
+      "title": "idea10-lumen",
+      "artist": "Brandon Mrgich",
+      "links": {},
+      "src": "tracks/scoring/57ce8dd6-0ae2-4ff9-879a-71b36ac0ad69_idea10-lumen.mp3"
+    }
+  ],
+  "REEL": [
+    {
+      "id": "63d2ade3-90e3-4021-9e2c-6717c16921c2",
+      "title": "I've been waiting",
+      "artist": "r.b. wells (ft. Laka Noch)",
+      "links": {},
+      "before": "tracks/reel/63d2ade3-90e3-4021-9e2c-6717c16921c2_PXL_20250119_032537341.mp3",
+      "after": "tracks/reel/63d2ade3-90e3-4021-9e2c-6717c16921c2_version2_IveBeenWaiting_MasterV3.mp3"
+    }
+  ]
 }

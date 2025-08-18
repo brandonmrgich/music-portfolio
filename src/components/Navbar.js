@@ -53,13 +53,21 @@ const Navbar = ({ refs, setShowLogin }) => {
       style={{ willChange: 'transform' }}
     >
       <div className="flex items-center space-x-2">
-        <a href="https://linktr.ee/brandonamrgich" target="_blank" rel="noopener noreferrer" aria-label="Linktree">
-          <img src="/asailboat.png" alt="Logo" className="h-9 w-9 rounded-full hover:scale-105 transition-transform duration-200" />
-        </a>
         {isAdmin ? (
-          <button onClick={logout} className="ml-4 px-3 py-1 rounded bg-accent-dark text-white">Logout</button>
+          <>
+            <a href="https://linktr.ee/brandonamrgich" target="_blank" rel="noopener noreferrer" aria-label="Linktree">
+              <img src="/asailboat.png" alt="Logo" className="h-9 w-9 rounded-full hover:scale-105 transition-transform duration-200" />
+            </a>
+            <button onClick={logout} className="ml-4 px-3 py-1 rounded bg-accent-dark text-white text-sm">Logout</button>
+          </>
         ) : (
-          <button onClick={() => setShowLogin(true)} className="ml-4 px-3 py-1 rounded bg-accent-dark text-white">Admin Login</button>
+          <button 
+            onClick={() => setShowLogin(true)} 
+            className="flex items-center space-x-2 hover:scale-105 transition-transform duration-200"
+            aria-label="Admin Login"
+          >
+            <img src="/asailboat.png" alt="Logo" className="h-9 w-9 rounded-full" />
+          </button>
         )}
       </div>
       <div className="md:hidden">
