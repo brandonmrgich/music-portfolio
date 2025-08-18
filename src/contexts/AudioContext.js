@@ -31,6 +31,10 @@ export const AudioProvider = ({ children }) => {
 
     // --- Audio refs ---
     const audioRefs = useRef({}); // { id: { audio, normalization } }
+    // Generation/version for async initialization to avoid races
+    const initGenerationRef = useRef({}); // { id: number }
+    // The most recently intended src per id (absolute URL)
+    const intendedSrcRef = useRef({}); // { id: string }
 
     // --- Web Audio API for normalization only ---
     const getNormalizationFactor = async (src, targetPeak = TARGET_PEAK) => {
@@ -56,37 +60,99 @@ export const AudioProvider = ({ children }) => {
 
     // --- Audio element management ---
     const initializeAudio = async (id, src) => {
-        if (audioRefs.current[id]) return;
-        const normalization = await getNormalizationFactor(src);
-        const audio = new window.Audio(src);
-        audio.preload = 'auto';
-        audio.volume = (volumes[id] !== undefined ? volumes[id] : DEFAULT_VOLUME) * normalization;
-        audio.addEventListener('loadedmetadata', () => {
-            setDurations((prev) => ({ ...prev, [id]: audio.duration }));
-        });
-        audio.addEventListener('timeupdate', () => {
-            setCurrentTimes((prev) => ({ ...prev, [id]: audio.currentTime }));
-        });
-        audio.addEventListener('ended', () => {
-            setPlayingStates((prev) => ({ ...prev, [id]: false }));
-            setCurrentTimes((prev) => ({ ...prev, [id]: 0 }));
-        });
-        audioRefs.current[id] = { audio, normalization };
+        // Normalize to absolute URL for consistent comparisons
+        const absoluteSrc = new URL(src, window.location.href).href;
+        intendedSrcRef.current[id] = absoluteSrc;
+        // If we already have an audio element with the same src, do nothing
+        const existing = audioRefs.current[id];
+        if (existing && existing.audio && new URL(existing.audio.src, window.location.href).href === absoluteSrc) {
+            return;
+        }
+
+        // If an element exists but for a different src, clean it up first
+        if (existing && existing.audio) {
+            cleanupAudio(id);
+        }
+
+        // Bump generation to invalidate any older in-flight initializations for this id
+        const myGeneration = (initGenerationRef.current[id] || 0) + 1;
+        initGenerationRef.current[id] = myGeneration;
+
+        try {
+            // Create the audio element immediately so playback is responsive
+            const audio = new window.Audio(absoluteSrc);
+            audio.preload = 'auto';
+            const initialVolume = volumes[id] !== undefined ? volumes[id] : DEFAULT_VOLUME;
+            audio.volume = initialVolume; // temporary; normalization applied asynchronously below
+
+            // Add event listeners
+            audio.addEventListener('loadedmetadata', () => {
+                setDurations((prev) => ({ ...prev, [id]: audio.duration }));
+            });
+            audio.addEventListener('timeupdate', () => {
+                setCurrentTimes((prev) => ({ ...prev, [id]: audio.currentTime }));
+            });
+            audio.addEventListener('ended', () => {
+                setPlayingStates((prev) => ({ ...prev, [id]: false }));
+                setCurrentTimes((prev) => ({ ...prev, [id]: 0 }));
+            });
+
+            // Commit the element immediately
+            audioRefs.current[id] = { audio, normalization: 1 };
+
+            // Compute normalization in the background and apply if still current
+            getNormalizationFactor(absoluteSrc)
+                .then((normalization) => {
+                    if (
+                        initGenerationRef.current[id] === myGeneration &&
+                        intendedSrcRef.current[id] === absoluteSrc &&
+                        audioRefs.current[id] &&
+                        audioRefs.current[id].audio === audio
+                    ) {
+                        audioRefs.current[id].normalization = normalization;
+                        audio.volume = initialVolume * normalization;
+                    }
+                })
+                .catch((err) => {
+                    console.error('Error normalizing audio:', err);
+                });
+        } catch (error) {
+            console.error(`Failed to initialize audio for ${id}:`, error);
+            throw error;
+        }
     };
 
     // Pause and reset all audio except the one with the given id
     const stopAllExcept = (id) => {
         Object.keys(audioRefs.current).forEach((key) => {
             if (key !== String(id) && audioRefs.current[key]) {
-                audioRefs.current[key].audio.pause();
-                audioRefs.current[key].audio.currentTime = 0;
+                const audio = audioRefs.current[key].audio;
+                audio.pause();
+                audio.currentTime = 0;
                 setPlayingStates((prev) => ({ ...prev, [key]: false }));
                 setCurrentTimes((prev) => ({ ...prev, [key]: 0 }));
             }
         });
     };
+    
+    // Clean up audio element completely
+    const cleanupAudio = (id) => {
+        if (audioRefs.current[id]) {
+            const audio = audioRefs.current[id].audio;
+            audio.pause();
+            audio.src = '';
+            audio.load();
+            delete audioRefs.current[id];
+            
+            // Reset related state
+            setPlayingStates((prev) => ({ ...prev, [id]: false }));
+            setCurrentTimes((prev) => ({ ...prev, [id]: 0 }));
+            setCurrentSrcs((prev) => ({ ...prev, [id]: null }));
+        }
+    };
 
-    const play = async (id, src, meta) => {
+    // Overloaded play method - can play from current time or specified time
+    const play = async (id, src, meta, startTime = null) => {
         stopAllExcept(id);
         await initializeAudio(id, src);
         const ref = audioRefs.current[id];
@@ -96,7 +162,12 @@ export const AudioProvider = ({ children }) => {
             setCurrentTrack(null);
             return;
         }
-        ref.audio.currentTime = currentTimes[id] || 0;
+        
+        // Set start time - either specified time or current saved time
+        const timeToStart = startTime !== null ? startTime : (currentTimes[id] || 0);
+        ref.audio.currentTime = timeToStart;
+        setCurrentTimes((prev) => ({ ...prev, [id]: timeToStart }));
+        
         ref.audio.play();
         setPlayingStates((prev) => ({ ...prev, [id]: true }));
         setCurrentSrcs((prev) => ({ ...prev, [id]: src }));
@@ -140,18 +211,77 @@ export const AudioProvider = ({ children }) => {
     // Toggle between two sources (A/B)
     const toggleSource = async (id, beforeSrc, afterSrc, isBeforeAudio) => {
         const newSrc = isBeforeAudio ? afterSrc : beforeSrc;
-        const oldVolume = volumes[id] !== undefined ? volumes[id] : DEFAULT_VOLUME;
-        const oldCurrentTime = currentTimes[id] || 0;
-        // Remove old audio element
-        if (audioRefs.current[id]) {
-            audioRefs.current[id].audio.pause();
-            audioRefs.current[id].audio.src = '';
-            delete audioRefs.current[id];
+        const previousVolume = volumes[id] !== undefined ? volumes[id] : DEFAULT_VOLUME;
+        const previousCurrentTime = currentTimes[id] || 0;
+        const wasPlaying = !!playingStates[id];
+
+        // Prefer reusing the existing audio element to avoid overlapping instances
+        const ref = audioRefs.current[id];
+        if (ref && ref.audio) {
+            try {
+                // Pause current, swap source, and preserve time/volume
+                ref.audio.pause();
+                // Swap to the new source immediately
+                const absoluteNewSrc = new URL(newSrc, window.location.href).href;
+                // Invalidate any in-flight initializations and set the intended src
+                const bumped = (initGenerationRef.current[id] || 0) + 1;
+                initGenerationRef.current[id] = bumped;
+                intendedSrcRef.current[id] = absoluteNewSrc;
+
+                ref.audio.src = absoluteNewSrc;
+                ref.audio.load();
+                // Temporarily use previous volume; normalization will be applied asynchronously
+                ref.audio.volume = previousVolume;
+
+                // If it was playing, resume from the same timestamp
+                if (wasPlaying) {
+                    // Ensure other tracks are stopped when resuming
+                    stopAllExcept(id);
+                    ref.audio.currentTime = previousCurrentTime;
+                    setCurrentTimes((prev) => ({ ...prev, [id]: previousCurrentTime }));
+                    await ref.audio.play();
+                    setPlayingStates((prev) => ({ ...prev, [id]: true }));
+                } else {
+                    setPlayingStates((prev) => ({ ...prev, [id]: false }));
+                }
+
+                setCurrentSrcs((prev) => ({ ...prev, [id]: absoluteNewSrc }));
+                setCurrentTrack((prev) => (prev && String(prev.id) === String(id) ? { ...prev, src: absoluteNewSrc } : prev));
+
+                // Compute normalization in the background and apply if still current
+                getNormalizationFactor(absoluteNewSrc)
+                    .then((normalization) => {
+                        if (
+                            initGenerationRef.current[id] === bumped &&
+                            intendedSrcRef.current[id] === absoluteNewSrc &&
+                            audioRefs.current[id] &&
+                            audioRefs.current[id].audio === ref.audio
+                        ) {
+                            ref.normalization = normalization;
+                            ref.audio.volume = previousVolume * normalization;
+                        }
+                    })
+                    .catch((err) => console.error('Error normalizing audio:', err));
+            } catch (e) {
+                // If anything fails, fall back to a clean re-init path
+                cleanupAudio(id);
+                await initializeAudio(id, newSrc);
+                setVolume(id, previousVolume);
+                if (wasPlaying) {
+                    play(id, newSrc, null, previousCurrentTime);
+                }
+                setCurrentTrack((prev) => (prev && String(prev.id) === String(id) ? { ...prev, src: newSrc } : prev));
+            }
+            return;
         }
+
+        // No existing element: initialize fresh
         await initializeAudio(id, newSrc);
-        setVolume(id, oldVolume);
-        seek(id, oldCurrentTime);
-        play(id, newSrc);
+        setVolume(id, previousVolume);
+        if (wasPlaying) {
+            play(id, newSrc, null, previousCurrentTime);
+        }
+        setCurrentTrack((prev) => (prev && String(prev.id) === String(id) ? { ...prev, src: newSrc } : prev));
     };
 
     // --- Track fetching ---
@@ -215,6 +345,7 @@ export const AudioProvider = ({ children }) => {
                 setVolume,
                 toggleSource,
                 initializeAudio,
+                cleanupAudio,
                 currentTrack,
                 tracks,
                 tracksLoading,

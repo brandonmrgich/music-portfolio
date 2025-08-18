@@ -196,8 +196,9 @@ const BaseAudioPlayer = ({ id, src, title, artist, links = {}, renderAdditionalC
     }, [volumeOpen]);
 
     useEffect(() => {
+        // Only (re)initialize when id or src changes; avoid depending on function identity
         initializeAudio(id, src);
-    }, [id, src, initializeAudio]);
+    }, [id, src]);
 
     if (error) console.log(error);
 
@@ -205,6 +206,7 @@ const BaseAudioPlayer = ({ id, src, title, artist, links = {}, renderAdditionalC
         if (isPlaying) {
             pause(id);
         } else {
+            // Ensure current intended source is the one we play from
             play(id, src, { title, artist, links });
         }
     };
