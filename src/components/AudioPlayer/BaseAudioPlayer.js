@@ -195,8 +195,8 @@ const BaseAudioPlayer = ({ id, src, title, artist, links = {}, renderAdditionalC
         };
     }, [volumeOpen]);
 
+    // Preload metadata so duration is known before first play
     useEffect(() => {
-        // Only (re)initialize when id or src changes; avoid depending on function identity
         initializeAudio(id, src);
     }, [id, src]);
 
@@ -206,7 +206,7 @@ const BaseAudioPlayer = ({ id, src, title, artist, links = {}, renderAdditionalC
         if (isPlaying) {
             pause(id);
         } else {
-            // Ensure current intended source is the one we play from
+            // Lazy init ensure
             play(id, src, { title, artist, links });
         }
     };
@@ -278,7 +278,7 @@ const BaseAudioPlayer = ({ id, src, title, artist, links = {}, renderAdditionalC
                         <span className="truncate text-sm font-semibold text-playercardText-dark">{title}</span>
                         <span className="truncate text-xs text-playercardText-dark opacity-80">{artist}</span>
                     </div>
-                    <span className="text-xs text-accent-dark ml-2 min-w-[40px] text-right">{formatTime(currentTime)}</span>
+                    <span className="text-xs text-accent-dark ml-2 min-w-[40px] text-right">{formatTime((!isPlaying && currentTime === 0 && duration > 0) ? duration : currentTime)}</span>
                 </div>
                 <input
                     type="range"

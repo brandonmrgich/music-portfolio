@@ -9,6 +9,7 @@ import { fetchTracksByType } from '../services/tracks';
 const AudioContext = createContext();
 
 const TARGET_PEAK = 0.9;
+const ENABLE_NORMALIZATION = false; // Set true to analyze audio and normalize perceived loudness
 const DEFAULT_VOLUME = 0.5;
 
 /**
@@ -38,6 +39,7 @@ export const AudioProvider = ({ children }) => {
 
     // --- Web Audio API for normalization only ---
     const getNormalizationFactor = async (src, targetPeak = TARGET_PEAK) => {
+        if (!ENABLE_NORMALIZATION) return 1;
         try {
             const response = await fetch(src);
             const arrayBuffer = await response.arrayBuffer();
@@ -80,14 +82,20 @@ export const AudioProvider = ({ children }) => {
 
         try {
             // Create the audio element immediately so playback is responsive
-            const audio = new window.Audio(absoluteSrc);
-            audio.preload = 'auto';
+            const audio = new window.Audio();
+            audio.crossOrigin = 'anonymous';
+            audio.preload = 'metadata';
+            audio.src = absoluteSrc;
             const initialVolume = volumes[id] !== undefined ? volumes[id] : DEFAULT_VOLUME;
             audio.volume = initialVolume; // temporary; normalization applied asynchronously below
 
             // Add event listeners
             audio.addEventListener('loadedmetadata', () => {
                 setDurations((prev) => ({ ...prev, [id]: audio.duration }));
+                // If user requested play before metadata arrived and state says playing, ensure playback starts
+                if (playingStates[id]) {
+                    audio.play().catch(() => {});
+                }
             });
             audio.addEventListener('timeupdate', () => {
                 setCurrentTimes((prev) => ({ ...prev, [id]: audio.currentTime }));
