@@ -17,7 +17,7 @@ import { deleteTrack } from '../../services/tracks';
  * @param {boolean} [props.compact] - If true, render a minimal UI
  * @param {string} [props.className] - Additional className for styling
  */
-const BaseAudioPlayer = ({ id, src, title, artist, links = {}, renderAdditionalControls, compact = false, className = '' }) => {
+const BaseAudioPlayer = ({ id, src, title, artist, links = {}, renderAdditionalControls, onToggleSource, compact = false, className = '' }) => {
     const {
         error,
         play,
@@ -35,6 +35,8 @@ const BaseAudioPlayer = ({ id, src, title, artist, links = {}, renderAdditionalC
     const [deleting, setDeleting] = useState(false);
     const [deleteStatus, setDeleteStatus] = useState('idle'); // idle | deleting | success | error
     const [deleteMsg, setDeleteMsg] = useState('');
+    const containerRef = useRef(null);
+    const [hasInitialized, setHasInitialized] = useState(false);
 
     const isPlaying = playingStates[id];
     const currentTime = currentTimes[id] || 0;
@@ -176,10 +178,25 @@ const BaseAudioPlayer = ({ id, src, title, artist, links = {}, renderAdditionalC
         };
     }, [volumeOpen]);
 
-    // Preload metadata so duration is known before first play
+    // Lazy metadata init using IntersectionObserver for performance
     useEffect(() => {
-        initializeAudio(id, src);
-    }, [id, src]);
+        if (hasInitialized) return;
+        const el = containerRef.current;
+        if (!el) return;
+        const observer = new IntersectionObserver(
+            (entries) => {
+                entries.forEach((entry) => {
+                    if (entry.isIntersecting && !hasInitialized) {
+                        initializeAudio(id, src);
+                        setHasInitialized(true);
+                    }
+                });
+            },
+            { root: null, rootMargin: '200px', threshold: 0.01 }
+        );
+        observer.observe(el);
+        return () => observer.disconnect();
+    }, [id, src, hasInitialized, initializeAudio]);
 
     if (error) console.log(error);
 
@@ -194,14 +211,41 @@ const BaseAudioPlayer = ({ id, src, title, artist, links = {}, renderAdditionalC
 
     // Keyboard left/right support
     const handleKeyDown = (e) => {
-        if (e.key === 'ArrowLeft' || e.key === 'ArrowDown') {
+        if (e.key === ' ' || e.code === 'Space') {
+            e.preventDefault();
+            handlePlayPause();
+            return;
+        }
+        if ((e.key === 't' || e.key === 'T') && typeof onToggleSource === 'function') {
+            e.preventDefault();
+            onToggleSource();
+            return;
+        }
+        if (e.key === 'ArrowLeft') {
+            const SEEK_STEP = 5;
+            const newTime = Math.max(0, (currentTime || 0) - SEEK_STEP);
+            seek(id, newTime);
+            e.preventDefault();
+            return;
+        }
+        if (e.key === 'ArrowRight') {
+            const SEEK_STEP = 5;
+            const newTime = Math.min(duration || 0, (currentTime || 0) + SEEK_STEP);
+            seek(id, newTime);
+            e.preventDefault();
+            return;
+        }
+        if (e.key === 'ArrowDown') {
             setMuted(false);
             setVolume(id, Math.max(0, volume - 0.05));
             e.preventDefault();
-        } else if (e.key === 'ArrowRight' || e.key === 'ArrowUp') {
+            return;
+        }
+        if (e.key === 'ArrowUp') {
             setMuted(false);
             setVolume(id, Math.min(1, volume + 0.05));
             e.preventDefault();
+            return;
         }
     };
 
@@ -225,7 +269,7 @@ const BaseAudioPlayer = ({ id, src, title, artist, links = {}, renderAdditionalC
     if (compact) {
         // Minimal UI for compressed grid
         return (
-            <div className={`relative flex flex-col bg-card-dark border border-border-dark rounded-lg shadow-md p-3 min-w-0 w-full max-w-xs mx-auto ${className}`}>
+            <div ref={containerRef} onKeyDown={handleKeyDown} tabIndex={0} className={`relative flex flex-col bg-card-dark border border-border-dark rounded-lg shadow-md p-3 min-w-0 w-full max-w-xs mx-auto outline-none focus:ring-1 focus:ring-accent-dark/60 ${className}`}>
                 {isAdmin && (
                     <button
                         className="absolute top-2 right-2 z-10 text-red-400 hover:text-red-600 bg-black/40 rounded-full p-1.5 transition-colors flex items-center justify-center"
@@ -252,6 +296,7 @@ const BaseAudioPlayer = ({ id, src, title, artist, links = {}, renderAdditionalC
                         onClick={handlePlayPause}
                         className="p-2 rounded-full bg-button-dark text-buttonText-dark hover:bg-accent-dark transition-colors"
                         aria-label={isPlaying ? 'Pause' : 'Play'}
+                        title={isPlaying ? 'Pause' : 'Play'}
                     >
                         {isPlaying ? <Pause size={18} /> : <Play size={18} />}
                     </button>
@@ -289,7 +334,7 @@ const BaseAudioPlayer = ({ id, src, title, artist, links = {}, renderAdditionalC
 
     // Full-featured player
     return (
-        <div className={`relative audio-player-card ${compact ? 'p-2' : 'p-4'} ${className}`}>
+        <div ref={containerRef} onKeyDown={handleKeyDown} tabIndex={0} className={`relative audio-player-card ${compact ? 'p-2' : 'p-4'} ${className} outline-none focus:ring-1 focus:ring-accent-dark/60`}>
             {isAdmin && (
                 <button
                     className="absolute top-2 right-2 z-10 text-red-400 hover:text-red-600 bg-black/40 rounded-full p-1.5 transition-colors flex items-center justify-center"

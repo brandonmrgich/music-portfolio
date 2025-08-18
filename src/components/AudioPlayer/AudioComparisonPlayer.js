@@ -59,6 +59,7 @@ const AudioComparisonPlayer = ({ id, before, after, title, artist, links, compac
             artist={artist}
             links={links}
             renderAdditionalControls={renderAdditionalControls}
+            onToggleSource={handleToggle}
             compact={compact}
             className={className}
         />
