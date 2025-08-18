@@ -35,3 +35,6 @@ if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('/service-worker.js');
   });
 }
+
+// Expose a lightweight global for deep-link copy of current times
+if (!window.__APP__) window.__APP__ = {};

@@ -30,26 +30,60 @@ const AudioComparisonPlayer = ({ id, before, after, title, artist, links, compac
      * Render the A/B toggle button.
      * @returns {JSX.Element}
      */
-    const renderAdditionalControls = () => (
-        <div className="inline-flex items-center bg-primary-dark2/40 rounded-md border border-border-dark overflow-hidden">
-            <button
-                onClick={() => { if (!isBeforeAudio) handleToggle(); }}
-                className={`px-2 py-1 text-xs transition-colors ${isBeforeAudio ? 'bg-accent-dark text-black' : 'text-playercardText-dark hover:bg-primary-dark2/60'}`}
-                aria-pressed={isBeforeAudio}
-                title="Original"
-            >
-                A
-            </button>
-            <button
-                onClick={() => { if (isBeforeAudio) handleToggle(); }}
-                className={`px-2 py-1 text-xs transition-colors ${!isBeforeAudio ? 'bg-accent-dark text-black' : 'text-playercardText-dark hover:bg-primary-dark2/60'}`}
-                aria-pressed={!isBeforeAudio}
-                title="Mastered"
-            >
-                B
-            </button>
-        </div>
-    );
+    const renderAdditionalControls = () => {
+        if (compact) {
+            // Full-width slim segmented toggle for compact cards (bottom row)
+            return (
+                <div className="w-full">
+                    <div className="relative w-full h-7 rounded-md overflow-hidden border border-border-dark bg-primary-dark2/30">
+                        <div className="absolute inset-0 grid grid-cols-2 text-xs">
+                            <button
+                                onClick={() => { if (!isBeforeAudio) handleToggle(); }}
+                                className={`w-full h-full transition-colors focus:outline-none ${isBeforeAudio ? 'bg-accent-dark text-black' : 'text-playercardText-dark hover:bg-primary-dark2/60'}`}
+                                aria-pressed={isBeforeAudio}
+                                aria-label="Original"
+                                title="Original"
+                            >
+                                Original
+                            </button>
+                            <button
+                                onClick={() => { if (isBeforeAudio) handleToggle(); }}
+                                className={`w-full h-full transition-colors focus:outline-none ${!isBeforeAudio ? 'bg-accent-dark text-black' : 'text-playercardText-dark hover:bg-primary-dark2/60'}`}
+                                aria-pressed={!isBeforeAudio}
+                                aria-label="Mastered"
+                                title="Mastered"
+                            >
+                                Mastered
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            );
+        }
+        // Inline compact pill for full-size cards (placed next to Play)
+        return (
+            <div className="inline-flex items-center rounded-full border border-border-dark overflow-hidden text-xs">
+                <button
+                    onClick={() => { if (!isBeforeAudio) handleToggle(); }}
+                    className={`px-2 py-1 transition-colors focus:outline-none ${isBeforeAudio ? 'bg-accent-dark text-black' : 'text-playercardText-dark hover:bg-primary-dark2/60'}`}
+                    aria-pressed={isBeforeAudio}
+                    aria-label="Original"
+                    title="Original"
+                >
+                    A
+                </button>
+                <button
+                    onClick={() => { if (isBeforeAudio) handleToggle(); }}
+                    className={`px-2 py-1 transition-colors focus:outline-none ${!isBeforeAudio ? 'bg-accent-dark text-black' : 'text-playercardText-dark hover:bg-primary-dark2/60'}`}
+                    aria-pressed={!isBeforeAudio}
+                    aria-label="Mastered"
+                    title="Mastered"
+                >
+                    B
+                </button>
+            </div>
+        );
+    };
 
     return (
         <BaseAudioPlayer

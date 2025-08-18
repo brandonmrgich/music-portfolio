@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Play, Pause, Volume, Volume1, Volume2, VolumeX, X, Loader2 } from 'lucide-react';
+import { Play, Pause, Volume, Volume1, Volume2, VolumeX, X, Loader2, Share } from 'lucide-react';
 import { useAudio } from '../../contexts/AudioContext';
 import { useAdmin } from '../../contexts/AdminContext';
 import { deleteTrack } from '../../services/tracks';
@@ -47,6 +47,48 @@ const BaseAudioPlayer = ({ id, src, title, artist, links = {}, renderAdditionalC
     const openVolume = () => setVolumeOpen(true);
     const closeVolume = () => setVolumeOpen(false);
     const volumeRef = useRef(null);
+    const titleLongPressTimerRef = useRef(null);
+    const LONG_PRESS_MS = 600;
+    const [copyToastVisible, setCopyToastVisible] = useState(false);
+    const copyToastTimeoutRef = useRef(null);
+
+    const copyDeepLink = (includeTime = true) => {
+        try {
+            const url = new URL(window.location.href);
+            url.searchParams.set('track', id);
+            if (includeTime) {
+                url.searchParams.set('t', Math.floor(currentTime || 0));
+            }
+            navigator.clipboard.writeText(url.toString());
+            // Show ephemeral toast
+            setCopyToastVisible(true);
+            if (copyToastTimeoutRef.current) clearTimeout(copyToastTimeoutRef.current);
+            copyToastTimeoutRef.current = setTimeout(() => setCopyToastVisible(false), 1200);
+        } catch (_) {}
+    };
+
+    const handleTitleTouchStart = () => {
+        try {
+            if (titleLongPressTimerRef.current) clearTimeout(titleLongPressTimerRef.current);
+            titleLongPressTimerRef.current = setTimeout(() => {
+                copyDeepLink(true);
+            }, LONG_PRESS_MS);
+        } catch (_) {}
+    };
+    const handleTitleTouchEnd = () => {
+        if (titleLongPressTimerRef.current) {
+            clearTimeout(titleLongPressTimerRef.current);
+            titleLongPressTimerRef.current = null;
+        }
+    };
+
+    // Cleanup timers on unmount
+    useEffect(() => {
+        return () => {
+            if (titleLongPressTimerRef.current) clearTimeout(titleLongPressTimerRef.current);
+            if (copyToastTimeoutRef.current) clearTimeout(copyToastTimeoutRef.current);
+        };
+    }, []);
 
     const formatTime = (time) => {
         const minutes = Math.floor(time / 60);
@@ -306,16 +348,22 @@ const BaseAudioPlayer = ({ id, src, title, artist, links = {}, renderAdditionalC
                                 className="text-sm font-semibold text-playercardText-dark overflow-hidden min-h-[40px]"
                                 title={title}
                                 style={{ display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }}
+                                onTouchStart={handleTitleTouchStart}
+                                onTouchEnd={handleTitleTouchEnd}
+                                onTouchCancel={handleTitleTouchEnd}
                             >
                                 {title}
                             </span>
                             <span className="text-xs text-playercardText-dark opacity-80 truncate" title={artist}>{artist}</span>
                         </div>
-                        {renderAdditionalControls && (
-                            <span className="ml-2 text-playercardText-dark">
-                                {renderAdditionalControls()}
-                            </span>
-                        )}
+                        <button
+                            onClick={() => copyDeepLink(true)}
+                            className="ml-2 p-1 rounded hover:bg-primary-dark2/60 focus:outline-none focus:ring-1 focus:ring-accent-dark/60"
+                            title="Share"
+                            aria-label="Share link to current time"
+                        >
+                            <Share size={16} className="text-playercardText-dark" />
+                        </button>
                     </div>
                     <span className="text-xs text-accent-dark ml-2 min-w-[40px] text-right">{formatTime((!isPlaying && currentTime === 0 && duration > 0) ? duration : currentTime)}</span>
                 </div>
@@ -328,13 +376,31 @@ const BaseAudioPlayer = ({ id, src, title, artist, links = {}, renderAdditionalC
                     className="w-full accent-accent-dark h-1 rounded bg-primary-dark2/30 mt-1"
                     aria-label="Seek audio"
                 />
+                {/* Bottom controls row for compact player: full-width A/B toggle */}
+                {renderAdditionalControls && (
+                    <div className="mt-2 w-full">
+                        {renderAdditionalControls()}
+                    </div>
+                )}
+                {copyToastVisible && (
+                    <div className="absolute inset-0 z-30 flex items-center justify-center">
+                        <div className="absolute inset-0 bg-black/50 backdrop-blur-sm rounded-lg"></div>
+                        <div
+                            className="relative px-4 py-2 rounded-full text-sm font-semibold text-white bg-white/20 border border-white/30 shadow-xl"
+                            role="status"
+                            aria-live="polite"
+                        >
+                            Link copied
+                        </div>
+                    </div>
+                )}
             </div>
         );
     }
 
     // Full-featured player
     return (
-        <div ref={containerRef} onKeyDown={handleKeyDown} tabIndex={0} className={`relative audio-player-card ${compact ? 'p-2' : 'p-4'} ${className} outline-none focus:ring-1 focus:ring-accent-dark/60`}>
+        <div id={`track-${id}`} ref={containerRef} onKeyDown={handleKeyDown} tabIndex={0} className={`relative audio-player-card ${compact ? 'p-2' : 'p-4'} ${className} outline-none focus:ring-1 focus:ring-accent-dark/60`}>
             {isAdmin && (
                 <button
                     className="absolute top-2 right-2 z-10 text-red-400 hover:text-red-600 bg-black/40 rounded-full p-1.5 transition-colors flex items-center justify-center"
@@ -373,6 +439,9 @@ const BaseAudioPlayer = ({ id, src, title, artist, links = {}, renderAdditionalC
                             <a
                                 href={links.song || '#'}
                                 className="block text-playercardText-dark hover:text-accent-dark transition-all duration-400"
+                                onTouchStart={handleTitleTouchStart}
+                                onTouchEnd={handleTitleTouchEnd}
+                                onTouchCancel={handleTitleTouchEnd}
                             >
                                 {title}
                             </a>
@@ -381,6 +450,7 @@ const BaseAudioPlayer = ({ id, src, title, artist, links = {}, renderAdditionalC
                             ref={iconRef}
                             className={`transition-transform focus:outline-none ${dragging ? 'scale-110' : ''}`}
                             aria-label="Volume"
+                            title="Volume"
                             onClick={handleIconClick}
                             onMouseDown={handleMouseDown}
                             onTouchStart={handleTouchStart}
@@ -434,8 +504,33 @@ const BaseAudioPlayer = ({ id, src, title, artist, links = {}, renderAdditionalC
                             />
                         </div>
                     </button>
-                    <div className="mt-1">{renderAdditionalControls && <span className="text-playercardText-dark">{renderAdditionalControls()}</span>}</div>
+                    <div className="mt-1 ml-2 flex items-center gap-2">
+                        {renderAdditionalControls && (
+                            <span className="inline-flex items-center">{renderAdditionalControls()}</span>
+                        )}
+                        <button
+                            onClick={() => copyDeepLink(true)}
+                            className="p-1 rounded hover:bg-primary-dark2/60 focus:outline-none focus:ring-1 focus:ring-accent-dark/60"
+                            title="Share"
+                            aria-label="Share link to current time"
+                        >
+                            <Share size={16} className="text-playercardText-dark" />
+                        </button>
+                    </div>
                 </section>
+
+                {copyToastVisible && (
+                    <div className="absolute inset-0 z-30 flex items-center justify-center">
+                        <div className="absolute inset-0 bg-black/50 backdrop-blur-sm rounded-lg"></div>
+                        <div
+                            className="relative px-4 py-2 rounded-full text-sm font-semibold text-white bg-white/20 border border-white/30 shadow-xl"
+                            role="status"
+                            aria-live="polite"
+                        >
+                            Link copied
+                        </div>
+                    </div>
+                )}
 
                 {error && <span className="sm text-red-500 mt-2">{error}</span>}
             </div>

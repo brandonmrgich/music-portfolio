@@ -44,6 +44,8 @@ export const AudioProvider = ({ children }) => {
     const normalizationCacheRef = useRef({}); // { absoluteSrc: factor }
     // Track any in-flight volume ramps so we can cancel/replace
     const volumeRampHandlesRef = useRef({}); // { id: { cancel: () => void } }
+    // Ensure deep-link handling runs once
+    const didApplyDeepLinkRef = useRef(false);
 
     // --- Web Audio API for normalization only ---
     const getNormalizationFactor = async (src, targetPeak = TARGET_PEAK, targetRms = TARGET_RMS) => {
@@ -153,6 +155,12 @@ export const AudioProvider = ({ children }) => {
             });
             audio.addEventListener('timeupdate', () => {
                 setCurrentTimes((prev) => ({ ...prev, [id]: audio.currentTime }));
+                // Update global mirror for deep-link copy
+                try {
+                    if (!window.__APP__) window.__APP__ = {};
+                    if (!window.__APP__.audioCurrentTimes) window.__APP__.audioCurrentTimes = {};
+                    window.__APP__.audioCurrentTimes[id] = audio.currentTime;
+                } catch (_) {}
             });
             audio.addEventListener('ended', () => {
                 setPlayingStates((prev) => ({ ...prev, [id]: false }));
@@ -376,6 +384,42 @@ export const AudioProvider = ({ children }) => {
         }
         return null;
     };
+
+    // Deep-link handling: ?track=<id>&t=<seconds>
+    useEffect(() => {
+        if (didApplyDeepLinkRef.current) return;
+        // Wait until tracks are loaded at least once
+        if (tracksLoading) return;
+        const params = new URLSearchParams(window.location.search);
+        const trackId = params.get('track');
+        if (!trackId) return;
+        const timeParam = parseInt(params.get('t') || '0', 10);
+        const startSeconds = Number.isFinite(timeParam) && timeParam >= 0 ? timeParam : 0;
+        const track = getTrackById(trackId);
+        if (!track) return;
+        // Determine a source
+        const chosenSrc = track.src || track.before || track.after;
+        if (!chosenSrc) return;
+        didApplyDeepLinkRef.current = true;
+        // Initialize and seek (no autoplay)
+        (async () => {
+            try {
+                await initializeAudio(trackId, chosenSrc);
+                seek(trackId, startSeconds);
+                setCurrentSrcs((prev) => ({ ...prev, [trackId]: chosenSrc }));
+                setCurrentTrack({ id: trackId, src: chosenSrc, title: track.title, artist: track.artist, links: track.links });
+                // Attempt to scroll the card into view
+                setTimeout(() => {
+                    const el = document.getElementById(`track-${trackId}`);
+                    if (el && typeof el.scrollIntoView === 'function') {
+                        el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    }
+                }, 0);
+            } catch (e) {
+                // ignore
+            }
+        })();
+    }, [tracks, tracksLoading]);
 
     // On unmount, pause and reset all audio
     useEffect(() => {
