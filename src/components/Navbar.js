@@ -5,9 +5,9 @@ import Login from './Login';
 
 const navLinks = [
   { label: 'Home', section: 'hero' },
-  { label: 'Scoring', section: 'scoring' },
+  { label: 'Mixing & Mastering', section: 'services' },
+  { label: 'Film & Game Scoring', section: 'scoring' },
   { label: 'In Work', section: 'inwork' },
-  { label: 'Services', section: 'services' },
   { label: 'About', section: 'about' },
 ];
 
