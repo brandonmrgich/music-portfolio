@@ -14,7 +14,16 @@ import { useAudio } from '../../contexts/AudioContext';
  * @param {string} props.artist - Track artist
  * @param {object} props.links - Track links (artist, song)
  */
-const AudioComparisonPlayer = ({ id, before, after, title, artist, links, compact = false, className = '' }) => {
+const AudioComparisonPlayer = ({
+    id,
+    before,
+    after,
+    title,
+    artist,
+    links,
+    compact = false,
+    className = '',
+}) => {
     const { toggleSource } = useAudio();
     const [isBeforeAudio, setIsBeforeAudio] = useState(true);
 
@@ -38,8 +47,10 @@ const AudioComparisonPlayer = ({ id, before, after, title, artist, links, compac
                     <div className="relative w-full h-7 rounded-md overflow-hidden border border-border-dark bg-primary-dark2/30">
                         <div className="absolute inset-0 grid grid-cols-2 text-xs">
                             <button
-                                onClick={() => { if (!isBeforeAudio) handleToggle(); }}
-                                className={`w-full h-full transition-colors focus:outline-none ${isBeforeAudio ? 'bg-accent-dark text-black' : 'text-playercardText-dark hover:bg-primary-dark2/60'}`}
+                                onClick={() => {
+                                    if (!isBeforeAudio) handleToggle();
+                                }}
+                                className={`px-2 py-1 transition-colors focus:outline-none ${isBeforeAudio ? 'bg-accent-dark text-black' : 'text-playercardText-dark hover:bg-primary-dark2/60'}`}
                                 aria-pressed={isBeforeAudio}
                                 aria-label="Original"
                                 title="Original"
@@ -47,8 +58,10 @@ const AudioComparisonPlayer = ({ id, before, after, title, artist, links, compac
                                 Original
                             </button>
                             <button
-                                onClick={() => { if (isBeforeAudio) handleToggle(); }}
-                                className={`w-full h-full transition-colors focus:outline-none ${!isBeforeAudio ? 'bg-accent-dark text-black' : 'text-playercardText-dark hover:bg-primary-dark2/60'}`}
+                                onClick={() => {
+                                    if (isBeforeAudio) handleToggle();
+                                }}
+                                className={`px-2 py-1 transition-colors focus:outline-none ${!isBeforeAudio ? 'bg-accent-dark text-black' : 'text-playercardText-dark hover:bg-primary-dark2/60'}`}
                                 aria-pressed={!isBeforeAudio}
                                 aria-label="Mastered"
                                 title="Mastered"
@@ -62,24 +75,28 @@ const AudioComparisonPlayer = ({ id, before, after, title, artist, links, compac
         }
         // Inline compact pill for full-size cards (placed next to Play)
         return (
-            <div className="inline-flex items-center rounded-full border border-border-dark overflow-hidden text-xs">
+            <div className="inline-flex items-center rounded-md border border-border-dark overflow-hidden text-xs">
                 <button
-                    onClick={() => { if (!isBeforeAudio) handleToggle(); }}
+                    onClick={() => {
+                        if (!isBeforeAudio) handleToggle();
+                    }}
                     className={`px-2 py-1 transition-colors focus:outline-none ${isBeforeAudio ? 'bg-accent-dark text-black' : 'text-playercardText-dark hover:bg-primary-dark2/60'}`}
                     aria-pressed={isBeforeAudio}
                     aria-label="Original"
                     title="Original"
                 >
-                    A
+                    Original
                 </button>
                 <button
-                    onClick={() => { if (isBeforeAudio) handleToggle(); }}
+                    onClick={() => {
+                        if (isBeforeAudio) handleToggle();
+                    }}
                     className={`px-2 py-1 transition-colors focus:outline-none ${!isBeforeAudio ? 'bg-accent-dark text-black' : 'text-playercardText-dark hover:bg-primary-dark2/60'}`}
                     aria-pressed={!isBeforeAudio}
                     aria-label="Mastered"
                     title="Mastered"
                 >
-                    B
+                    Mastered
                 </button>
             </div>
         );

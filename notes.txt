@@ -1,5 +1,3 @@
-TODO: when fetching track cache it once, use it while cached avoid extra calls
- 
-TODO: Fix useEffect multi-call on track fetches
-- Review component lifecycle : InWork -> useTracks -> AudioGrid -> ABCAudioPlayer -> AudioPlayer
-- Use effects stacking causing re-mount behavior and double calls to the tracks fetch
+
+TODO: Review local changes, remove / fix normalization
+TODO: A/B playback needs shape changed
