@@ -14,6 +14,8 @@ import beachImg from './assets/images/profile-beach.jpeg';
 import AppProvider from './contexts/AppProvider';
 import { useAdmin } from './contexts/AdminContext';
 import Login from './components/Login';
+import ProjectSelector from './components/Projects/ProjectSelector';
+import ProjectView from './components/Projects/ProjectView';
 
 /**
  * App - Main application shell.
@@ -24,6 +26,7 @@ import Login from './components/Login';
 const App = () => {
     // Refs for smooth scroll navigation
     const heroRef = useRef(null);
+    const projectsRef = useRef(null);
     const inWorkRef = useRef(null);
     const servicesRef = useRef(null);
     const scoringRef = useRef(null);
@@ -59,6 +62,7 @@ const App = () => {
                 <Navbar
                     refs={{
                         hero: heroRef,
+                        projects: projectsRef,
                         inwork: inWorkRef,
                         services: servicesRef,
                         scoring: scoringRef,
@@ -69,6 +73,8 @@ const App = () => {
                 <main className="flex flex-col flex-grow relative z-10">
                     <section ref={heroRef} id="hero"><HeroSection onHeroExit={unlockAndScroll} scrollLocked={scrollLocked} /></section>
                     <SectionDivider variant={1} />
+                    <section ref={projectsRef} id="projects"><ProjectSelector /></section>
+                    <SectionDivider variant={0} />
                     <section ref={servicesRef} id="services"><ServicesSection /></section>
                     <SectionDivider variant={0} />
                     <section ref={scoringRef} id="scoring"><ScoringSection /></section>
@@ -80,6 +86,8 @@ const App = () => {
                 <GlobalAudioBar />
                 <Footer />
                 <ContactModal />
+                {/* Project View Overlay */}
+                <ProjectView />
                 {/* Login Modal rendered at root level for proper overlay */}
                 {showLogin && !isAdmin && (
                   <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">

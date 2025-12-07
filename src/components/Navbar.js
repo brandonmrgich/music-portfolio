@@ -5,6 +5,7 @@ import Login from './Login';
 
 const navLinks = [
   { label: 'Home', section: 'hero' },
+  { label: 'Projects', section: 'projects' },
   { label: 'Mixing & Mastering', section: 'services' },
   { label: 'Film & Game Scoring', section: 'scoring' },
   { label: 'In Work', section: 'inwork' },
