@@ -44,8 +44,8 @@ const AudioComparisonPlayer = ({
             // Full-width slim segmented toggle for compact cards (bottom row)
             return (
                 <div className="w-full">
-                    <div className="relative w-full h-7 rounded-md overflow-hidden border border-border-dark bg-card-dark/30">
-                        <div className="absolute inset-0 grid grid-cols-2 text-xs">
+                    <div className="relative w-full h-8 rounded-md overflow-hidden border border-border-dark bg-card-dark/30">
+                        <div className="absolute inset-0 grid grid-cols-2 text-sm">
                             <button
                                 onClick={() => {
                                     if (!isBeforeAudio) handleToggle();
@@ -75,7 +75,7 @@ const AudioComparisonPlayer = ({
         }
         // Inline compact pill for full-size cards (placed next to Play)
         return (
-            <div className="inline-flex items-center rounded-md border border-border-dark overflow-hidden text-xs">
+            <div className="inline-flex items-center rounded-md border border-border-dark overflow-hidden text-sm">
                 <button
                     onClick={() => {
                         if (!isBeforeAudio) handleToggle();

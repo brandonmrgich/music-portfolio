@@ -39,7 +39,7 @@ module.exports = {
                 playercardText: {
 					// Secondary text on cards/players (muted, readable)
 					light: '#5f6b7a',
-					dark: '#a8b4c2',
+					dark: '#d9e1ee',
                 },
                 border: {
 					light: 'rgb(203, 191, 175)', // #E5D7C6

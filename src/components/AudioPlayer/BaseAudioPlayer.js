@@ -345,7 +345,7 @@ const BaseAudioPlayer = ({ id, src, title, artist, links = {}, renderAdditionalC
                     <div className="flex items-center flex-1 min-w-0 ml-2">
                         <div className="flex flex-col flex-1 min-w-0">
                             <span
-                                className="text-sm font-semibold text-playercardText-dark overflow-hidden min-h-[40px]"
+                                className="text-base font-semibold text-playercardText-dark overflow-hidden min-h-[40px]"
                                 title={title}
                                 style={{ display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }}
                                 onTouchStart={handleTitleTouchStart}
@@ -354,7 +354,7 @@ const BaseAudioPlayer = ({ id, src, title, artist, links = {}, renderAdditionalC
                             >
                                 {title}
                             </span>
-                            <span className="text-xs text-playercardText-dark opacity-80 truncate" title={artist}>{artist}</span>
+                            <span className="text-sm text-playercardText-dark opacity-80 truncate" title={artist}>{artist}</span>
                         </div>
                         <button
                             onClick={() => copyDeepLink(true)}
@@ -365,7 +365,7 @@ const BaseAudioPlayer = ({ id, src, title, artist, links = {}, renderAdditionalC
                             <Share size={16} className="text-playercardText-dark" />
                         </button>
                     </div>
-                    <span className="text-xs text-accent-dark ml-2 min-w-[40px] text-right">{formatTime((!isPlaying && currentTime === 0 && duration > 0) ? duration : currentTime)}</span>
+                    <span className="text-sm text-accent-dark ml-2 min-w-[40px] text-right">{formatTime((!isPlaying && currentTime === 0 && duration > 0) ? duration : currentTime)}</span>
                 </div>
                 <input
                     type="range"
@@ -432,7 +432,7 @@ const BaseAudioPlayer = ({ id, src, title, artist, links = {}, renderAdditionalC
                 <div className="flex flex-col gap-1">
                     <div className="flex items-center gap-2">
                         <h3
-                            className="flex-grow text-lg font-semibold text-playercardText-dark hover:text-accent-dark overflow-hidden min-h-[48px]"
+                            className="flex-grow text-xl font-semibold text-playercardText-dark hover:text-accent-dark overflow-hidden min-h-[48px]"
                             title={title}
                             style={{ display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }}
                         >
@@ -447,7 +447,7 @@ const BaseAudioPlayer = ({ id, src, title, artist, links = {}, renderAdditionalC
                             </a>
                         </h3>
                     </div>
-                    <h4 className="truncate text-md font-light text-playercardText-dark hover:text-accent-dark" title={artist}>
+                    <h4 className="truncate text-lg font-light text-playercardText-dark hover:text-accent-dark" title={artist}>
                         <a
                             href={links.artist || '#'}
                             className="max-w-xs opacity-80 text-playercardText-dark hover:text-accent-dark transition-all duration-300"
@@ -457,7 +457,7 @@ const BaseAudioPlayer = ({ id, src, title, artist, links = {}, renderAdditionalC
                     </h4>
                 </div>
 
-                <div className="mb-2 mt-2 flex items-center text-sm italic">
+                <div className="mb-2 mt-2 flex items-center text-base italic">
                     <span className="text-accent-dark">{formatTime(currentTime)}</span>
                     <div className="flex-grow mx-4 flex items-center justify-center">
                         <input

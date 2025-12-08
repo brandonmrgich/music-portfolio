@@ -50,7 +50,7 @@ const AudioPlayer = ({ id, src, title, artist, links }) => {
                         navigator.clipboard.writeText(url.toString());
                     } catch (_) {}
                 }}
-                className="px-2 py-0.5 text-xs text-playercardText-dark hover:bg-card-dark/50 rounded focus:outline-none focus:ring-1 focus:ring-accent-dark/60"
+                className="px-2 py-0.5 text-sm text-playercardText-dark hover:bg-card-dark/50 rounded focus:outline-none focus:ring-1 focus:ring-accent-dark/60"
                 title="Share"
                 aria-label="Share link to current time"
             >
@@ -66,7 +66,7 @@ const AudioPlayer = ({ id, src, title, artist, links }) => {
                     <Heart
                         className={`w-4 h-4 text-accent-dark hover:text-red-500 ${hasLiked ? 'fill-current text-red-500' : 'fill-none'}`}
                     />
-                    <span className="text-xs text-playercardText-dark">{likes}</span>
+                    <span className="text-sm text-playercardText-dark">{likes}</span>
                 </div>
             </button>
         </div>
