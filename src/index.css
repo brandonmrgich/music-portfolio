@@ -5,6 +5,20 @@
 /* Professional fonts: Inter (body), Spectral (headings) */
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Spectral:wght@400;600;700&display=swap');
 
+/* Subtle background drift (performance-friendly) */
+@keyframes bg-drift {
+  0%   { transform: translate3d(0,0,0) scale(1.02); filter: blur(0.6px); opacity: .14; }
+  50%  { transform: translate3d(40px,26px,0) scale(1.6); filter: blur(1.6px); opacity: .26; }
+  100% { transform: translate3d(0,0,0) scale(1.02); filter: blur(0.6px); opacity: .14; }
+}
+.bg-drift {
+  animation: bg-drift 24s ease-in-out infinite;
+  will-change: transform, filter, opacity;
+}
+@media (prefers-reduced-motion: reduce) {
+  .bg-drift { animation: none; }
+}
+
 html,
 body {
     margin: 0;

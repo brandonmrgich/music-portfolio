@@ -68,6 +68,17 @@ const App = () => {
                     backgroundBlendMode: 'overlay',
                 }}
             >
+                {/* Subtle drifting overlay for background texture (performance-conscious) */}
+                <div
+                    className="pointer-events-none fixed inset-0 z-0 bg-drift"
+                    style={{
+                        backgroundImage: `url(${lakaBanner})`,
+                        backgroundRepeat: 'repeat',
+                        backgroundSize: 'auto 360px',
+                        mixBlendMode: 'screen',
+                        opacity: 0.7, 
+                    }}
+                />
                 <Navbar
                     refs={{
                         hero: heroRef,
