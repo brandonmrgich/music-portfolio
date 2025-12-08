@@ -5,53 +5,60 @@ import { useProjects } from '../../contexts/ProjectContext';
 import ProjectCard from './ProjectCard';
 
 const container = {
-	hidden: { opacity: 0, y: 12 },
-	show: {
-		opacity: 1,
-		y: 0,
-		transition: {
-			staggerChildren: 0.08,
-			delayChildren: 0.05,
-		},
-	},
+    hidden: { opacity: 0, y: 12 },
+    show: {
+        opacity: 1,
+        y: 0,
+        transition: {
+            staggerChildren: 0.08,
+            delayChildren: 0.05,
+        },
+    },
 };
 
 const item = {
-	hidden: { opacity: 0, y: 16 },
-	show: { opacity: 1, y: 0 },
+    hidden: { opacity: 0, y: 16 },
+    show: { opacity: 1, y: 0 },
 };
 
 const ProjectSelector = () => {
-	const { openProject } = useProjects();
-	return (
-		<section className="w-full">
-			<div className="mx-auto max-w-7xl px-4 md:px-6 py-12 md:py-20">
-				<header className="mb-10 md:mb-14">
-					<div className="max-w-3xl mx-auto bg-card-dark/60 backdrop-blur-md border border-border-dark rounded-xl shadow-xl px-5 py-5 text-center">
-						<h2 className="text-4xl md:text-5xl font-bold font-heading tracking-tight text-accent-dark drop-shadow-md">Projects</h2>
-						<p className="mt-3 text-text-dark max-w-2xl mx-auto text-xl">
-							Select a project to dive in. Smooth shared-layout transitions guide you into each world.
-						</p>
-					</div>
-				</header>
-				<motion.ul
-					variants={container}
-					initial="hidden"
-					whileInView="show"
-					viewport={{ once: true, amount: 0.2 }}
-					className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 md:gap-6"
-				>
-					{PROJECTS.map((project) => (
-						<motion.li key={project.id} variants={item} className="min-h-[260px]">
-							<ProjectCard project={project} onClick={() => openProject(project.id)} />
-						</motion.li>
-					))}
-				</motion.ul>
-			</div>
-		</section>
-	);
+    const { openProject } = useProjects();
+    return (
+        <section className="w-full">
+            <div className="mx-auto max-w-7xl px-4 md:px-6 py-12 md:py-20">
+                <header className="mb-10 md:mb-14">
+                    <div className="max-w-3xl mx-auto bg-card-dark/60 backdrop-blur-md border border-border-dark rounded-xl shadow-xl px-5 py-5 text-center">
+                        <h2 className="text-4xl md:text-5xl font-bold font-heading tracking-tight text-accent-dark drop-shadow-md">
+                            Projects
+                        </h2>
+                        <p className="mt-3 text-text-dark max-w-2xl mx-auto text-xl md:text-2xl">
+                            Here are the three artist accounts I release under, each exploring a
+                            different set of genres & sound.
+                        </p>
+                        <p className="mt-3 text-text-dark max-w-2xl mx-auto text-l md:text-xl">
+                            (note: Select to expand a project)
+                        </p>
+                    </div>
+                </header>
+                <motion.ul
+                    variants={container}
+                    initial="hidden"
+                    whileInView="show"
+                    viewport={{ once: true, amount: 0.2 }}
+                    className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 md:gap-6"
+                >
+                    {PROJECTS.map((project) => (
+                        <motion.li key={project.id} variants={item} className="min-h-[260px]">
+                            <ProjectCard
+                                project={project}
+                                onClick={() => openProject(project.id)}
+                            />
+                        </motion.li>
+                    ))}
+                </motion.ul>
+            </div>
+        </section>
+    );
 };
 
 export default ProjectSelector;
-
-

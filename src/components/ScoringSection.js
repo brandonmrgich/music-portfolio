@@ -6,9 +6,8 @@ import { useAdmin } from '../contexts/AdminContext';
 import TrackUploadForm from './TrackUploadForm';
 
 const scoringData = {
-    pitch: "I've always dreamed of scoring stories — ones that move people. From large scale film tracks by Hans Zimmer, to tracks from games like Minecraft & What Remains of Edith Finch — I'm inspired by how music can shape worlds, whether vast or intimate. I chase that feeling in every song I write.",
-    disclaimer:
-        "Heres are a few tracks I've done that would work well for stories like this. I own 100% of the master and publishing rights to them, so if you’re interested in using anything here, or you want me to make something new just for your project, reach out directly!",
+    pitch: "I've always dreamed of making music for games & film, especially like Her, The Black Phone 2, Minecraft, Astroneer, and What Remains of Edith Finch and many more.",
+    disclaimer: 'Heres are a few tracks in the works that would work well for stories like this:',
 };
 
 const ScoringSection = () => {
@@ -49,9 +48,7 @@ const ScoringSection = () => {
                     <p className="text-xl md:text-2xl text-text-dark text-center mb-3">
                         {scoringData.pitch}
                     </p>
-                    <p className="text-xl text-text-dark text-center">
-                        {scoringData.disclaimer}
-                    </p>
+                    <p className="text-xl text-text-dark text-center">{scoringData.disclaimer}</p>
                 </div>
                 {highlight && highlight.src && (
                     <div className="mb-8 max-w-lg mx-auto">

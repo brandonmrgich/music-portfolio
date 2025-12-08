@@ -25,6 +25,7 @@ const BRAND_COLORS = {
     'Apple Music': '#FA2D48', // Apple Music pink/red
     Instagram: '#E4405F',
     Tiktok: '#010101',
+    TikTok: '#9ec7b0', // explicit pastel green for TikTok label variant
     Amazon: '#FF9900',
     Bandcamp: '#629AA9',
     SoundCloud: '#FF5500',

@@ -6,9 +6,8 @@ import { useAdmin } from '../contexts/AdminContext';
 import TrackUploadForm from './TrackUploadForm';
 
 const servicesData = {
-    header: "I love transforming songs into immersive experiences - boosting clarity, punch, and width while building a sound that feels just right. I've produced music for myself, friends, and various other artists over the years. Here are a few of my favorites that I've worked.",
-    instructions:
-        'Click the A / B toggle to switch between the original and final versions of the song!',
+    header: "I love transforming songs into immersive experiences - boosting clarity, punch, and width. I've produced music for myself, friends, and various other artists over the years. Here are a few of my favorites that I've worked on.",
+    instructions: '(note: You can swap between the Original and Mastered version of each song!)',
 };
 
 const ServicesSection = () => {
@@ -49,7 +48,7 @@ const ServicesSection = () => {
                     <p className="text-xl md:text-2xl text-text-dark text-center mb-3">
                         {servicesData.header}
                     </p>
-                    <p className="text-xl text-text-dark text-center">
+                    <p className="text-l md:text-xl text-text-dark text-center">
                         {servicesData.instructions}
                     </p>
                 </div>
@@ -65,11 +64,7 @@ const ServicesSection = () => {
                         />
                     </div>
                 )}
-                {rest.length > 0 && (
-                    <CompressedAudioGrid
-                        tracks={rest}
-                    />
-                )}
+                {rest.length > 0 && <CompressedAudioGrid tracks={rest} />}
                 {showForm && isAdmin && (
                     <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
                         <div className="relative">
