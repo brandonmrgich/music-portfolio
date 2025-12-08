@@ -8,6 +8,7 @@ import ContactModal from './components/Contact/ContactModal';
 import GlobalAudioBar from './components/AudioPlayer/GlobalAudioBar';
 import Footer from './components/Footer';
 import SectionDivider from './components/SectionDivider';
+import lakaBanner from './assets/images/laka-noch/banner.png';
 import AppProvider from './contexts/AppProvider';
 import { useAdmin } from './contexts/AdminContext';
 import Login from './components/Login';
@@ -56,7 +57,17 @@ const App = () => {
 
     return (
         <AppProvider>
-            <div className="w-full min-h-screen flex flex-col text-text-light dark:text-text-dark bg-gradient-to-b from-card-dark via-[#0f111a] to-surface-dark">
+            <div
+                className="w-full min-h-screen flex flex-col text-text-light dark:text-text-dark"
+                style={{
+                    backgroundImage: `linear-gradient(180deg, rgba(21,24,38,0.88), rgba(14,17,22,0.92)), url(${lakaBanner})`,
+                    backgroundRepeat: 'repeat',
+                    backgroundSize: 'auto 360px',
+                    backgroundAttachment: 'fixed',
+                    backgroundPosition: 'center top',
+                    backgroundBlendMode: 'overlay',
+                }}
+            >
                 <Navbar
                     refs={{
                         hero: heroRef,

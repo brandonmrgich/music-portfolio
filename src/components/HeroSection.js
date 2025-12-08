@@ -93,7 +93,7 @@ const HeroSection = ({ onHeroExit, scrollLocked }) => {
         />
         <div className="relative flex flex-col items-center w-full max-w-2xl">
           <div className="absolute inset-0 w-full h-full px-4 py-8 bg-black/40 rounded-xl backdrop-blur-sm" style={{ zIndex: 1 }} />
-          <h1 className="text-4xl md:text-6xl font-extrabold mb-4 text-accent-dark drop-shadow-lg relative" style={{ zIndex: 2 }}>
+          <h1 className="text-4xl md:text-6xl font-extrabold font-heading tracking-tight mb-4 text-accent-dark drop-shadow-lg relative" style={{ zIndex: 2 }}>
             {heroData.heading}
           </h1>
           <p className="text-xl md:text-2xl text-accent-dark mb-6 max-w-2xl mx-auto relative whitespace-pre-line" style={{ zIndex: 2 }}>

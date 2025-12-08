@@ -3,22 +3,28 @@ module.exports = {
     content: ['./src/**/*.{js,jsx,ts,tsx}'],
     theme: {
         extend: {
+				fontFamily: {
+					// Elegant serif for headings
+					heading: ['"Spectral"', 'serif'],
+					// Clean sans for body
+					sans: ['"Inter"', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+				},
             // Modern, soft pastel/tan semantic tokens for the site (all rgba for easy tweaking)
             colors: {
                 surface: {
 					light: 'rgb(232, 225, 218)',
-					// Deep, muted blue-gray for dark backgrounds (nearly black, but softer)
+					// Deep, muted near-black for dark backgrounds (softer than pure black)
 					dark: '#0e1116',
                 },
                 card: {
 					light: 'rgba(255,247,241,1)', // #FFF7F1
-					// Dark glassy panel color (subtle lift from surface.dark)
-					dark: '#151a23',
+					// Dark glassy panel color with slight purple tint (subtle lift)
+					dark: '#151826',
                 },
                 button: {
 					light: 'rgba(70, 117, 153, .5)', // #467599
-					// Muted accent for buttons on dark
-					dark: '#8aa9b7',
+					// Muted pastel green for primary CTA buttons on dark
+					dark: '#9ec7b0',
                 },
                 buttonText: {
 					light: 'rgba(255,255,255,1)',
@@ -42,21 +48,24 @@ module.exports = {
                 },
                 accent: {
 					light: 'rgba(70, 117, 153, 1)', // #467599
-					// Muted teal-blue pastel used across CTAs/highlights
-					dark: '#9bb8c7',
+					// Pastel purple accent for highlights on dark
+					dark: '#b7a6e0',
                 },
+				// Optional secondary accent (pastel green) for selective highlights
+				accent2: {
+					dark: '#a7d3b9',
+				},
                 playicon: {
                     light: 'rgba(63,62,64,1)',    // #3F3E40
                     dark: 'rgba(248,245,242,.5)', // #F8F5F2
                 },
 				// Additional muted pastel accents suitable for dark UI
 				muted: {
-					blue: '#93a4b2',
-					teal: '#87a8a3',
-					mauve: '#b7a6c7',
-					amber: '#c9a479',
-					rose: '#b98c92',
-					indigo: '#8f9ac8',
+					green: '#a8c8b1',
+					purple: '#c1b0e3',
+					amber: '#c8a77f',
+					rose: '#c19aa3',
+					indigo: '#9aa3d6',
 				},
 				// Dark glass overlay for modals/overlays
 				overlay: 'rgba(10, 12, 18, .55)',

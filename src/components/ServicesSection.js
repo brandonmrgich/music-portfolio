@@ -32,7 +32,7 @@ const ServicesSection = () => {
         <div className="relative min-h-screen py-16 px-4 overflow-hidden">
             <div className="relative z-10 flex flex-col items-center w-full max-w-4xl mx-auto">
                 <div className="flex items-center mb-10">
-                    <h2 className="text-4xl md:text-5xl font-bold text-accent-dark text-center mr-2">
+                    <h2 className="text-4xl md:text-5xl font-bold font-heading tracking-tight text-accent-dark text-center mr-2">
                         Mixing & Mastering
                     </h2>
                     {isAdmin && (
