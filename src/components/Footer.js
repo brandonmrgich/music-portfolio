@@ -35,7 +35,7 @@ const Footer = () => {
                     </a>
                 </div>
                 <p className="flex justify-center arr text-xs font-extralight mb-6 text-text-dark opacity-70">
-                    &copy; 1999-2025 Brandon Mrgich. All rights reserved.
+                    &copy; 1999-2026 Brandon Mrgich. All rights reserved.
                 </p>
             </section>
         </footer>

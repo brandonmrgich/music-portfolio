@@ -4,8 +4,9 @@ export const ARTISTS = {
 	'brandon-mrgich': {
 		name: 'Brandon Mrgich',
 		bio:
-			'Composer, producer, and mixer exploring the edges of texture and melody. ' +
-			'From intimate ambient works to bold cinematic cues, this project showcases breadth and detail.',
+			'Multi-instrumentalist, multi-genre musician based in Florida, simply exploring the massive world of sound. ' +
+			'Drawn to music and sound since the age of 7, the sense of curiosity and desire to create fuels a never-ending journey of music composition.\n\n' +
+			'This project is a blend of ambient/electronic music, meant to be moody and atmospheric, with the hope it may be used in Film & Games.',
 		links: {
 			instagram: 'https://instagram.com/brandonmrgichmusic',
 			spotify: 'https://open.spotify.com/artist/7h7WBTx9dIcxxPXLbPUu0e',
@@ -16,8 +17,7 @@ export const ARTISTS = {
 	'laka-noch': {
 		name: 'Laka Noch',
 		bio:
-			'An experimental electronic persona—granular textures, percussive pulses, and restless motion. ' +
-			'Expect sound design-forward pieces that reward deep listening.',
+			'(lah‑kah nohch), named after the Serbian phrase for “good night” — Laku noć — a saying taught by his grandfather.',
 		links: {
 			instagram: 'https://instagram.com/',
 			spotify: 'https://open.spotify.com/',
@@ -28,8 +28,8 @@ export const ARTISTS = {
 	'serendipitous': {
 		name: 'Serendipitous',
 		bio:
-			'Ambient and cinematic calm: slow-evolving harmonies, gentle noise floors, and contemplative arcs. ' +
-			'Music for focus, reflection, and breath.',
+			'Named after the almost random, yet meaningful and purposeful aspects of music, and in general life.\n\n' +
+			'“We don’t make mistakes, just happy little accidents."',
 		links: {
 			instagram: 'https://instagram.com/',
 			spotify: 'https://open.spotify.com/',

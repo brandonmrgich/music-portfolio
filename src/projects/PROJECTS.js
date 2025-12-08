@@ -12,7 +12,7 @@ export const PROJECTS = [
 		id: 'brandon-mrgich',
 		artistId: 'brandon-mrgich',
 		name: 'Brandon Mrgich',
-		tagline: 'Composer • Mixer • Producer',
+		tagline: 'Ambient Electronic, Neo-Classical, Film & Game',
 		theme: {
 			bgFrom: '#0f172a', // slate-900
 			bgTo: '#1e293b', // slate-800
@@ -32,7 +32,7 @@ export const PROJECTS = [
 		id: 'laka-noch',
 		artistId: 'laka-noch',
 		name: 'Laka Noch',
-		tagline: 'Experimental Electronic • Textures',
+		tagline: 'Folktronic, Alternative, Singer-Songwriter',
 		theme: {
 			bgFrom: '#111827', // gray-900
 			bgTo: '#064e3b', // emerald-900
@@ -50,7 +50,7 @@ export const PROJECTS = [
 		id: 'serendipitous',
 		artistId: 'serendipitous',
 		name: 'Serendipitous',
-		tagline: 'Ambient • Cinematic • Calm',
+		tagline: 'House, Indie pop, Drum&Bass, Downtempo',
 		theme: {
 			bgFrom: '#0b1020', // deep custom
 			bgTo: '#1f2937', // gray-800
