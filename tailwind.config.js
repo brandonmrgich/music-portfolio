@@ -57,7 +57,8 @@ module.exports = {
 				},
                 playicon: {
                     light: 'rgba(63,62,64,1)',    // #3F3E40
-                    dark: 'rgba(248,245,242,.5)', // #F8F5F2
+					// Use dark stroke on green play button for better contrast
+					dark: '#0e1116',
                 },
 				// Additional muted pastel accents suitable for dark UI
 				muted: {

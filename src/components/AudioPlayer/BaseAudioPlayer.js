@@ -446,20 +446,6 @@ const BaseAudioPlayer = ({ id, src, title, artist, links = {}, renderAdditionalC
                                 {title}
                             </a>
                         </h3>
-                        <button
-                            ref={iconRef}
-                            className={`transition-transform focus:outline-none ${dragging ? 'scale-110' : ''}`}
-                            aria-label="Volume"
-                            title="Volume"
-                            onClick={handleIconClick}
-                            onMouseDown={handleMouseDown}
-                            onTouchStart={handleTouchStart}
-                            onKeyDown={handleKeyDown}
-                            tabIndex={0}
-                            style={{ cursor: 'pointer', outline: 'none', background: 'none', border: 'none', padding: 0 }}
-                        >
-                            {getIcon()}
-                        </button>
                     </div>
                     <h4 className="truncate text-md font-light text-playercardText-dark hover:text-accent-dark" title={artist}>
                         <a
