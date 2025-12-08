@@ -358,7 +358,7 @@ const BaseAudioPlayer = ({ id, src, title, artist, links = {}, renderAdditionalC
                         </div>
                         <button
                             onClick={() => copyDeepLink(true)}
-                            className="ml-2 p-1 rounded hover:bg-primary-dark2/60 focus:outline-none focus:ring-1 focus:ring-accent-dark/60"
+                            className="ml-2 p-1 rounded hover:bg-card-dark/50 focus:outline-none focus:ring-1 focus:ring-accent-dark/60"
                             title="Share"
                             aria-label="Share link to current time"
                         >
@@ -373,7 +373,7 @@ const BaseAudioPlayer = ({ id, src, title, artist, links = {}, renderAdditionalC
                     max={duration}
                     value={currentTime}
                     onChange={(e) => seek(id, Number(e.target.value))}
-                    className="w-full accent-accent-dark h-1 rounded bg-primary-dark2/30 mt-1"
+                    className="w-full accent-accent-dark h-1 rounded bg-border-dark/30 mt-1"
                     aria-label="Seek audio"
                 />
                 {/* Bottom controls row for compact player: full-width A/B toggle */}
@@ -510,7 +510,7 @@ const BaseAudioPlayer = ({ id, src, title, artist, links = {}, renderAdditionalC
                         )}
                         <button
                             onClick={() => copyDeepLink(true)}
-                            className="p-1 rounded hover:bg-primary-dark2/60 focus:outline-none focus:ring-1 focus:ring-accent-dark/60"
+                            className="p-1 rounded hover:bg-card-dark/50 focus:outline-none focus:ring-1 focus:ring-accent-dark/60"
                             title="Share"
                             aria-label="Share link to current time"
                         >

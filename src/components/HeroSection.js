@@ -96,10 +96,10 @@ const HeroSection = ({ onHeroExit, scrollLocked }) => {
           <h1 className="text-4xl md:text-6xl font-extrabold mb-4 text-accent-dark drop-shadow-lg relative" style={{ zIndex: 2 }}>
             {heroData.heading}
           </h1>
-          <p className="text-xl md:text-2xl text-comfy-accent1 mb-6 max-w-2xl mx-auto relative whitespace-pre-line" style={{ zIndex: 2 }}>
+          <p className="text-xl md:text-2xl text-accent-dark mb-6 max-w-2xl mx-auto relative whitespace-pre-line" style={{ zIndex: 2 }}>
             {heroData.tagline}
           </p>
-          <p className="text-sm text-comfy-accent1/80 mb-4 max-w-2xl mx-auto relative text-center italic" style={{ zIndex: 2 }}>
+          <p className="text-sm text-text-dark/80 mb-4 max-w-2xl mx-auto relative text-center italic" style={{ zIndex: 2 }}>
             This site is an evolving portfolio of my music production work. Updates and improvements are ongoing. If your audio stops, simply refresh the page :)
           </p>
         </div>

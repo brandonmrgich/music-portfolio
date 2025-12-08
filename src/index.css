@@ -16,7 +16,7 @@ body {
 }
 
 a {
-    @apply text-primary-dark2 hover:text-linktree-accent focus:text-linktree-accent active:text-linktree-accent;
+    @apply text-accent-dark hover:text-accent-dark focus:text-accent-dark active:text-accent-dark;
     cursor: pointer;
 }
 

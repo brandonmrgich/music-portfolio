@@ -44,13 +44,13 @@ const AudioComparisonPlayer = ({
             // Full-width slim segmented toggle for compact cards (bottom row)
             return (
                 <div className="w-full">
-                    <div className="relative w-full h-7 rounded-md overflow-hidden border border-border-dark bg-primary-dark2/30">
+                    <div className="relative w-full h-7 rounded-md overflow-hidden border border-border-dark bg-card-dark/30">
                         <div className="absolute inset-0 grid grid-cols-2 text-xs">
                             <button
                                 onClick={() => {
                                     if (!isBeforeAudio) handleToggle();
                                 }}
-                                className={`px-2 py-1 transition-colors focus:outline-none ${isBeforeAudio ? 'bg-accent-dark text-black' : 'text-playercardText-dark hover:bg-primary-dark2/60'}`}
+                                className={`px-2 py-1 transition-colors focus:outline-none ${isBeforeAudio ? 'bg-accent-dark text-black' : 'text-playercardText-dark hover:bg-card-dark/50'}`}
                                 aria-pressed={isBeforeAudio}
                                 aria-label="Original"
                                 title="Original"
@@ -61,7 +61,7 @@ const AudioComparisonPlayer = ({
                                 onClick={() => {
                                     if (isBeforeAudio) handleToggle();
                                 }}
-                                className={`px-2 py-1 transition-colors focus:outline-none ${!isBeforeAudio ? 'bg-accent-dark text-black' : 'text-playercardText-dark hover:bg-primary-dark2/60'}`}
+                                className={`px-2 py-1 transition-colors focus:outline-none ${!isBeforeAudio ? 'bg-accent-dark text-black' : 'text-playercardText-dark hover:bg-card-dark/50'}`}
                                 aria-pressed={!isBeforeAudio}
                                 aria-label="Mastered"
                                 title="Mastered"
@@ -80,7 +80,7 @@ const AudioComparisonPlayer = ({
                     onClick={() => {
                         if (!isBeforeAudio) handleToggle();
                     }}
-                    className={`px-2 py-1 transition-colors focus:outline-none ${isBeforeAudio ? 'bg-accent-dark text-black' : 'text-playercardText-dark hover:bg-primary-dark2/60'}`}
+                    className={`px-2 py-1 transition-colors focus:outline-none ${isBeforeAudio ? 'bg-accent-dark text-black' : 'text-playercardText-dark hover:bg-card-dark/50'}`}
                     aria-pressed={isBeforeAudio}
                     aria-label="Original"
                     title="Original"
@@ -91,7 +91,7 @@ const AudioComparisonPlayer = ({
                     onClick={() => {
                         if (isBeforeAudio) handleToggle();
                     }}
-                    className={`px-2 py-1 transition-colors focus:outline-none ${!isBeforeAudio ? 'bg-accent-dark text-black' : 'text-playercardText-dark hover:bg-primary-dark2/60'}`}
+                    className={`px-2 py-1 transition-colors focus:outline-none ${!isBeforeAudio ? 'bg-accent-dark text-black' : 'text-playercardText-dark hover:bg-card-dark/50'}`}
                     aria-pressed={!isBeforeAudio}
                     aria-label="Mastered"
                     title="Mastered"
