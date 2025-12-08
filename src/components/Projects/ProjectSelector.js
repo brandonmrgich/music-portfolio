@@ -26,9 +26,9 @@ const ProjectSelector = () => {
 	return (
 		<section className="w-full">
 			<div className="mx-auto max-w-7xl px-4 md:px-6 py-12 md:py-20">
-				<header className="mb-8 md:mb-12 text-center">
-					<h2 className="text-3xl md:text-4xl font-bold text-white drop-shadow-md">Projects</h2>
-					<p className="mt-2 text-white/80 max-w-2xl mx-auto">
+				<header className="mb-10 md:mb-14 text-center">
+					<h2 className="text-4xl md:text-5xl font-bold text-white drop-shadow-md">Projects</h2>
+					<p className="mt-3 text-white/80 max-w-2xl mx-auto text-xl">
 						Select a project to dive in. Smooth shared-layout transitions guide you into each world.
 					</p>
 				</header>

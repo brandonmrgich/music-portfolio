@@ -4,18 +4,16 @@ import HeroSection from './components/HeroSection';
 import InWorkSection from './components/InWorkSection';
 import ServicesSection from './components/ServicesSection';
 import ScoringSection from './components/ScoringSection';
-import AboutSection from './components/AboutSection';
 import ContactModal from './components/Contact/ContactModal';
 import GlobalAudioBar from './components/AudioPlayer/GlobalAudioBar';
 import Footer from './components/Footer';
-import backgroundImg from './assets/images/background1.jpg';
 import SectionDivider from './components/SectionDivider';
-import beachImg from './assets/images/profile-beach.jpeg';
 import AppProvider from './contexts/AppProvider';
 import { useAdmin } from './contexts/AdminContext';
 import Login from './components/Login';
 import ProjectSelector from './components/Projects/ProjectSelector';
 import ProjectView from './components/Projects/ProjectView';
+import ContactSection from './components/ContactSection';
 
 /**
  * App - Main application shell.
@@ -26,11 +24,11 @@ import ProjectView from './components/Projects/ProjectView';
 const App = () => {
     // Refs for smooth scroll navigation
     const heroRef = useRef(null);
-    const projectsRef = useRef(null);
     const inWorkRef = useRef(null);
     const servicesRef = useRef(null);
     const scoringRef = useRef(null);
-    const aboutRef = useRef(null);
+    const projectsRef = useRef(null);
+    const contactRef = useRef(null);
     const [scrollLocked, setScrollLocked] = useState(true);
     const [showLogin, setShowLogin] = useState(false);
     const { isAdmin } = useAdmin();
@@ -58,30 +56,33 @@ const App = () => {
 
     return (
         <AppProvider>
-            <div className="w-full min-h-screen flex flex-col text-text-light dark:text-text-dark bg-surface-light dark:bg-surface-dark bg-cover bg-center" style={{ backgroundImage: `url(${backgroundImg})`, backgroundSize: 'cover', backgroundPosition: 'center', backgroundAttachment: 'fixed' }}>
+            <div className="w-full min-h-screen flex flex-col text-text-light dark:text-text-dark bg-gradient-to-b from-card-dark via-[#0f111a] to-surface-dark">
                 <Navbar
                     refs={{
                         hero: heroRef,
-                        projects: projectsRef,
-                        inwork: inWorkRef,
                         services: servicesRef,
                         scoring: scoringRef,
-                        about: aboutRef,
+                        inwork: inWorkRef,
+                        projects: projectsRef,
+                        // about: aboutRef,
+                        contact: contactRef,
                     }}
                     setShowLogin={setShowLogin}
                 />
                 <main className="flex flex-col flex-grow relative z-10">
                     <section ref={heroRef} id="hero"><HeroSection onHeroExit={unlockAndScroll} scrollLocked={scrollLocked} /></section>
                     <SectionDivider variant={1} />
-                    <section ref={projectsRef} id="projects"><ProjectSelector /></section>
-                    <SectionDivider variant={0} />
                     <section ref={servicesRef} id="services"><ServicesSection /></section>
                     <SectionDivider variant={0} />
                     <section ref={scoringRef} id="scoring"><ScoringSection /></section>
                     <SectionDivider variant={0} />
                     <section ref={inWorkRef} id="inwork" className="scroll-mt-24"><InWorkSection /></section>
                     <SectionDivider variant={0} />
-                    <section ref={aboutRef} id="about"><AboutSection /></section>
+                    {/* About section now showcases the Project Selector */}
+                    <section ref={projectsRef} id="projects"><ProjectSelector /></section>
+                    <SectionDivider variant={0} />
+                    {/* New Contact section with contact info previously in About */}
+                    <section ref={contactRef} id="contact"><ContactSection /></section>
                 </main>
                 <GlobalAudioBar />
                 <Footer />

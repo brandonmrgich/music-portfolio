@@ -1,12 +1,10 @@
 import React, { useEffect, useRef } from 'react';
-import coatImg from '../assets/images/profile-coat.png';
-import beachImg from '../assets/images/profile-beach.jpeg';
-import img from '../assets/images/profile-default.jpg';
+import heroPicture from '../assets/images/hero-picture.jpg';
 
 const heroData = {
   heading: "Brandon Mrgich",
   tagline: "From Indie Songs to Cinematic Scores\nMulti-Instrumentalist • Producer • Sound Designer • Software Engineer",
-  background: img,
+  background: heroPicture,
 };
 
 const HeroSection = ({ onHeroExit, scrollLocked }) => {

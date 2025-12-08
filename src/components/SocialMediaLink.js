@@ -10,6 +10,7 @@ import {
     FaAmazon,
     FaBandcamp,
     FaSoundcloud,
+	FaGlobe,
 } from "react-icons/fa";
 import AudiusIcon from "./icons/AudiusIcon";
 
@@ -17,15 +18,18 @@ import AudiusIcon from "./icons/AudiusIcon";
 const BRAND_COLORS = {
     Google: '#4285F4',
     Spotify: '#1DB954',
-    'Youtube Channel': '#FF0000', // YouTube Channel (red)
-    'YouTube Music': '#FF0000',      // YouTube Music (white)
+    'Youtube Channel': '#FF0000', // YouTube red
+    'YouTube': '#FF0000',
+    'YouTube Music': '#FF0000',
     Apple: '#000000',
+    'Apple Music': '#FA2D48', // Apple Music pink/red
     Instagram: '#E4405F',
     Tiktok: '#010101',
     Amazon: '#FF9900',
     Bandcamp: '#629AA9',
     SoundCloud: '#FF5500',
     Audius: '#CC47FF', // Audius purple
+    Website: '#60A5FA', // neutral globe blue
 };
 
 const Links = {
@@ -93,9 +97,18 @@ const Links = {
 // Pastel red for hover
 const HOVER_COLOR = '#F7B2AD';
 
-const SocialMediaLink = ({ href, icon: Icon, label }) => {
-    // Get the brand color for the icon
-    const brandColor = BRAND_COLORS[label] || BRAND_COLORS[label.replace(/ .*/,"")] || '#fff';
+/**
+ * Generic, reusable social link icon component.
+ * - Accepts any icon component
+ * - Computes brand color by label, allows explicit color override
+ * - Backward compatible with existing usage
+ */
+const SocialMediaLink = ({ href, icon: Icon, label, color }) => {
+    const ChosenIcon = Icon || FaGlobe;
+    // Prefer explicit color if provided; else infer by label token
+    const labelKey = typeof label === 'string' ? label : '';
+    const inferredColor = BRAND_COLORS[labelKey] || BRAND_COLORS[labelKey.replace(/ .*/,"")];
+    const brandColor = color || inferredColor || '#ffffff';
     return (
         <li className="group flex flex-col items-center p-2 rounded-full bg-opacity-0 hover:bg-opacity-10 font-thin transition">
             <a
@@ -104,7 +117,7 @@ const SocialMediaLink = ({ href, icon: Icon, label }) => {
                 target="_blank"
                 rel="noopener noreferrer"
             >
-                <Icon
+                <ChosenIcon
                     className="text-3xl max-h-6 transition-colors duration-200"
                     style={{
                         color: brandColor,

@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import backgroundImg from '../assets/images/background1.jpg';
 import BaseAudioPlayer from './AudioPlayer/BaseAudioPlayer';
 import CompressedAudioGrid from './AudioPlayer/CompressedAudioGrid';
 import { useAudio } from '../contexts/AudioContext';
@@ -32,8 +31,8 @@ const ScoringSection = () => {
     return (
         <div className="relative min-h-screen py-16 px-4 overflow-hidden">
             <div className="relative z-10 flex flex-col items-center w-full max-w-4xl mx-auto">
-                <div className="flex items-center mb-8">
-                    <h2 className="text-3xl font-bold text-accent-dark text-center mr-2">
+                <div className="flex items-center mb-10">
+                    <h2 className="text-4xl md:text-5xl font-bold text-accent-dark text-center mr-2">
                         Film & Game Scoring
                     </h2>
                     {isAdmin && (
@@ -46,10 +45,10 @@ const ScoringSection = () => {
                         </button>
                     )}
                 </div>
-                <p className="text-lg text-text-dark max-w-3xl text-center mb-4">
+                <p className="text-xl md:text-2xl text-text-dark max-w-3xl text-center mb-5">
                     {scoringData.pitch}
                 </p>
-                <p className="text-lg text-text-dark max-w-3xl text-center mb-4">
+                <p className="text-xl text-text-dark max-w-3xl text-center mb-6">
                     {scoringData.disclaimer}
                 </p>
                 {highlight && highlight.src && (

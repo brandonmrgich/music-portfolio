@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { motion } from 'framer-motion';
 
 const hoverVariants = {
@@ -13,6 +13,13 @@ const imageVariants = {
 
 const ProjectCard = ({ project, onClick }) => {
 	const { id, name, tagline, theme, images } = project;
+	// Prefer structured images.profile when available, fallback to first image in array
+	const profileUrl = useMemo(() => {
+		if (images && typeof images === 'object' && !Array.isArray(images) && images.profile) {
+			return images.profile;
+		}
+		return Array.isArray(images) ? images[0] : undefined;
+	}, [images]);
 	const bgStyle = {
 		backgroundImage: `linear-gradient(135deg, ${theme.bgFrom}, ${theme.bgTo})`,
 	};
@@ -39,9 +46,11 @@ const ProjectCard = ({ project, onClick }) => {
 						className="aspect-[16/9] w-full overflow-hidden rounded-lg bg-black/20"
 					>
 						<motion.img
-							src={images?.[0]}
+							src={profileUrl}
 							alt={`${name} cover`}
-							className="w-full h-full object-cover"
+							className="w-full h-full object-cover object-center"
+							loading="lazy"
+							decoding="async"
 							variants={imageVariants}
 							transition={{ type: 'spring', stiffness: 200, damping: 20 }}
 						/>

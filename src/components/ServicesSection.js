@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import AudioComparisonPlayer from './AudioPlayer/AudioComparisonPlayer';
 import CompressedAudioGrid from './AudioPlayer/CompressedAudioGrid';
-import backgroundImg from '../assets/images/background1.jpg';
 import { useAudio } from '../contexts/AudioContext';
 import { useAdmin } from '../contexts/AdminContext';
 import TrackUploadForm from './TrackUploadForm';
@@ -32,8 +31,8 @@ const ServicesSection = () => {
     return (
         <div className="relative min-h-screen py-16 px-4 overflow-hidden">
             <div className="relative z-10 flex flex-col items-center w-full max-w-4xl mx-auto">
-                <div className="flex items-center mb-8">
-                    <h2 className="text-3xl font-bold text-accent-dark text-center mr-2">
+                <div className="flex items-center mb-10">
+                    <h2 className="text-4xl md:text-5xl font-bold text-accent-dark text-center mr-2">
                         Mixing & Mastering
                     </h2>
                     {isAdmin && (
@@ -46,10 +45,10 @@ const ServicesSection = () => {
                         </button>
                     )}
                 </div>
-                <p className="text-lg text-text-dark max-w-3xl text-center mb-4">
+                <p className="text-xl md:text-2xl text-text-dark max-w-3xl text-center mb-5">
                     {servicesData.header}
                 </p>
-                <p className="text-lg text-text-dark max-w-3xl text-center mb-4">
+                <p className="text-xl text-text-dark max-w-3xl text-center mb-6">
                     {servicesData.instructions}
                 </p>
                 {highlight && (

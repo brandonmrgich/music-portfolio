@@ -1,12 +1,16 @@
 // Centralized project metadata used by the Project Selector and View
-// Dummy assets reference existing images; replace with your own later.
-import profileDefault from '../assets/images/profile-default.jpg';
-import profileCoat from '../assets/images/profile-coat.png';
-import profileBeach from '../assets/images/profile-beach.jpeg';
+// Per-project images; replace with your own later as needed.
+import brandonProfile from '../assets/images/brandon-mrgich/profile.jpeg';
+import brandonBanner from '../assets/images/brandon-mrgich/banner.png';
+import lakaProfile from '../assets/images/laka-noch/profile.jpg';
+import lakaBanner from '../assets/images/laka-noch/banner.png';
+import serProfile from '../assets/images/serendipitous/profile.png';
+import serBanner from '../assets/images/serendipitous/banner.jpg';
 
 export const PROJECTS = [
 	{
 		id: 'brandon-mrgich',
+		artistId: 'brandon-mrgich',
 		name: 'Brandon Mrgich',
 		tagline: 'Composer • Mixer • Producer',
 		theme: {
@@ -15,10 +19,18 @@ export const PROJECTS = [
 			accent: '#38bdf8', // sky-400
 			textOnAccent: '#020617', // slate-950
 		},
-		images: [profileDefault, profileCoat],
+		images: {
+			profile: brandonProfile,
+			banner: brandonBanner,
+			// Controls vertical crop of the banner image (object-position: center <value>%)
+			// Increase to shift focus lower; decrease to shift focus higher.
+			bannerFocusY: 45,
+			covers: [],
+		},
 	},
 	{
 		id: 'laka-noch',
+		artistId: 'laka-noch',
 		name: 'Laka Noch',
 		tagline: 'Experimental Electronic • Textures',
 		theme: {
@@ -27,10 +39,16 @@ export const PROJECTS = [
 			accent: '#34d399', // emerald-400
 			textOnAccent: '#052e2b',
 		},
-		images: [profileCoat, profileBeach],
+		images: {
+			profile: lakaProfile,
+			banner: lakaBanner,
+			bannerFocusY: 35,
+			covers: [],
+		},
 	},
 	{
 		id: 'serendipitous',
+		artistId: 'serendipitous',
 		name: 'Serendipitous',
 		tagline: 'Ambient • Cinematic • Calm',
 		theme: {
@@ -39,7 +57,12 @@ export const PROJECTS = [
 			accent: '#a78bfa', // violet-400
 			textOnAccent: '#0a0620',
 		},
-		images: [profileBeach, profileDefault],
+		images: {
+			profile: serProfile,
+			banner: serBanner,
+			bannerFocusY: 0,
+			covers: [],
+		},
 	},
 ];
 

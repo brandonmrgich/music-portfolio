@@ -5,11 +5,11 @@ import Login from './Login';
 
 const navLinks = [
   { label: 'Home', section: 'hero' },
-  { label: 'Projects', section: 'projects' },
   { label: 'Mixing & Mastering', section: 'services' },
   { label: 'Film & Game Scoring', section: 'scoring' },
   { label: 'In Work', section: 'inwork' },
-  { label: 'About', section: 'about' },
+  { label: 'Projects', section: 'projects' },
+  { label: 'Contact', section: 'contact' },
 ];
 
 const Navbar = ({ refs, setShowLogin }) => {
