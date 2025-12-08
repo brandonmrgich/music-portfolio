@@ -10,7 +10,7 @@ const AnimatedLoadingText = () => {
                 (letter, index) => (
                     <span
                         key={index}
-                        className="inline-block transition-transform duration-300 ease-in-out p-1 text-comfy-dark hover:text-comfy-light"
+                        className="inline-block transition-transform duration-300 ease-in-out p-1 text-text-dark hover:text-accent-dark"
                         style={{
                             transformOrigin: 'center',
                             transitionDelay: `${index}ms`,

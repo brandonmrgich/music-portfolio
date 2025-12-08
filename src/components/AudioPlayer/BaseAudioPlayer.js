@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Play, Pause, Volume, Volume1, Volume2, VolumeX, X, Loader2 } from 'lucide-react';
+import { Play, Pause, Volume, Volume1, Volume2, VolumeX, X, Loader2, Share } from 'lucide-react';
 import { useAudio } from '../../contexts/AudioContext';
 import { useAdmin } from '../../contexts/AdminContext';
 import { deleteTrack } from '../../services/tracks';
@@ -17,7 +17,7 @@ import { deleteTrack } from '../../services/tracks';
  * @param {boolean} [props.compact] - If true, render a minimal UI
  * @param {string} [props.className] - Additional className for styling
  */
-const BaseAudioPlayer = ({ id, src, title, artist, links = {}, renderAdditionalControls, compact = false, className = '' }) => {
+const BaseAudioPlayer = ({ id, src, title, artist, links = {}, renderAdditionalControls, onToggleSource, compact = false, className = '' }) => {
     const {
         error,
         play,
@@ -35,6 +35,8 @@ const BaseAudioPlayer = ({ id, src, title, artist, links = {}, renderAdditionalC
     const [deleting, setDeleting] = useState(false);
     const [deleteStatus, setDeleteStatus] = useState('idle'); // idle | deleting | success | error
     const [deleteMsg, setDeleteMsg] = useState('');
+    const containerRef = useRef(null);
+    const [hasInitialized, setHasInitialized] = useState(false);
 
     const isPlaying = playingStates[id];
     const currentTime = currentTimes[id] || 0;
@@ -45,6 +47,48 @@ const BaseAudioPlayer = ({ id, src, title, artist, links = {}, renderAdditionalC
     const openVolume = () => setVolumeOpen(true);
     const closeVolume = () => setVolumeOpen(false);
     const volumeRef = useRef(null);
+    const titleLongPressTimerRef = useRef(null);
+    const LONG_PRESS_MS = 600;
+    const [copyToastVisible, setCopyToastVisible] = useState(false);
+    const copyToastTimeoutRef = useRef(null);
+
+    const copyDeepLink = (includeTime = true) => {
+        try {
+            const url = new URL(window.location.href);
+            url.searchParams.set('track', id);
+            if (includeTime) {
+                url.searchParams.set('t', Math.floor(currentTime || 0));
+            }
+            navigator.clipboard.writeText(url.toString());
+            // Show ephemeral toast
+            setCopyToastVisible(true);
+            if (copyToastTimeoutRef.current) clearTimeout(copyToastTimeoutRef.current);
+            copyToastTimeoutRef.current = setTimeout(() => setCopyToastVisible(false), 1200);
+        } catch (_) {}
+    };
+
+    const handleTitleTouchStart = () => {
+        try {
+            if (titleLongPressTimerRef.current) clearTimeout(titleLongPressTimerRef.current);
+            titleLongPressTimerRef.current = setTimeout(() => {
+                copyDeepLink(true);
+            }, LONG_PRESS_MS);
+        } catch (_) {}
+    };
+    const handleTitleTouchEnd = () => {
+        if (titleLongPressTimerRef.current) {
+            clearTimeout(titleLongPressTimerRef.current);
+            titleLongPressTimerRef.current = null;
+        }
+    };
+
+    // Cleanup timers on unmount
+    useEffect(() => {
+        return () => {
+            if (titleLongPressTimerRef.current) clearTimeout(titleLongPressTimerRef.current);
+            if (copyToastTimeoutRef.current) clearTimeout(copyToastTimeoutRef.current);
+        };
+    }, []);
 
     const formatTime = (time) => {
         const minutes = Math.floor(time / 60);
@@ -176,10 +220,25 @@ const BaseAudioPlayer = ({ id, src, title, artist, links = {}, renderAdditionalC
         };
     }, [volumeOpen]);
 
-    // Preload metadata so duration is known before first play
+    // Lazy metadata init using IntersectionObserver for performance
     useEffect(() => {
-        initializeAudio(id, src);
-    }, [id, src]);
+        if (hasInitialized) return;
+        const el = containerRef.current;
+        if (!el) return;
+        const observer = new IntersectionObserver(
+            (entries) => {
+                entries.forEach((entry) => {
+                    if (entry.isIntersecting && !hasInitialized) {
+                        initializeAudio(id, src);
+                        setHasInitialized(true);
+                    }
+                });
+            },
+            { root: null, rootMargin: '200px', threshold: 0.01 }
+        );
+        observer.observe(el);
+        return () => observer.disconnect();
+    }, [id, src, hasInitialized, initializeAudio]);
 
     if (error) console.log(error);
 
@@ -194,14 +253,41 @@ const BaseAudioPlayer = ({ id, src, title, artist, links = {}, renderAdditionalC
 
     // Keyboard left/right support
     const handleKeyDown = (e) => {
-        if (e.key === 'ArrowLeft' || e.key === 'ArrowDown') {
+        if (e.key === ' ' || e.code === 'Space') {
+            e.preventDefault();
+            handlePlayPause();
+            return;
+        }
+        if ((e.key === 't' || e.key === 'T') && typeof onToggleSource === 'function') {
+            e.preventDefault();
+            onToggleSource();
+            return;
+        }
+        if (e.key === 'ArrowLeft') {
+            const SEEK_STEP = 5;
+            const newTime = Math.max(0, (currentTime || 0) - SEEK_STEP);
+            seek(id, newTime);
+            e.preventDefault();
+            return;
+        }
+        if (e.key === 'ArrowRight') {
+            const SEEK_STEP = 5;
+            const newTime = Math.min(duration || 0, (currentTime || 0) + SEEK_STEP);
+            seek(id, newTime);
+            e.preventDefault();
+            return;
+        }
+        if (e.key === 'ArrowDown') {
             setMuted(false);
             setVolume(id, Math.max(0, volume - 0.05));
             e.preventDefault();
-        } else if (e.key === 'ArrowRight' || e.key === 'ArrowUp') {
+            return;
+        }
+        if (e.key === 'ArrowUp') {
             setMuted(false);
             setVolume(id, Math.min(1, volume + 0.05));
             e.preventDefault();
+            return;
         }
     };
 
@@ -225,7 +311,7 @@ const BaseAudioPlayer = ({ id, src, title, artist, links = {}, renderAdditionalC
     if (compact) {
         // Minimal UI for compressed grid
         return (
-            <div className={`relative flex flex-col bg-card-dark border border-border-dark rounded-lg shadow-md p-3 min-w-0 w-full max-w-xs mx-auto ${className}`}>
+            <div ref={containerRef} onKeyDown={handleKeyDown} tabIndex={0} className={`relative flex flex-col bg-card-dark border border-border-dark rounded-lg shadow-md p-3 min-w-0 w-full max-w-xs mx-auto outline-none focus:ring-1 focus:ring-accent-dark/60 ${className}`}>
                 {isAdmin && (
                     <button
                         className="absolute top-2 right-2 z-10 text-red-400 hover:text-red-600 bg-black/40 rounded-full p-1.5 transition-colors flex items-center justify-center"
@@ -252,27 +338,34 @@ const BaseAudioPlayer = ({ id, src, title, artist, links = {}, renderAdditionalC
                         onClick={handlePlayPause}
                         className="p-2 rounded-full bg-button-dark text-buttonText-dark hover:bg-accent-dark transition-colors"
                         aria-label={isPlaying ? 'Pause' : 'Play'}
+                        title={isPlaying ? 'Pause' : 'Play'}
                     >
                         {isPlaying ? <Pause size={18} /> : <Play size={18} />}
                     </button>
                     <div className="flex items-center flex-1 min-w-0 ml-2">
                         <div className="flex flex-col flex-1 min-w-0">
                             <span
-                                className="text-sm font-semibold text-playercardText-dark overflow-hidden min-h-[40px]"
+                                className="text-base font-semibold text-playercardText-dark overflow-hidden min-h-[40px]"
                                 title={title}
                                 style={{ display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }}
+                                onTouchStart={handleTitleTouchStart}
+                                onTouchEnd={handleTitleTouchEnd}
+                                onTouchCancel={handleTitleTouchEnd}
                             >
                                 {title}
                             </span>
-                            <span className="text-xs text-playercardText-dark opacity-80 truncate" title={artist}>{artist}</span>
+                            <span className="text-sm text-playercardText-dark opacity-80 truncate" title={artist}>{artist}</span>
                         </div>
-                        {renderAdditionalControls && (
-                            <span className="ml-2 text-playercardText-dark">
-                                {renderAdditionalControls()}
-                            </span>
-                        )}
+                        <button
+                            onClick={() => copyDeepLink(true)}
+                            className="ml-2 p-1 rounded hover:bg-card-dark/50 focus:outline-none focus:ring-1 focus:ring-accent-dark/60"
+                            title="Share"
+                            aria-label="Share link to current time"
+                        >
+                            <Share size={16} className="text-playercardText-dark" />
+                        </button>
                     </div>
-                    <span className="text-xs text-accent-dark ml-2 min-w-[40px] text-right">{formatTime((!isPlaying && currentTime === 0 && duration > 0) ? duration : currentTime)}</span>
+                    <span className="text-sm text-accent-dark ml-2 min-w-[40px] text-right">{formatTime((!isPlaying && currentTime === 0 && duration > 0) ? duration : currentTime)}</span>
                 </div>
                 <input
                     type="range"
@@ -280,16 +373,34 @@ const BaseAudioPlayer = ({ id, src, title, artist, links = {}, renderAdditionalC
                     max={duration}
                     value={currentTime}
                     onChange={(e) => seek(id, Number(e.target.value))}
-                    className="w-full accent-accent-dark h-1 rounded bg-primary-dark2/30 mt-1"
+                    className="w-full accent-accent-dark h-1 rounded bg-border-dark/30 mt-1"
                     aria-label="Seek audio"
                 />
+                {/* Bottom controls row for compact player: full-width A/B toggle */}
+                {renderAdditionalControls && (
+                    <div className="mt-2 w-full">
+                        {renderAdditionalControls()}
+                    </div>
+                )}
+                {copyToastVisible && (
+                    <div className="absolute inset-0 z-30 flex items-center justify-center">
+                        <div className="absolute inset-0 bg-black/50 backdrop-blur-sm rounded-lg"></div>
+                        <div
+                            className="relative px-4 py-2 rounded-full text-sm font-semibold text-white bg-white/20 border border-white/30 shadow-xl"
+                            role="status"
+                            aria-live="polite"
+                        >
+                            Link copied
+                        </div>
+                    </div>
+                )}
             </div>
         );
     }
 
     // Full-featured player
     return (
-        <div className={`relative audio-player-card ${compact ? 'p-2' : 'p-4'} ${className}`}>
+        <div id={`track-${id}`} ref={containerRef} onKeyDown={handleKeyDown} tabIndex={0} className={`relative audio-player-card ${compact ? 'p-2' : 'p-4'} ${className} outline-none focus:ring-1 focus:ring-accent-dark/60`}>
             {isAdmin && (
                 <button
                     className="absolute top-2 right-2 z-10 text-red-400 hover:text-red-600 bg-black/40 rounded-full p-1.5 transition-colors flex items-center justify-center"
@@ -321,32 +432,22 @@ const BaseAudioPlayer = ({ id, src, title, artist, links = {}, renderAdditionalC
                 <div className="flex flex-col gap-1">
                     <div className="flex items-center gap-2">
                         <h3
-                            className="flex-grow text-lg font-semibold text-playercardText-dark hover:text-accent-dark overflow-hidden min-h-[48px]"
+                            className="flex-grow text-xl font-semibold text-playercardText-dark hover:text-accent-dark overflow-hidden min-h-[48px]"
                             title={title}
                             style={{ display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }}
                         >
                             <a
                                 href={links.song || '#'}
                                 className="block text-playercardText-dark hover:text-accent-dark transition-all duration-400"
+                                onTouchStart={handleTitleTouchStart}
+                                onTouchEnd={handleTitleTouchEnd}
+                                onTouchCancel={handleTitleTouchEnd}
                             >
                                 {title}
                             </a>
                         </h3>
-                        <button
-                            ref={iconRef}
-                            className={`transition-transform focus:outline-none ${dragging ? 'scale-110' : ''}`}
-                            aria-label="Volume"
-                            onClick={handleIconClick}
-                            onMouseDown={handleMouseDown}
-                            onTouchStart={handleTouchStart}
-                            onKeyDown={handleKeyDown}
-                            tabIndex={0}
-                            style={{ cursor: 'pointer', outline: 'none', background: 'none', border: 'none', padding: 0 }}
-                        >
-                            {getIcon()}
-                        </button>
                     </div>
-                    <h4 className="truncate text-md font-light text-playercardText-dark hover:text-accent-dark" title={artist}>
+                    <h4 className="truncate text-lg font-light text-playercardText-dark hover:text-accent-dark" title={artist}>
                         <a
                             href={links.artist || '#'}
                             className="max-w-xs opacity-80 text-playercardText-dark hover:text-accent-dark transition-all duration-300"
@@ -356,7 +457,7 @@ const BaseAudioPlayer = ({ id, src, title, artist, links = {}, renderAdditionalC
                     </h4>
                 </div>
 
-                <div className="mb-2 mt-2 flex items-center text-sm italic">
+                <div className="mb-2 mt-2 flex items-center text-base italic">
                     <span className="text-accent-dark">{formatTime(currentTime)}</span>
                     <div className="flex-grow mx-4 flex items-center justify-center">
                         <input
@@ -389,8 +490,33 @@ const BaseAudioPlayer = ({ id, src, title, artist, links = {}, renderAdditionalC
                             />
                         </div>
                     </button>
-                    <div className="mt-1">{renderAdditionalControls && <span className="text-playercardText-dark">{renderAdditionalControls()}</span>}</div>
+                    <div className="mt-1 ml-2 flex items-center gap-2">
+                        {renderAdditionalControls && (
+                            <span className="inline-flex items-center">{renderAdditionalControls()}</span>
+                        )}
+                        <button
+                            onClick={() => copyDeepLink(true)}
+                            className="p-1 rounded hover:bg-card-dark/50 focus:outline-none focus:ring-1 focus:ring-accent-dark/60"
+                            title="Share"
+                            aria-label="Share link to current time"
+                        >
+                            <Share size={16} className="text-playercardText-dark" />
+                        </button>
+                    </div>
                 </section>
+
+                {copyToastVisible && (
+                    <div className="absolute inset-0 z-30 flex items-center justify-center">
+                        <div className="absolute inset-0 bg-black/50 backdrop-blur-sm rounded-lg"></div>
+                        <div
+                            className="relative px-4 py-2 rounded-full text-sm font-semibold text-white bg-white/20 border border-white/30 shadow-xl"
+                            role="status"
+                            aria-live="polite"
+                        >
+                            Link copied
+                        </div>
+                    </div>
+                )}
 
                 {error && <span className="sm text-red-500 mt-2">{error}</span>}
             </div>

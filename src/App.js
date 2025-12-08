@@ -4,16 +4,17 @@ import HeroSection from './components/HeroSection';
 import InWorkSection from './components/InWorkSection';
 import ServicesSection from './components/ServicesSection';
 import ScoringSection from './components/ScoringSection';
-import AboutSection from './components/AboutSection';
 import ContactModal from './components/Contact/ContactModal';
 import GlobalAudioBar from './components/AudioPlayer/GlobalAudioBar';
 import Footer from './components/Footer';
-import backgroundImg from './assets/images/background1.jpg';
 import SectionDivider from './components/SectionDivider';
-import beachImg from './assets/images/profile-beach.jpeg';
+import lakaBanner from './assets/images/laka-noch/banner.png';
 import AppProvider from './contexts/AppProvider';
 import { useAdmin } from './contexts/AdminContext';
 import Login from './components/Login';
+import ProjectSelector from './components/Projects/ProjectSelector';
+import ProjectView from './components/Projects/ProjectView';
+import ContactSection from './components/ContactSection';
 
 /**
  * App - Main application shell.
@@ -27,7 +28,8 @@ const App = () => {
     const inWorkRef = useRef(null);
     const servicesRef = useRef(null);
     const scoringRef = useRef(null);
-    const aboutRef = useRef(null);
+    const projectsRef = useRef(null);
+    const contactRef = useRef(null);
     const [scrollLocked, setScrollLocked] = useState(true);
     const [showLogin, setShowLogin] = useState(false);
     const { isAdmin } = useAdmin();
@@ -49,37 +51,66 @@ const App = () => {
         if (!scrollLocked) return;
         setScrollLocked(false);
         setTimeout(() => {
-            scoringRef.current?.scrollIntoView({ behavior: 'smooth' });
+            servicesRef.current?.scrollIntoView({ behavior: 'smooth' });
         }, 10);
     }, [scrollLocked]);
 
     return (
         <AppProvider>
-            <div className="w-full min-h-screen flex flex-col text-text-light dark:text-text-dark bg-surface-light dark:bg-surface-dark bg-cover bg-center" style={{ backgroundImage: `url(${backgroundImg})`, backgroundSize: 'cover', backgroundPosition: 'center', backgroundAttachment: 'fixed' }}>
+            <div
+                className="w-full min-h-screen flex flex-col text-text-light dark:text-text-dark"
+                style={{
+                    backgroundImage: `linear-gradient(180deg, rgba(21,24,38,0.88), rgba(14,17,22,0.92)), url(${lakaBanner})`,
+                    backgroundRepeat: 'repeat',
+                    backgroundSize: 'auto 360px',
+                    backgroundAttachment: 'fixed',
+                    backgroundPosition: 'center top',
+                    backgroundBlendMode: 'overlay',
+                }}
+            >
+                {/* Subtle drifting overlay for background texture (performance-conscious) */}
+                <div
+                    className="pointer-events-none fixed inset-0 z-0 bg-drift"
+                    style={{
+                        backgroundImage: `url(${lakaBanner})`,
+                        backgroundRepeat: 'repeat',
+                        backgroundSize: 'auto 360px',
+                        mixBlendMode: 'screen',
+                        opacity: 0.7, 
+                    }}
+                />
                 <Navbar
                     refs={{
                         hero: heroRef,
-                        inwork: inWorkRef,
                         services: servicesRef,
                         scoring: scoringRef,
-                        about: aboutRef,
+                        inwork: inWorkRef,
+                        projects: projectsRef,
+                        // about: aboutRef,
+                        contact: contactRef,
                     }}
                     setShowLogin={setShowLogin}
                 />
                 <main className="flex flex-col flex-grow relative z-10">
                     <section ref={heroRef} id="hero"><HeroSection onHeroExit={unlockAndScroll} scrollLocked={scrollLocked} /></section>
                     <SectionDivider variant={1} />
+                    <section ref={servicesRef} id="services"><ServicesSection /></section>
+                    <SectionDivider variant={0} />
                     <section ref={scoringRef} id="scoring"><ScoringSection /></section>
                     <SectionDivider variant={0} />
                     <section ref={inWorkRef} id="inwork" className="scroll-mt-24"><InWorkSection /></section>
                     <SectionDivider variant={0} />
-                    <section ref={servicesRef} id="services"><ServicesSection /></section>
+                    {/* About section now showcases the Project Selector */}
+                    <section ref={projectsRef} id="projects"><ProjectSelector /></section>
                     <SectionDivider variant={0} />
-                    <section ref={aboutRef} id="about"><AboutSection /></section>
+                    {/* New Contact section with contact info previously in About */}
+                    <section ref={contactRef} id="contact"><ContactSection /></section>
                 </main>
                 <GlobalAudioBar />
                 <Footer />
                 <ContactModal />
+                {/* Project View Overlay */}
+                <ProjectView />
                 {/* Login Modal rendered at root level for proper overlay */}
                 {showLogin && !isAdmin && (
                   <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">

@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import backgroundImg from '../assets/images/background1.jpg';
 import BaseAudioPlayer from './AudioPlayer/BaseAudioPlayer';
 import CompressedAudioGrid from './AudioPlayer/CompressedAudioGrid';
 import { useAudio } from '../contexts/AudioContext';
@@ -30,23 +29,25 @@ const InWorkSection = () => {
     return (
         <div className="relative min-h-screen py-16 px-4 overflow-hidden">
             <div className="relative z-10 flex flex-col items-center w-full max-w-4xl mx-auto">
-                <div className="flex items-center mb-8">
-                    <h2 className="text-3xl font-bold text-accent-dark text-center mr-2">
-                        In Work
-                    </h2>
-                    {isAdmin && (
-                        <button
-                            onClick={() => setShowForm(true)}
-                            title="Add WIP track"
-                            className="text-2xl text-accent-dark hover:text-accent-light ml-2"
-                        >
-                            +
-                        </button>
-                    )}
+                <div className="w-full max-w-3xl mx-auto mb-6 bg-card-dark/60 backdrop-blur-md border border-border-dark rounded-xl shadow-xl px-5 py-5">
+                    <div className="flex items-center justify-center mb-4">
+                        <h2 className="text-4xl md:text-5xl font-bold font-heading tracking-tight text-accent-dark text-center mr-2">
+                            In Work
+                        </h2>
+                        {isAdmin && (
+                            <button
+                                onClick={() => setShowForm(true)}
+                                title="Add WIP track"
+                                className="text-2xl text-accent-dark hover:text-accent-light ml-2"
+                            >
+                                +
+                            </button>
+                        )}
+                    </div>
+                    <p className="text-xl md:text-2xl text-text-dark text-center">
+                        {inWorkData.header}
+                    </p>
                 </div>
-                <p className="text-lg text-text-dark max-w-3xl text-center mb-4">
-                    {inWorkData.header}
-                </p>
                 {highlight && highlight.src && (
                     <div className="mb-8 max-w-lg mx-auto">
                         <BaseAudioPlayer

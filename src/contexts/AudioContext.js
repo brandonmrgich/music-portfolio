@@ -9,8 +9,19 @@ import { fetchTracksByType } from '../services/tracks';
 const AudioContext = createContext();
 
 const TARGET_PEAK = 0.9;
-const ENABLE_NORMALIZATION = false; // Set true to analyze audio and normalize perceived loudness
+const TARGET_RMS = 0.2; // perceived loudness target (rough)
+const ENABLE_NORMALIZATION = true; // Analyze audio and normalize perceived loudness
+// Strategy for resolving conflicting peak vs RMS targets:
+// - 'conservative': respect peaks first (uses min)
+// - 'rms_with_limiter': prioritize RMS and rely on a light limiter to catch peaks (uses max)
+const NORMALIZATION_STRATEGY = 'rms_with_limiter';
+const NORMALIZATION_MAX_GAIN = 4.0; // avoid excessive boosts
+const NORMALIZATION_MIN_GAIN = 0.05; // avoid near-silence
+const VOLUME_RAMP_MS = 140; // smooth ramp to avoid jumps
 const DEFAULT_VOLUME = 0.5;
+
+// Clamp a numeric value to [0, 1]
+const clamp01 = (v) => Math.min(1, Math.max(0, v || 0));
 
 /**
  * AudioProvider wraps the app and provides audio state and controls via context.
@@ -36,28 +47,88 @@ export const AudioProvider = ({ children }) => {
     const initGenerationRef = useRef({}); // { id: number }
     // The most recently intended src per id (absolute URL)
     const intendedSrcRef = useRef({}); // { id: string }
+    // Cache normalization by absolute src
+    const normalizationCacheRef = useRef({}); // { absoluteSrc: factor }
+    // Track any in-flight volume ramps so we can cancel/replace
+    const volumeRampHandlesRef = useRef({}); // { id: { cancel: () => void } }
+    // Ensure deep-link handling runs once
+    const didApplyDeepLinkRef = useRef(false);
 
     // --- Web Audio API for normalization only ---
-    const getNormalizationFactor = async (src, targetPeak = TARGET_PEAK) => {
+    const getNormalizationFactor = async (src, targetPeak = TARGET_PEAK, targetRms = TARGET_RMS) => {
         if (!ENABLE_NORMALIZATION) return 1;
         try {
+            if (normalizationCacheRef.current[src] !== undefined) {
+                return normalizationCacheRef.current[src];
+            }
             const response = await fetch(src);
             const arrayBuffer = await response.arrayBuffer();
             const audioCtx = new window.AudioContext();
             const audioBuffer = await audioCtx.decodeAudioData(arrayBuffer);
             let peak = 0;
+            let sumSquares = 0;
+            let totalSamples = 0;
             for (let i = 0; i < audioBuffer.numberOfChannels; i++) {
                 const channelData = audioBuffer.getChannelData(i);
                 for (let j = 0; j < channelData.length; j++) {
                     peak = Math.max(peak, Math.abs(channelData[j]));
+                    const s = channelData[j];
+                    sumSquares += s * s;
                 }
+                totalSamples += channelData.length;
             }
             audioCtx.close();
-            return peak === 0 ? 1 : targetPeak / peak;
+            const rms = totalSamples > 0 ? Math.sqrt(sumSquares / totalSamples) : 0;
+            const peakFactor = peak === 0 ? 1 : targetPeak / peak;
+            const rmsFactor = rms === 0 ? 1 : targetRms / rms;
+            let factor;
+            if (NORMALIZATION_STRATEGY === 'rms_with_limiter') {
+                // Prioritize perceived loudness; limiter in the playback graph will protect peaks
+                factor = Math.max(peakFactor, rmsFactor);
+            } else {
+                // Conservative: never exceed peak allowance
+                factor = Math.min(peakFactor, rmsFactor);
+            }
+            factor = Math.max(NORMALIZATION_MIN_GAIN, Math.min(NORMALIZATION_MAX_GAIN, factor));
+            normalizationCacheRef.current[src] = factor;
+            return factor;
         } catch (err) {
             console.error('Error normalizing audio:', err);
             return 1;
         }
+    };
+
+    // Smooth volume ramp to target over duration
+    const rampVolumeTo = (id, targetVolume, durationMs = VOLUME_RAMP_MS) => {
+        const ref = audioRefs.current[id];
+        if (!ref || !ref.audio) return;
+        const audio = ref.audio;
+        const startVolume = clamp01(audio.volume);
+        const clampedTarget = clamp01(targetVolume);
+        const delta = clampedTarget - startVolume;
+        if (Math.abs(delta) < 0.001) {
+            audio.volume = clampedTarget;
+            return;
+        }
+        // Cancel any existing ramp
+        if (volumeRampHandlesRef.current[id] && volumeRampHandlesRef.current[id].cancel) {
+            volumeRampHandlesRef.current[id].cancel();
+        }
+        let rafId = null;
+        const startTime = performance.now();
+        const cancel = () => {
+            if (rafId !== null) cancelAnimationFrame(rafId);
+        };
+        volumeRampHandlesRef.current[id] = { cancel };
+        const step = () => {
+            const now = performance.now();
+            const t = Math.min(1, (now - startTime) / Math.max(1, durationMs));
+            audio.volume = clamp01(startVolume + delta * t);
+            if (t < 1) {
+                rafId = requestAnimationFrame(step);
+            }
+        };
+        rafId = requestAnimationFrame(step);
     };
 
     // --- Audio element management ---
@@ -87,7 +158,7 @@ export const AudioProvider = ({ children }) => {
             audio.preload = 'metadata';
             audio.src = absoluteSrc;
             const initialVolume = volumes[id] !== undefined ? volumes[id] : DEFAULT_VOLUME;
-            audio.volume = initialVolume; // temporary; normalization applied asynchronously below
+            audio.volume = clamp01(initialVolume); // temporary; normalization applied asynchronously below
 
             // Add event listeners
             audio.addEventListener('loadedmetadata', () => {
@@ -99,6 +170,12 @@ export const AudioProvider = ({ children }) => {
             });
             audio.addEventListener('timeupdate', () => {
                 setCurrentTimes((prev) => ({ ...prev, [id]: audio.currentTime }));
+                // Update global mirror for deep-link copy
+                try {
+                    if (!window.__APP__) window.__APP__ = {};
+                    if (!window.__APP__.audioCurrentTimes) window.__APP__.audioCurrentTimes = {};
+                    window.__APP__.audioCurrentTimes[id] = audio.currentTime;
+                } catch (_) {}
             });
             audio.addEventListener('ended', () => {
                 setPlayingStates((prev) => ({ ...prev, [id]: false }));
@@ -107,6 +184,32 @@ export const AudioProvider = ({ children }) => {
 
             // Commit the element immediately
             audioRefs.current[id] = { audio, normalization: 1 };
+
+            // Build a lightweight Web Audio graph for optional peak protection
+            // Only when using RMS-priority strategy
+            if (NORMALIZATION_STRATEGY === 'rms_with_limiter') {
+                try {
+                    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+                    const source = ctx.createMediaElementSource(audio);
+                    const compressor = ctx.createDynamicsCompressor();
+                    // Gentle limiting to catch overs while keeping transparency
+                    compressor.threshold.setValueAtTime(-6, ctx.currentTime); // dB
+                    compressor.knee.setValueAtTime(6, ctx.currentTime);
+                    compressor.ratio.setValueAtTime(8, ctx.currentTime);
+                    compressor.attack.setValueAtTime(0.003, ctx.currentTime);
+                    compressor.release.setValueAtTime(0.25, ctx.currentTime);
+                    source.connect(compressor);
+                    compressor.connect(ctx.destination);
+                    // Store graph refs for cleanup
+                    audioRefs.current[id].waCtx = ctx;
+                    audioRefs.current[id].waSource = source;
+                    audioRefs.current[id].waCompressor = compressor;
+                } catch (e) {
+                    // Fallback gracefully if Web Audio is unavailable
+                    // eslint-disable-next-line no-console
+                    console.warn('Web Audio graph unavailable; falling back to HTMLAudio only', e);
+                }
+            }
 
             // Compute normalization in the background and apply if still current
             getNormalizationFactor(absoluteSrc)
@@ -118,7 +221,7 @@ export const AudioProvider = ({ children }) => {
                         audioRefs.current[id].audio === audio
                     ) {
                         audioRefs.current[id].normalization = normalization;
-                        audio.volume = initialVolume * normalization;
+                        rampVolumeTo(id, clamp01(initialVolume * normalization));
                     }
                 })
                 .catch((err) => {
@@ -150,6 +253,18 @@ export const AudioProvider = ({ children }) => {
             audio.pause();
             audio.src = '';
             audio.load();
+            // Close and disconnect Web Audio graph if present
+            try {
+                if (audioRefs.current[id].waSource) {
+                    audioRefs.current[id].waSource.disconnect();
+                }
+                if (audioRefs.current[id].waCompressor) {
+                    audioRefs.current[id].waCompressor.disconnect();
+                }
+                if (audioRefs.current[id].waCtx && typeof audioRefs.current[id].waCtx.close === 'function') {
+                    audioRefs.current[id].waCtx.close();
+                }
+            } catch (_) {}
             delete audioRefs.current[id];
             
             // Reset related state
@@ -212,7 +327,8 @@ export const AudioProvider = ({ children }) => {
         setVolumes((prev) => ({ ...prev, [id]: volume }));
         const ref = audioRefs.current[id];
         if (ref) {
-            ref.audio.volume = volume * ref.normalization;
+            const scaled = (volume || 0) * (ref.normalization || 1);
+            ref.audio.volume = clamp01(scaled);
         }
     };
 
@@ -239,7 +355,7 @@ export const AudioProvider = ({ children }) => {
                 ref.audio.src = absoluteNewSrc;
                 ref.audio.load();
                 // Temporarily use previous volume; normalization will be applied asynchronously
-                ref.audio.volume = previousVolume;
+                ref.audio.volume = clamp01(previousVolume);
 
                 // If it was playing, resume from the same timestamp
                 if (wasPlaying) {
@@ -266,7 +382,7 @@ export const AudioProvider = ({ children }) => {
                             audioRefs.current[id].audio === ref.audio
                         ) {
                             ref.normalization = normalization;
-                            ref.audio.volume = previousVolume * normalization;
+                            rampVolumeTo(id, clamp01(previousVolume * normalization));
                         }
                     })
                     .catch((err) => console.error('Error normalizing audio:', err));
@@ -322,6 +438,42 @@ export const AudioProvider = ({ children }) => {
         }
         return null;
     };
+
+    // Deep-link handling: ?track=<id>&t=<seconds>
+    useEffect(() => {
+        if (didApplyDeepLinkRef.current) return;
+        // Wait until tracks are loaded at least once
+        if (tracksLoading) return;
+        const params = new URLSearchParams(window.location.search);
+        const trackId = params.get('track');
+        if (!trackId) return;
+        const timeParam = parseInt(params.get('t') || '0', 10);
+        const startSeconds = Number.isFinite(timeParam) && timeParam >= 0 ? timeParam : 0;
+        const track = getTrackById(trackId);
+        if (!track) return;
+        // Determine a source
+        const chosenSrc = track.src || track.before || track.after;
+        if (!chosenSrc) return;
+        didApplyDeepLinkRef.current = true;
+        // Initialize and seek (no autoplay)
+        (async () => {
+            try {
+                await initializeAudio(trackId, chosenSrc);
+                seek(trackId, startSeconds);
+                setCurrentSrcs((prev) => ({ ...prev, [trackId]: chosenSrc }));
+                setCurrentTrack({ id: trackId, src: chosenSrc, title: track.title, artist: track.artist, links: track.links });
+                // Attempt to scroll the card into view
+                setTimeout(() => {
+                    const el = document.getElementById(`track-${trackId}`);
+                    if (el && typeof el.scrollIntoView === 'function') {
+                        el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    }
+                }, 0);
+            } catch (e) {
+                // ignore
+            }
+        })();
+    }, [tracks, tracksLoading]);
 
     // On unmount, pause and reset all audio
     useEffect(() => {

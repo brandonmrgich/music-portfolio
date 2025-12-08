@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import backgroundImg from '../assets/images/background1.jpg';
 import BaseAudioPlayer from './AudioPlayer/BaseAudioPlayer';
 import CompressedAudioGrid from './AudioPlayer/CompressedAudioGrid';
 import { useAudio } from '../contexts/AudioContext';
@@ -7,9 +6,8 @@ import { useAdmin } from '../contexts/AdminContext';
 import TrackUploadForm from './TrackUploadForm';
 
 const scoringData = {
-    pitch: "I've always dreamed of scoring stories — ones that move people. From large scale film tracks by Hans Zimmer, to tracks from games like Minecraft & What Remains of Edith Finch — I'm inspired by how music can shape worlds, whether vast or intimate. I chase that feeling in every song I write.",
-    disclaimer:
-        "Heres are a few tracks I've done that would work well for stories like this. I own 100% of the master and publishing rights to them, so if you’re interested in using anything here, or you want me to make something new just for your project, reach out directly!",
+    pitch: "I've always dreamed of making music for games & film, especially like Her, The Black Phone 2, Minecraft, Astroneer, and What Remains of Edith Finch and many more.",
+    disclaimer: 'Heres are a few tracks in the works that would work well for stories like this:',
 };
 
 const ScoringSection = () => {
@@ -32,26 +30,26 @@ const ScoringSection = () => {
     return (
         <div className="relative min-h-screen py-16 px-4 overflow-hidden">
             <div className="relative z-10 flex flex-col items-center w-full max-w-4xl mx-auto">
-                <div className="flex items-center mb-8">
-                    <h2 className="text-3xl font-bold text-accent-dark text-center mr-2">
-                        Film & Game Scoring
-                    </h2>
-                    {isAdmin && (
-                        <button
-                            onClick={() => setShowForm(true)}
-                            title="Add SCORING track"
-                            className="text-2xl text-accent-dark hover:text-accent-light ml-2"
-                        >
-                            +
-                        </button>
-                    )}
+                <div className="w-full max-w-3xl mx-auto mb-6 bg-card-dark/60 backdrop-blur-md border border-border-dark rounded-xl shadow-xl px-5 py-5">
+                    <div className="flex items-center justify-center mb-4">
+                        <h2 className="text-4xl md:text-5xl font-bold font-heading tracking-tight text-accent-dark text-center mr-2">
+                            Film & Game Scoring
+                        </h2>
+                        {isAdmin && (
+                            <button
+                                onClick={() => setShowForm(true)}
+                                title="Add SCORING track"
+                                className="text-2xl text-accent-dark hover:text-accent-light ml-2"
+                            >
+                                +
+                            </button>
+                        )}
+                    </div>
+                    <p className="text-xl md:text-2xl text-text-dark text-center mb-3">
+                        {scoringData.pitch}
+                    </p>
+                    <p className="text-xl text-text-dark text-center">{scoringData.disclaimer}</p>
                 </div>
-                <p className="text-lg text-text-dark max-w-3xl text-center mb-4">
-                    {scoringData.pitch}
-                </p>
-                <p className="text-lg text-text-dark max-w-3xl text-center mb-4">
-                    {scoringData.disclaimer}
-                </p>
                 {highlight && highlight.src && (
                     <div className="mb-8 max-w-lg mx-auto">
                         <BaseAudioPlayer

@@ -3,6 +3,7 @@ import { AudioProvider } from './AudioContext';
 import { ContactProvider } from './ContactContext';
 import { ThemeProvider } from './ThemeContext';
 import { AdminProvider } from './AdminContext';
+import { ProjectProvider } from './ProjectContext';
 
 // All providers will be nested here
 const AppProvider = ({ children }) => {
@@ -10,7 +11,9 @@ const AppProvider = ({ children }) => {
         <AdminProvider>
             <ThemeProvider>
                 <AudioProvider>
-                    <ContactProvider>{children}</ContactProvider>
+                    <ContactProvider>
+                        <ProjectProvider>{children}</ProjectProvider>
+                    </ContactProvider>
                 </AudioProvider>
             </ThemeProvider>
         </AdminProvider>

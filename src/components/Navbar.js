@@ -1,14 +1,14 @@
 import React, { useState, useEffect, useRef } from 'react';
-import ContentLinks from '../utils/ContentLinks';
 import { useAdmin } from '../contexts/AdminContext';
 import Login from './Login';
 
 const navLinks = [
   { label: 'Home', section: 'hero' },
-  { label: 'Scoring', section: 'scoring' },
+  { label: 'Mixing & Mastering', section: 'services' },
+  { label: 'Film & Game Scoring', section: 'scoring' },
   { label: 'In Work', section: 'inwork' },
-  { label: 'Services', section: 'services' },
-  { label: 'About', section: 'about' },
+  { label: 'Projects', section: 'projects' },
+  { label: 'Contact', section: 'contact' },
 ];
 
 const Navbar = ({ refs, setShowLogin }) => {

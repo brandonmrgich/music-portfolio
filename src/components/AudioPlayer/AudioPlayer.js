@@ -40,19 +40,36 @@ const AudioPlayer = ({ id, src, title, artist, links }) => {
      * @returns {JSX.Element}
      */
     const renderAdditionalControls = () => (
-        <button
-            onClick={handleLike}
-            className="relative bg-none text-playercardText-dark hover:scale-110 transition-transform px-1 py-0"
-            aria-label="Like"
-            title="Like"
-        >
-            <div className="flex items-center gap-1">
-                <Heart
-                    className={`w-4 h-4 text-accent-dark hover:text-red-500 ${hasLiked ? 'fill-current text-red-500' : 'fill-none'}`}
-                />
-                <span className="text-xs text-playercardText-dark">{likes}</span>
-            </div>
-        </button>
+        <div className="inline-flex items-center gap-1">
+            <button
+                onClick={() => {
+                    try {
+                        const url = new URL(window.location.href);
+                        url.searchParams.set('track', id);
+                        url.searchParams.set('t', Math.floor(window?.__APP__?.audioCurrentTimes?.[id] || 0));
+                        navigator.clipboard.writeText(url.toString());
+                    } catch (_) {}
+                }}
+                className="px-2 py-0.5 text-sm text-playercardText-dark hover:bg-card-dark/50 rounded focus:outline-none focus:ring-1 focus:ring-accent-dark/60"
+                title="Share"
+                aria-label="Share link to current time"
+            >
+                Link
+            </button>
+            <button
+                onClick={handleLike}
+                className="relative bg-none text-playercardText-dark hover:scale-110 transition-transform px-1 py-0"
+                aria-label="Like"
+                title="Like"
+            >
+                <div className="flex items-center gap-1">
+                    <Heart
+                        className={`w-4 h-4 text-accent-dark hover:text-red-500 ${hasLiked ? 'fill-current text-red-500' : 'fill-none'}`}
+                    />
+                    <span className="text-sm text-playercardText-dark">{likes}</span>
+                </div>
+            </button>
+        </div>
     );
 
     return (
