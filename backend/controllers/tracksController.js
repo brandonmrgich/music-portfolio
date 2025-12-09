@@ -64,6 +64,9 @@ const getTracks = async (req, res) => {
                     type,
                     tracks: await Promise.all(
                         manifest[type].map(async (track) => {
+                            // TODO [perf/audio]: When manifest includes durationSec / gain metadata
+                            // (truePeakDbfs, integratedLufs, recommendedGainDb), pass it through here:
+                            // e.g., return { ...track, src: signedUrl, durationSec, recommendedGainDb }
                             // For REEL type, we need to generate signed URLs for both 'before' and 'after'
                             if (track.before && track.after) {
                                 return {
@@ -195,9 +198,18 @@ const uploadTrack = async (req, res) => {
                 })
                 .promise();
         }
-        // TODO: Capture and persist track duration during upload.
-        // Compute duration (e.g., via ffprobe or decoding) and include it in the manifest entry
-        // so clients can render song lengths without fetching audio. Example field: durationSec.
+        // TODO [perf/audio]: Capture and persist technical metadata server-side during upload:
+        // - durationSec (via ffprobe)
+        // - truePeakDbfs (via ffmpeg + aeval/aresample oversampling or ebur128 true-peak)
+        // - integratedLufs (via ebur128)
+        // - recommendedGainDb (to bring true peak to -1 dBFS, or LUFS to target)
+        // Rationale: avoids client-side full-file fetch/decoding and enables instant, consistent loudness.
+        // Implementation sketch:
+        //   const meta = await probeAudio(buffer) // wrapper around ffprobe/ffmpeg
+        //   track.durationSec = meta.durationSec
+        //   track.truePeakDbfs = meta.truePeakDbfs
+        //   track.integratedLufs = meta.integratedLufs
+        //   track.recommendedGainDb = Math.min(0, -1 - meta.truePeakDbfs) // to cap at -1 dBTP
         const track = {
             id,
             title: sanitizedTitle,
