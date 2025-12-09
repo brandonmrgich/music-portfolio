@@ -138,7 +138,15 @@ const ProjectView = () => {
 									<div className="md:col-span-1">
 										<div className="rounded-xl p-4 space-y-4" style={{ backgroundColor: 'rgba(0,0,0,0.25)' }}>
 											<div className="w-28 h-28 md:w-32 md:h-32 rounded-full overflow-hidden mx-auto ring-2 ring-white/30">
-												<img src={profileUrl} alt={`${artist?.name || activeProject.name} profile`} className="w-full h-full object-cover object-center" loading="lazy" decoding="async" />
+												<img
+													src={profileUrl}
+													alt={`${artist?.name || activeProject.name} profile`}
+													className="w-full h-full object-cover object-center"
+													loading="lazy"
+													decoding="async"
+													width="128"
+													height="128"
+												/>
 											</div>
 											<h4 className="text-white/90 font-semibold mb-3">Find {artist?.name || activeProject.name}</h4>
 											<ArtistSocialLinks artistId={artistId} />

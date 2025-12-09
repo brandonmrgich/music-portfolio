@@ -82,6 +82,8 @@ const HeroSection = ({ onHeroExit, scrollLocked }) => {
         src={heroData.background}
         alt="Profile Beach Background"
         className="absolute inset-0 w-full h-full object-cover object-center z-0 blur-md scale-110"
+        decoding="async"
+        fetchpriority="low"
         style={{ filter: 'brightness(0.5) blur(8px)' }}
       />
       <div className="relative z-10 flex flex-col items-center justify-center w-full h-full">
@@ -89,6 +91,10 @@ const HeroSection = ({ onHeroExit, scrollLocked }) => {
           src={heroData.background}
           alt="Profile Beach Album Cover"
           className="w-48 h-48 md:w-64 md:h-64 rounded-xl shadow-2xl border-4 border-white/20 object-cover object-center mb-6"
+          decoding="async"
+          fetchpriority="high"
+          width="256"
+          height="256"
           style={{ background: 'rgba(0,0,0,0.2)' }}
         />
         <div className="relative flex flex-col items-center w-full max-w-2xl">

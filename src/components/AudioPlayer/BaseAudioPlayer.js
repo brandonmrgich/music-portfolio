@@ -28,7 +28,6 @@ const BaseAudioPlayer = ({ id, src, title, artist, links = {}, renderAdditionalC
         currentTimes,
         durations,
         volumes,
-        initializeAudio,
         refreshTracks,
     } = useAudio();
     const { isAdmin } = useAdmin();
@@ -36,7 +35,6 @@ const BaseAudioPlayer = ({ id, src, title, artist, links = {}, renderAdditionalC
     const [deleteStatus, setDeleteStatus] = useState('idle'); // idle | deleting | success | error
     const [deleteMsg, setDeleteMsg] = useState('');
     const containerRef = useRef(null);
-    const [hasInitialized, setHasInitialized] = useState(false);
 
     const isPlaying = playingStates[id];
     const currentTime = currentTimes[id] || 0;
@@ -220,25 +218,7 @@ const BaseAudioPlayer = ({ id, src, title, artist, links = {}, renderAdditionalC
         };
     }, [volumeOpen]);
 
-    // Lazy metadata init using IntersectionObserver for performance
-    useEffect(() => {
-        if (hasInitialized) return;
-        const el = containerRef.current;
-        if (!el) return;
-        const observer = new IntersectionObserver(
-            (entries) => {
-                entries.forEach((entry) => {
-                    if (entry.isIntersecting && !hasInitialized) {
-                        initializeAudio(id, src);
-                        setHasInitialized(true);
-                    }
-                });
-            },
-            { root: null, rootMargin: '200px', threshold: 0.01 }
-        );
-        observer.observe(el);
-        return () => observer.disconnect();
-    }, [id, src, hasInitialized, initializeAudio]);
+    // Removed scroll-based pre-initialization to avoid background downloads.
 
     if (error) console.log(error);
 

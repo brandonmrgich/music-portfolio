@@ -55,6 +55,7 @@ const App = () => {
         }, 10);
     }, [scrollLocked]);
 
+    // TODO: Make the background move with scroll parallax
     return (
         <AppProvider>
             <div
@@ -62,7 +63,7 @@ const App = () => {
                 style={{
                     backgroundImage: `linear-gradient(180deg, rgba(21,24,38,0.88), rgba(14,17,22,0.92)), url(${lakaBanner})`,
                     backgroundRepeat: 'repeat',
-                    backgroundSize: 'auto 360px',
+                    backgroundSize: 'auto 1024px',
                     backgroundAttachment: 'fixed',
                     backgroundPosition: 'center top',
                     backgroundBlendMode: 'overlay',
@@ -74,9 +75,9 @@ const App = () => {
                     style={{
                         backgroundImage: `url(${lakaBanner})`,
                         backgroundRepeat: 'repeat',
-                        backgroundSize: 'auto 360px',
+                        backgroundSize: 'auto 1024px',
                         mixBlendMode: 'screen',
-                        opacity: 0.7, 
+                        opacity: 0.7,
                     }}
                 />
                 <Navbar
@@ -92,19 +93,31 @@ const App = () => {
                     setShowLogin={setShowLogin}
                 />
                 <main className="flex flex-col flex-grow relative z-10">
-                    <section ref={heroRef} id="hero"><HeroSection onHeroExit={unlockAndScroll} scrollLocked={scrollLocked} /></section>
+                    <section ref={heroRef} id="hero">
+                        <HeroSection onHeroExit={unlockAndScroll} scrollLocked={scrollLocked} />
+                    </section>
                     <SectionDivider variant={1} />
-                    <section ref={servicesRef} id="services"><ServicesSection /></section>
+                    <section ref={servicesRef} id="services">
+                        <ServicesSection />
+                    </section>
                     <SectionDivider variant={0} />
-                    <section ref={scoringRef} id="scoring"><ScoringSection /></section>
+                    <section ref={scoringRef} id="scoring">
+                        <ScoringSection />
+                    </section>
                     <SectionDivider variant={0} />
-                    <section ref={inWorkRef} id="inwork" className="scroll-mt-24"><InWorkSection /></section>
+                    <section ref={inWorkRef} id="inwork" className="scroll-mt-24">
+                        <InWorkSection />
+                    </section>
                     <SectionDivider variant={0} />
                     {/* About section now showcases the Project Selector */}
-                    <section ref={projectsRef} id="projects"><ProjectSelector /></section>
+                    <section ref={projectsRef} id="projects">
+                        <ProjectSelector />
+                    </section>
                     <SectionDivider variant={0} />
                     {/* New Contact section with contact info previously in About */}
-                    <section ref={contactRef} id="contact"><ContactSection /></section>
+                    <section ref={contactRef} id="contact">
+                        <ContactSection />
+                    </section>
                 </main>
                 <GlobalAudioBar />
                 <Footer />
@@ -113,12 +126,17 @@ const App = () => {
                 <ProjectView />
                 {/* Login Modal rendered at root level for proper overlay */}
                 {showLogin && !isAdmin && (
-                  <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
-                    <div className="bg-white p-6 rounded shadow-lg relative w-full max-w-xs flex flex-col items-center justify-center">
-                      <button onClick={() => setShowLogin(false)} className="absolute top-2 right-2 text-gray-500">&times;</button>
-                      <Login onSuccess={() => setShowLogin(false)} />
+                    <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
+                        <div className="bg-white p-6 rounded shadow-lg relative w-full max-w-xs flex flex-col items-center justify-center">
+                            <button
+                                onClick={() => setShowLogin(false)}
+                                className="absolute top-2 right-2 text-gray-500"
+                            >
+                                &times;
+                            </button>
+                            <Login onSuccess={() => setShowLogin(false)} />
+                        </div>
                     </div>
-                  </div>
                 )}
             </div>
         </AppProvider>
