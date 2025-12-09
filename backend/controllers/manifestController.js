@@ -14,6 +14,10 @@ let manifestCache = DEFAULT_MANIFEST;
 let lastManifestFetch = 0;
 const REFRESH_INTERVAL = parseInt(process.env.MANIFEST_REFRESH_INTERVAL_MS, 10) || 30000;
 
+// TODO: Manifest schema should include per-track duration captured during upload
+// (e.g., durationSec). Store this alongside src/before/after so the frontend
+// can display song lengths without loading audio files client-side.
+
 /**
  * PRIVATE: Only for admin/debug or legacy migration. Not exported.
  * Reads the manifest from disk (legacy, not used in new design).

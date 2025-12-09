@@ -211,22 +211,6 @@ export const AudioProvider = ({ children }) => {
                 }
             }
 
-            // Compute normalization in the background and apply if still current
-            getNormalizationFactor(absoluteSrc)
-                .then((normalization) => {
-                    if (
-                        initGenerationRef.current[id] === myGeneration &&
-                        intendedSrcRef.current[id] === absoluteSrc &&
-                        audioRefs.current[id] &&
-                        audioRefs.current[id].audio === audio
-                    ) {
-                        audioRefs.current[id].normalization = normalization;
-                        rampVolumeTo(id, clamp01(initialVolume * normalization));
-                    }
-                })
-                .catch((err) => {
-                    console.error('Error normalizing audio:', err);
-                });
         } catch (error) {
             console.error(`Failed to initialize audio for ${id}:`, error);
             throw error;
@@ -295,6 +279,31 @@ export const AudioProvider = ({ children }) => {
         setPlayingStates((prev) => ({ ...prev, [id]: true }));
         setCurrentSrcs((prev) => ({ ...prev, [id]: src }));
         if (meta) setCurrentTrack({ id, src, ...meta });
+
+        // Defer normalization until user initiates playback
+        try {
+            const absoluteSrc = new URL(src, window.location.href).href;
+            const myGeneration = initGenerationRef.current[id];
+            const previousVolume = volumes[id] !== undefined ? volumes[id] : DEFAULT_VOLUME;
+            getNormalizationFactor(absoluteSrc)
+                .then((normalization) => {
+                    const refNow = audioRefs.current[id];
+                    if (
+                        initGenerationRef.current[id] === myGeneration &&
+                        intendedSrcRef.current[id] === absoluteSrc &&
+                        refNow &&
+                        refNow.audio === ref.audio
+                    ) {
+                        audioRefs.current[id].normalization = normalization;
+                        rampVolumeTo(id, clamp01(previousVolume * normalization));
+                    }
+                })
+                .catch((err) => {
+                    console.error('Error normalizing audio:', err);
+                });
+        } catch (_) {
+            // no-op
+        }
     };
 
     const pause = (id) => {

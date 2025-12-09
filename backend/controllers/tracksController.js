@@ -195,6 +195,9 @@ const uploadTrack = async (req, res) => {
                 })
                 .promise();
         }
+        // TODO: Capture and persist track duration during upload.
+        // Compute duration (e.g., via ffprobe or decoding) and include it in the manifest entry
+        // so clients can render song lengths without fetching audio. Example field: durationSec.
         const track = {
             id,
             title: sanitizedTitle,
