@@ -17,7 +17,7 @@ import { deleteTrack } from '../../services/tracks';
  * @param {boolean} [props.compact] - If true, render a minimal UI
  * @param {string} [props.className] - Additional className for styling
  */
-const BaseAudioPlayer = ({ id, src, title, artist, links = {}, renderAdditionalControls, onToggleSource, compact = false, className = '' }) => {
+const BaseAudioPlayer = ({ id, src, title, artist, links = {}, renderAdditionalControls, onToggleSource, onFirstPlay, compact = false, className = '' }) => {
     const {
         error,
         play,
@@ -227,6 +227,9 @@ const BaseAudioPlayer = ({ id, src, title, artist, links = {}, renderAdditionalC
             pause(id);
         } else {
             // Lazy init ensure
+            if (typeof onFirstPlay === 'function') {
+                try { onFirstPlay(); } catch (_) {}
+            }
             play(id, src, { title, artist, links });
         }
     };

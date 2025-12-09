@@ -14,9 +14,12 @@ let manifestCache = DEFAULT_MANIFEST;
 let lastManifestFetch = 0;
 const REFRESH_INTERVAL = parseInt(process.env.MANIFEST_REFRESH_INTERVAL_MS, 10) || 30000;
 
-// TODO: Manifest schema should include per-track duration captured during upload
-// (e.g., durationSec). Store this alongside src/before/after so the frontend
-// can display song lengths without loading audio files client-side.
+// TODO [perf/audio]: Extend manifest schema to include audio technical metadata captured at upload:
+// - durationSec: number
+// - truePeakDbfs: number (e.g., -0.7)
+// - integratedLufs: number (e.g., -14)
+// - recommendedGainDb: number (apply on client to cap at -1 dBTP or reach LUFS target)
+// This enables instant UI durations and consistent loudness without client-side decoding.
 
 /**
  * PRIVATE: Only for admin/debug or legacy migration. Not exported.

@@ -24,7 +24,7 @@ const AudioComparisonPlayer = ({
     compact = false,
     className = '',
 }) => {
-    const { toggleSource } = useAudio();
+    const { toggleSource, primeComparisonPairNormalization } = useAudio();
     const [isBeforeAudio, setIsBeforeAudio] = useState(true);
 
     /**
@@ -111,6 +111,10 @@ const AudioComparisonPlayer = ({
             links={links}
             renderAdditionalControls={renderAdditionalControls}
             onToggleSource={handleToggle}
+            onFirstPlay={() => {
+                const current = isBeforeAudio ? before : after;
+                primeComparisonPairNormalization(id, before, after, current);
+            }}
             compact={compact}
             className={className}
         />
