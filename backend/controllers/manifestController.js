@@ -8,7 +8,16 @@ dotenv.config();
 // Path to where the manifest is stored locally (for legacy and current use)
 const manifestPath = path.join(__dirname, '..', 'data', 'manifest.json');
 const SERVER_MANIFEST_PATH = 'state/manifest.json';
-const DEFAULT_MANIFEST = { WIP: [], REEL: [], SCORING: [] };
+// NOTE: Keep this list in sync with the frontend's expected buckets.
+// Artist buckets use the existing project ids (uppercased).
+const DEFAULT_MANIFEST = {
+    WIP: [],
+    REEL: [],
+    SCORING: [],
+    ARTIST_BRANDON_MRGICH: [],
+    ARTIST_LAKA_NOCH: [],
+    ARTIST_SERENDIPITOUS: [],
+};
 
 let manifestCache = DEFAULT_MANIFEST;
 let lastManifestFetch = 0;
@@ -148,7 +157,9 @@ async function fetchManifestFromS3AndUpdateCache(req) {
     const serverManifest = await fetchManifestFromServer(req);
     console.log('fetching manifest from s3', { serverManifest });
     if (serverManifest) {
-        manifestCache = serverManifest;
+        // Ensure expected buckets exist even if the server manifest is older.
+        // We only add missing keys; we do not delete unknown keys.
+        manifestCache = { ...DEFAULT_MANIFEST, ...serverManifest };
         lastManifestFetch = Date.now();
         console.log('[ManifestCache] Manifest updated from S3.');
     } else {
@@ -171,9 +182,10 @@ function startManifestCacheAutoRefresh(req) {
  */
 function loadManifest() {
     if (fs.existsSync(manifestPath)) {
-        return JSON.parse(fs.readFileSync(manifestPath, 'utf8'));
+        const parsed = JSON.parse(fs.readFileSync(manifestPath, 'utf8'));
+        return { ...DEFAULT_MANIFEST, ...parsed };
     }
-    return { WIP: [], REEL: [], SCORING: [] };
+    return { ...DEFAULT_MANIFEST };
 }
 
 /**

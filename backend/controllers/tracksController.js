@@ -12,6 +12,15 @@ const {
 const BUCKET_NAME = process.env.AWS_BUCKET_NAME;
 
 /**
+ * Return manifest keys that are "track buckets" (i.e., values are arrays).
+ * This allows new buckets (like ARTIST_*) without hard-coded enumerations.
+ */
+const getBucketKeys = (manifest) => {
+    if (!manifest || typeof manifest !== 'object') return [];
+    return Object.keys(manifest).filter((k) => Array.isArray(manifest[k]));
+};
+
+/**
  * Track Controller
  * Handles CRUD operations for audio tracks (WIP, REEL, SCORING).
  *
@@ -59,7 +68,7 @@ const getTracks = async (req, res) => {
         const s3 = req.s3;
         // Iterate through all tracks and generate signed URLs
         const signedTracks = await Promise.all(
-            Object.keys(manifest).map(async (type) => {
+            getBucketKeys(manifest).map(async (type) => {
                 return {
                     type,
                     tracks: await Promise.all(
@@ -174,6 +183,8 @@ const uploadTrack = async (req, res) => {
         }
         // Step 3: Load manifest from disk
         const manifest = loadManifest();
+        // Allow new buckets (e.g., ARTIST_*). If bucket doesn't exist, create it.
+        if (!manifest[sanitizedType]) manifest[sanitizedType] = [];
         const id = uuidv4();
         const beforeFile = files[0];
         let afterFile = files.length > 1 ? files[1] : null;
@@ -258,9 +269,9 @@ const deleteTrackById = async (req, res) => {
     let trackIndex = -1;
     let track = null;
 
-    ['WIP', 'REEL', 'SCORING'].forEach((type) => {
+    getBucketKeys(manifest).forEach((type) => {
         manifest[type].forEach((t, index) => {
-            if (t.id == id) {
+            if (t && String(t.id) === String(id)) {
                 trackType = type;
                 trackIndex = index;
                 track = t;
@@ -332,11 +343,11 @@ const updateTrackById = async (req, res) => {
 
     let trackFound = false;
 
-    ['WIP', 'REEL', 'SCORING'].forEach((type) => {
+    getBucketKeys(manifest).forEach((type) => {
         manifest[type] = manifest[type].map((track) => {
             console.log(`audio.js::put(/tracks/:id): ${track}`);
 
-            if (track.id == id) {
+            if (track && String(track.id) === String(id)) {
                 trackFound = true;
                 return {
                     ...track,
