@@ -1,8 +1,12 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useProjects } from '../../contexts/ProjectContext';
+import { useAudio } from '../../contexts/AudioContext';
+import { useAdmin } from '../../contexts/AdminContext';
 import { ARTISTS } from '../../projects/artistData';
 import ArtistSocialLinks from './ArtistSocialLinks';
+import CompressedAudioGrid from '../AudioPlayer/CompressedAudioGrid';
+import TrackUploadForm from '../TrackUploadForm';
 
 const overlayVariants = {
 	hidden: { opacity: 0 },
@@ -18,8 +22,13 @@ const contentVariants = {
 
 const ProjectView = () => {
 	const { activeProject, isProjectOpen, closeProject } = useProjects();
+	const { tracksByType, tracksLoading } = useAudio();
+	const { isAdmin } = useAdmin();
 	const artistId = activeProject?.artistId || activeProject?.id;
 	const artist = artistId ? ARTISTS[artistId] : null;
+	const artistBucketKey = artistId ? `ARTIST_${String(artistId).toUpperCase().replace(/-/g, '_')}` : null;
+	const artistTracks = (artistBucketKey && tracksByType && tracksByType[artistBucketKey]) ? tracksByType[artistBucketKey] : [];
+	const [showUpload, setShowUpload] = useState(false);
 	// Resolve banner/profile from project images (object form preferred)
 	const resolveImage = (key) => {
 		const imgs = activeProject?.images;
@@ -39,12 +48,17 @@ const ProjectView = () => {
 		if (!isProjectOpen) return;
 		const handleKeyDown = (e) => {
 			if (e.key === 'Escape' || e.key === 'Esc') {
+				// If the upload modal is open, close it first
+				if (showUpload) {
+					setShowUpload(false);
+					return;
+				}
 				closeProject();
 			}
 		};
 		window.addEventListener('keydown', handleKeyDown);
 		return () => window.removeEventListener('keydown', handleKeyDown);
-	}, [isProjectOpen, closeProject]);
+	}, [isProjectOpen, closeProject, showUpload]);
 	return (
 		<AnimatePresence>
 			{isProjectOpen && activeProject && (
@@ -153,6 +167,59 @@ const ProjectView = () => {
 										</div>
 									</div>
 								</motion.div>
+
+								{/* Artist Tracks */}
+								<div className="px-4 md:px-6 pb-8">
+									<div className="rounded-xl p-4 md:p-5 border border-white/10" style={{ backgroundColor: 'rgba(0,0,0,0.25)' }}>
+										<div className="flex items-end justify-between gap-4">
+											<div className="flex items-center gap-2">
+												<h4 className="text-white/90 font-semibold text-lg">Tracks</h4>
+												{isAdmin && artistBucketKey && (
+													<button
+														onClick={() => setShowUpload(true)}
+														title="Add track"
+														className="text-2xl leading-none text-white/90 hover:text-white"
+														aria-label="Add track"
+													>
+														+
+													</button>
+												)}
+											</div>
+											{artistBucketKey && (
+												<span className="text-xs text-white/50 font-mono">{artistBucketKey}</span>
+											)}
+										</div>
+										<div className="mt-4">
+											{tracksLoading ? (
+												<p className="text-white/70">Loading tracks…</p>
+											) : artistTracks && artistTracks.length > 0 ? (
+												<CompressedAudioGrid tracks={artistTracks} />
+											) : (
+												<p className="text-white/70">No tracks yet.</p>
+											)}
+										</div>
+									</div>
+								</div>
+
+								{/* Upload Modal (admin only) */}
+								{showUpload && isAdmin && artistBucketKey && (
+									<div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50">
+										<div className="relative">
+											<button
+												onClick={() => setShowUpload(false)}
+												className="absolute -top-4 -right-4 text-gray-300 bg-black/60 rounded-full p-2 hover:text-white hover:bg-black/80 z-10"
+												aria-label="Close upload"
+											>
+												&times;
+											</button>
+											<TrackUploadForm
+												type={artistBucketKey}
+												onSuccess={() => setShowUpload(false)}
+												defaults={{ artist: artist?.name || activeProject.name }}
+											/>
+										</div>
+									</div>
+								)}
 							</div>
 						</motion.div>
 					</div>

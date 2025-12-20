@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useRef, useEffect } from 'react';
-import { fetchTracksByType } from '../services/tracks';
+import { fetchTracks } from '../services/tracks';
 
 /**
  * AudioContext provides global audio playback state and controls for the app.
@@ -55,6 +55,9 @@ export const AudioProvider = ({ children }) => {
     const [currentSrcs, setCurrentSrcs] = useState({});
     const [currentTrack, setCurrentTrack] = useState(null); // Metadata for global bar
     // --- Track data state ---
+    // Canonical: tracks keyed by backend manifest bucket/type (e.g., 'REEL', 'SCORING', 'WIP', 'ARTIST_BRANDON_MRGICH', ...)
+    const [tracksByType, setTracksByType] = useState({});
+    // Legacy convenience shape used by existing sections
     const [tracks, setTracks] = useState({ wip: [], scoring: [], reel: [] });
     const [tracksLoading, setTracksLoading] = useState(false);
     const [tracksError, setTracksError] = useState(null);
@@ -557,12 +560,38 @@ export const AudioProvider = ({ children }) => {
         setTracksLoading(true);
         setTracksError(null);
         try {
-            const [wip, scoring, reel] = await Promise.all([
-                fetchTracksByType('wip'),
-                fetchTracksByType('scoring'),
-                fetchTracksByType('reel'),
-            ]);
-            setTracks({ wip, scoring, reel });
+            // Backend returns: Array<{ type: string, tracks: Track[] }>
+            const buckets = await fetchTracks();
+            const byType = {};
+
+            // Ensure known buckets exist even when empty (so UI can be data-driven)
+            const knownEmpty = [
+                'WIP',
+                'SCORING',
+                'REEL',
+                // Artist buckets use the existing project ids (uppercased)
+                'ARTIST_BRANDON_MRGICH',
+                'ARTIST_LAKA_NOCH',
+                'ARTIST_SERENDIPITOUS',
+            ];
+            knownEmpty.forEach((k) => {
+                byType[k] = [];
+            });
+
+            if (Array.isArray(buckets)) {
+                buckets.forEach((bucket) => {
+                    if (!bucket || !bucket.type) return;
+                    byType[bucket.type] = Array.isArray(bucket.tracks) ? bucket.tracks : [];
+                });
+            }
+
+            setTracksByType(byType);
+            // Preserve existing sections without needing refactors right now
+            setTracks({
+                wip: byType.WIP || [],
+                scoring: byType.SCORING || [],
+                reel: byType.REEL || [],
+            });
         } catch (err) {
             setTracksError(err);
         } finally {
@@ -576,8 +605,18 @@ export const AudioProvider = ({ children }) => {
 
     // --- Get track by id ---
     const getTrackById = (id) => {
+        // Prefer the canonical map so deep-links work for any bucket (including ARTIST_*).
+        if (tracksByType && typeof tracksByType === 'object') {
+            for (const type of Object.keys(tracksByType)) {
+                const list = tracksByType[type];
+                if (!Array.isArray(list)) continue;
+                const found = list.find((t) => t && String(t.id) === String(id));
+                if (found) return found;
+            }
+        }
+        // Fallback to legacy shape
         for (const type of Object.keys(tracks)) {
-            const found = tracks[type]?.find((t) => String(t.id) === String(id));
+            const found = tracks[type]?.find((t) => t && String(t.id) === String(id));
             if (found) return found;
         }
         return null;
@@ -661,6 +700,7 @@ export const AudioProvider = ({ children }) => {
                 // Expose REEL A/B helper so comparison player can pre-warm both sources
                 primeComparisonPairNormalization,
                 tracks,
+                tracksByType,
                 tracksLoading,
                 tracksError,
                 refreshTracks,
