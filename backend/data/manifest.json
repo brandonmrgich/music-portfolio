@@ -15,20 +15,6 @@
       "src": "tracks/wip/b4947042-280c-4289-b303-0909804c8384_ToBeYouV2-ChorusSection-v2.mp3"
     },
     {
-      "id": "05fea946-7440-487c-8540-302a246084df",
-      "title": "To Be You (Demo vocal stacks)",
-      "artist": "Laka Noch",
-      "links": {},
-      "src": "tracks/wip/05fea946-7440-487c-8540-302a246084df_ToBeYou(NewVocalChain).mp3"
-    },
-    {
-      "id": "e6eba0da-850e-4012-ab5f-a9be5de1ff3e",
-      "title": "Take me away",
-      "artist": "Laka Noch",
-      "links": {},
-      "src": "tracks/wip/e6eba0da-850e-4012-ab5f-a9be5de1ff3e_TakeMeAway.mp3"
-    },
-    {
       "id": "886d599f-0cb9-49a7-ae34-4c4087f3a764",
       "title": "New Catastrophe - voice memo",
       "artist": "Laka Noch",
@@ -41,13 +27,6 @@
       "artist": "Laka Noch",
       "links": {},
       "src": "tracks/wip/99991244-51b2-4fab-a534-31347cfe1510_Favorite PlaceV6-Instrumental.mp3"
-    },
-    {
-      "id": "6581ebf3-f40d-40c2-9b6a-ff5fc6541b4d",
-      "title": "Your place (Slowed+Reverbed)",
-      "artist": "Laka Noch",
-      "links": {},
-      "src": "tracks/wip/6581ebf3-f40d-40c2-9b6a-ff5fc6541b4d_Your place (Slowed+Reverbed).mp3"
     },
     {
       "id": "0c0d1573-59ed-49d0-8ef5-73243450be74",
@@ -94,13 +73,6 @@
       "src": "tracks/scoring/78efcdf8-a488-488c-90f6-2440c35c0e4e_RecursionV2.mp3"
     },
     {
-      "id": "7ef0ebf2-c35f-41db-b01c-a6b1bb21ad96",
-      "title": "Sway - Post Rock Version (ft. Another Language)",
-      "artist": "Brandon Mrgich",
-      "links": {},
-      "src": "tracks/scoring/7ef0ebf2-c35f-41db-b01c-a6b1bb21ad96_Sway - Post Rock Version (feat. Another Language).mp3"
-    },
-    {
       "id": "ecbed72f-b3cd-4a4a-9509-71145d9367c6",
       "title": "idea02-Sway",
       "artist": "Brandon Mrgich",
@@ -141,6 +113,20 @@
       "artist": "Brandon Mrgich",
       "links": {},
       "src": "tracks/scoring/57ce8dd6-0ae2-4ff9-879a-71b36ac0ad69_idea10-lumen.mp3"
+    },
+    {
+      "id": "356e3551-e99e-4e03-9219-952b02a81705",
+      "title": "Luminis - Slowed & Reverbed",
+      "artist": "Serendipitous, Brandon Mrgich",
+      "links": {},
+      "src": "tracks/scoring/356e3551-e99e-4e03-9219-952b02a81705_Luminis_Slowed&Reverbed.mp3"
+    },
+    {
+      "id": "0d179b0e-4d1e-418d-a907-bb50c7ff83af",
+      "title": "idea12-Vocoder Experiment",
+      "artist": "Brandon Mrgich",
+      "links": {},
+      "src": "tracks/scoring/0d179b0e-4d1e-418d-a907-bb50c7ff83af_CustomVocoderExperiment2.mp3"
     }
   ],
   "REEL": [
@@ -175,6 +161,46 @@
       "links": {},
       "before": "tracks/reel/3a1caf9d-4b72-4dc5-8a7c-ffee06f5be14_Through Your Eyes.mp3",
       "after": "tracks/reel/3a1caf9d-4b72-4dc5-8a7c-ffee06f5be14_version2_TLM-ThroughYourEyesMasterV1.mp3"
+    },
+    {
+      "id": "f06af980-75a2-4cbc-9d8d-70231158f690",
+      "title": "Gone off on his own",
+      "artist": "r.b. wells, Laka Noch",
+      "links": {},
+      "before": "tracks/reel/f06af980-75a2-4cbc-9d8d-70231158f690_Gone off on his own.mp3",
+      "after": "tracks/reel/f06af980-75a2-4cbc-9d8d-70231158f690_version2_Gone off on his own_MasterV3.mp3"
+    },
+    {
+      "id": "27cebffb-1328-433b-bd3d-af6f21406de5",
+      "title": "Sick as a dog",
+      "artist": "r.b. wells",
+      "links": {},
+      "before": "tracks/reel/27cebffb-1328-433b-bd3d-af6f21406de5_It's just the weatherV1.mp3",
+      "after": "tracks/reel/27cebffb-1328-433b-bd3d-af6f21406de5_version2_Sick as a dog_MasterV3.mp3"
+    },
+    {
+      "id": "fba68e97-91a5-4823-973a-c2a0d5b948f5",
+      "title": "Sway - Post Rock Version (feat. Another Language)",
+      "artist": "Brandon Mrgich, Another Language",
+      "links": {},
+      "before": "tracks/reel/fba68e97-91a5-4823-973a-c2a0d5b948f5_Sway - Post Rock Version (feat. Another Language).mp3",
+      "after": "tracks/reel/fba68e97-91a5-4823-973a-c2a0d5b948f5_version2_idea02-Sway-PostRockVersion(ft.AnotherLanguage)_Master.mp3"
+    },
+    {
+      "id": "f7809504-9d5c-4d39-a3e0-d3fa048674c6",
+      "title": "When you're gone",
+      "artist": "Laka Noch",
+      "links": {},
+      "before": "tracks/reel/f7809504-9d5c-4d39-a3e0-d3fa048674c6_WhenYoureGone_MIX1.mp3",
+      "after": "tracks/reel/f7809504-9d5c-4d39-a3e0-d3fa048674c6_version2_WhenYoureGone_MIX3_Balanced.mp3"
+    },
+    {
+      "id": "8d086bcb-a301-4633-bcda-d0de3d33616d",
+      "title": "Trying",
+      "artist": "Serendipitous, r.b. wells",
+      "links": {},
+      "before": "tracks/reel/8d086bcb-a301-4633-bcda-d0de3d33616d_tryingV6_Master.mp3",
+      "after": "tracks/reel/8d086bcb-a301-4633-bcda-d0de3d33616d_version2_TryingV8_Master-wide.mp3"
     }
   ]
 }
