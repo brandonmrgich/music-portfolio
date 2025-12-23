@@ -50,7 +50,7 @@ const getSignedUrl = (key, s3) => {
     const params = {
         Bucket: BUCKET_NAME,
         Key: key,
-        Expires: 300, // URL expires in 5 minutes
+        Expires: 3600, // URL expires in 1 hour
     };
     return s3.getSignedUrl('getObject', params);
 };
