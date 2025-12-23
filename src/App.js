@@ -105,10 +105,10 @@ const App = () => {
                         <ScoringSection />
                     </section>
                     <SectionDivider variant={0} />
-                    <section ref={inWorkRef} id="inwork" className="scroll-mt-24">
+                    {/*<section ref={inWorkRef} id="inwork" className="scroll-mt-24">
                         <InWorkSection />
-                    </section>
-                    <SectionDivider variant={0} />
+                    </section> 
+                    <SectionDivider variant={0} />*/}
                     {/* About section now showcases the Project Selector */}
                     <section ref={projectsRef} id="projects">
                         <ProjectSelector />
