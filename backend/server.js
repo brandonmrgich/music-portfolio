@@ -50,10 +50,15 @@ app.use(session({
     secret: sessionSecret,
     resave: false,
     saveUninitialized: false,
+    // When behind nginx/ALB in production, trust proxy headers for secure cookies
+    proxy: !isDev,
     cookie: { 
         httpOnly: true, 
-        secure: !isDev, 
-        sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+        // 'auto' avoids "cookie not set" if TLS is terminated upstream but forwarded proto is misconfigured.
+        // Since the frontend is on the same site (brandonmrgich.com) as api.brandonmrgich.com,
+        // SameSite=Lax works and avoids the Secure+SameSite=None requirement pitfalls.
+        secure: isDev ? false : 'auto',
+        sameSite: 'lax',
         maxAge: 1000 * 60 * 60 * 2 }, // 2 hours
 }));
 
