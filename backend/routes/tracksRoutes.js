@@ -30,9 +30,9 @@ router.get('/:type', getTracksByType);
 // POST /tracks - Upload a track (max 2 files for REEL)
 router.post('/', adminSession, upload.array('file', 2), uploadTrack);
 // DELETE /tracks/:id - Delete track by ID
-router.delete('/:id', deleteTrackById);
+router.delete('/:id', adminSession, deleteTrackById);
 // PUT /tracks/:id - Update track by ID
-router.put('/:id', updateTrackById);
+router.put('/:id', adminSession, updateTrackById);
 
 // Routes for manifest-related operations
 //router.post('/manifest', upload.single('file'), syncManifest);

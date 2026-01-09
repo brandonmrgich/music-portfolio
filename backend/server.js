@@ -32,6 +32,8 @@ app.use(configMiddleware);
 app.use(express.urlencoded({ extended: true })); // For form-data URL encoding
 app.use(bodyParser.json()); // Parse JSON request bodies
 app.use(cors(corsOptions)); // Apply CORS
+// Explicitly handle CORS preflight across the API (needed for cross-origin DELETE/PUT/POST multipart in prod)
+app.options('*', cors(corsOptions));
 app.use(s3Middleware); // Attach S3 client to all requests
 
 // --- Request logger middleware ---
@@ -61,10 +63,14 @@ app.use('/heartbeat', hbRoutes);
 app.use('/tracks', tracksRoutes);
 app.use('/admin', adminRoutes);
 
-// Start the manifest cache auto-refresh on server startup
-startManifestCacheAutoRefresh({ s3: getS3Instance() });
+// Start the server only when this file is executed directly (not when imported for tests/scripts)
+if (require.main === module) {
+    // Start the manifest cache auto-refresh on server startup
+    startManifestCacheAutoRefresh({ s3: getS3Instance() });
 
-// Start the server
-app.listen(port, () => {
-    console.log(`[BOOT] Server running at http://localhost:${port}`);
-});
+    app.listen(port, () => {
+        console.log(`[BOOT] Server running at http://localhost:${port}`);
+    });
+}
+
+module.exports = app;
