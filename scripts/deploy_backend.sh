@@ -26,6 +26,10 @@ REMOTE_ENV=("BACKEND_DIR=$BACKEND_DIR"
 SERVER="aws"                                        # AWS SSH alias
 LOCAL_BACKEND_DIR="${MUSIC_PORTFOLIO_ROOT}/backend" # Local backend directory
 LOCAL_TAR_PATH="${HOME}/tmp/${TAR_NAME}"
+# Maintenance scripts (uploaded next to .env on the EC2 host)
+LOCAL_SCRIPTS_DIR="${MUSIC_PORTFOLIO_ROOT}/scripts"
+BACKUP_SCRIPT_NAME="backup_backend_container.sh"
+RESTORE_SCRIPT_NAME="restore_backend_from_backup.sh"
 #DOCKER_BUILD_PLATFORMS="linux/amd64,linux/arm64"
 DOCKER_BUILD_PLATFORMS="linux/amd64"
 
@@ -82,10 +86,22 @@ check_docker_or_colima() {
 
 check_docker_or_colima
 
-# Build Docker image (multi-arch if needed)
+# Build Docker image (use buildx for cross-arch builds; fixes "exec format error" on Apple Silicon/Colima)
 log_action "Building Docker image locally..."
 if [ "$DRY_RUN" = false ]; then
-    if [[ "$DOCKER_BUILD_PLATFORMS" == *,* ]]; then
+    LOCAL_ARCH="$(uname -m)"
+    # Use buildx whenever:
+    # - multi-platform is requested, OR
+    # - we're on arm64 but building linux/amd64 (common for EC2 x86_64 targets)
+    if [[ "$DOCKER_BUILD_PLATFORMS" == *,* ]] || ([[ "$LOCAL_ARCH" == "arm64" || "$LOCAL_ARCH" == "aarch64" ]] && [[ "$DOCKER_BUILD_PLATFORMS" == *"linux/amd64"* ]]); then
+        # Ensure a buildx builder exists and is active
+        if ! docker buildx inspect music-portfolio-builder >/dev/null 2>&1; then
+            docker buildx create --name music-portfolio-builder --use
+        else
+            docker buildx use music-portfolio-builder
+        fi
+        docker buildx inspect --bootstrap >/dev/null
+
         docker buildx build --platform ${DOCKER_BUILD_PLATFORMS} -t $DOCKER_IMAGE_NAME --load ${LOCAL_BACKEND_DIR}
     else
         docker build --platform ${DOCKER_BUILD_PLATFORMS} -t $DOCKER_IMAGE_NAME ${LOCAL_BACKEND_DIR}
@@ -126,6 +142,22 @@ if [ "$DRY_RUN" = false ]; then
     fi
 else
     echo "[DRY-RUN] .env file would be copied to $SERVER:$BACKEND_DIR/.env"
+fi
+
+log_action "Copying backup/restore scripts to AWS (next to .env)..."
+if [ "$DRY_RUN" = false ]; then
+    if [ -f "$LOCAL_SCRIPTS_DIR/$BACKUP_SCRIPT_NAME" ]; then
+        rsync -avz -c --progress "$LOCAL_SCRIPTS_DIR/$BACKUP_SCRIPT_NAME" "$SERVER:$BACKEND_DIR/$BACKUP_SCRIPT_NAME"
+    else
+        echo "[WARN] Script not found: $LOCAL_SCRIPTS_DIR/$BACKUP_SCRIPT_NAME. Skipping."
+    fi
+    if [ -f "$LOCAL_SCRIPTS_DIR/$RESTORE_SCRIPT_NAME" ]; then
+        rsync -avz -c --progress "$LOCAL_SCRIPTS_DIR/$RESTORE_SCRIPT_NAME" "$SERVER:$BACKEND_DIR/$RESTORE_SCRIPT_NAME"
+    else
+        echo "[WARN] Script not found: $LOCAL_SCRIPTS_DIR/$RESTORE_SCRIPT_NAME. Skipping."
+    fi
+else
+    echo "[DRY-RUN] Scripts would be copied to $SERVER:$BACKEND_DIR/"
 fi
 
 log_action "Deploying Docker container on ${SERVER}..."
@@ -192,6 +224,14 @@ ssh ${SSH_FLAGS} $SERVER env "${REMOTE_ENV[@]}" 'bash -s' <<'EOF' #EOF requires 
 
     echo "[DEPLOY] Running new container..."
     docker run --platform ${PLATFORM_ARG} -d --restart unless-stopped --name $DOCKER_CONTAINER_NAME -p 5000:5000 --env-file $BACKEND_DIR/.env $DOCKER_IMAGE_NAME
+
+    # Ensure maintenance scripts are executable (uploaded next to .env)
+    if [ -f "$BACKEND_DIR/backup_backend_container.sh" ]; then
+        chmod +x "$BACKEND_DIR/backup_backend_container.sh" || true
+    fi
+    if [ -f "$BACKEND_DIR/restore_backend_from_backup.sh" ]; then
+        chmod +x "$BACKEND_DIR/restore_backend_from_backup.sh" || true
+    fi
 
     echo "[DEPLOY] Deployment complete, cleaning up."
 EOF

@@ -1,6 +1,8 @@
 const allowedOrigins = [
   'https://brandonmrgich.com',
+  'https://www.brandonmrgich.com',
   'http://localhost:3000',
+  'http://127.0.0.1:3000',
 ];
 
 module.exports = {
@@ -15,6 +17,7 @@ module.exports = {
     }
   },
   methods: 'GET,POST,PUT,DELETE,OPTIONS',
-  allowedHeaders: 'Content-Type,Authorization',
+  // include common headers browsers may preflight for
+  allowedHeaders: 'Content-Type,Authorization,Accept,X-Requested-With',
   credentials: true,
 };
